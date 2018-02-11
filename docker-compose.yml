@@ -1,0 +1,150 @@
+version: "3"
+
+services:
+
+  nginx:
+    image: nginx:stable
+    restart: always
+    volumes:
+      - /storage:/usr/share/nginx/html:ro
+    network_mode: host
+
+  nginx-rtmp:
+    image: anyvision-docker-local.jfrog.io/nginx-rtmp
+    restart: always
+    network_mode: host
+
+  mongo:
+    image: mongo:3.4-jessie
+    restart: always
+    volumes:
+      - db_data:/data/db
+    network_mode: host
+
+  api:
+    image: anyvision-docker.jfrog.io/api:staging
+    restart: always
+    network_mode: host
+    depends_on:
+      - mongo
+      - nginx
+      #- elk
+    volumes:
+      - /storage/logs:/root/Dash-API/logs
+    environment:
+      - mongo_host=localhost
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:4-alpine
+    restart: always
+    network_mode: host
+
+  backend:
+    image: anyvision-docker.jfrog.io/backend:staging
+    restart: always
+    #devices: #  - /dev/nvidia0
+    network_mode: host
+    depends_on:
+      - api
+      #- elk
+      - redis
+    volumes:
+      - /home/user/license:/home/user/license:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - pipe_data:/root/pipe_data
+      - /storage/logs:/var/www/html/logs
+      - /storage/frame_store:/var/www/html/frame_store
+      - /storage/pipe_store:/var/www/html/pipe_store
+      #- /root/installation/docker/backend/files/nvidiagpubeat/nvidiagpubeat.yml:/root/go/src/github.com/deepujain/nvidiagpubeat/nvidiagpubeat.yml:ro
+    environment:
+      - DISPLAY=$DISPLAY
+      - external_ip=${external_ip:-localhost}
+      - flask_port=${flask_port:-4005}
+      - api_service_ip=${api_service_ip:-127.0.0.1}
+      - api_service_port=${api_service_port:-3000}
+      - reid_service_ip=${reid_service_ip:-127.0.0.1}
+      - reid_service_port=${reid_service_port:-9069}
+      - collate_service_ip=${collate_service_ip:-127.0.0.1}
+      - collate_service_port=${collate_service_port:-9067}
+      - track_archive_service_ip=${track_archive_service_ip:-127.0.0.1}
+      - track_archive_service_port=${track_archive_service_port:-9068}
+      - redis_host=${redis_host:-localhost}
+      - redis_port=${redis_port:-6379}
+      - rtsp_url=${rtsp_url:-localhost}
+      - rtsp_port=${rtsp_port:-5545}
+      - debug_progress=${debug_progress:-true}
+      - rtsp_out_stream=${rtsp_out_stream:-false}
+      - perform_remote_recognition=${perform_remote_recognition:-false}
+      - network_type=${network_type:-maxout_v5}
+      - detector_type=${detector_type:-v5}
+      - static_detector_type=${static_detector_type:-v5_static}
+      - landmark_type=${landmark_type:-5p}
+      - pipe_uuid_file_path=${pipe_uuid_file_path:-/root/pipe_data/pipe_id}
+      - custom_ip_settings_path=${custom_ip_settings_path:-/root/pipe_data/custom_ip_settings_file.json}
+      - dataservice_db_static_path=${dataservice_db_static_path:-/root/pipe_data}
+      - db_static_path=${db_static_path:-/root/pipe_data/pipe_backup}
+      - tracking_storage_dir=${tracking_storage_dir:-/root/pipe_data}
+      - work_gpu_threshold=${work_gpu_threshold:-15000}
+      - image_enlarge_w_factor=${image_enlarge_w_factor:-1.2}
+      - image_enlarge_h_factor=${image_enlarge_h_factor:-1.4}
+      - cpu_gpu_query_results_count=${cpu_gpu_query_results_count:-3}
+      - debug_show_fps_info=${debug_show_fps_info:-true}
+      - archive_max_periods=${archive_max_periods:-30}
+      - tracks_stack_interval=${tracks_stack_interval:-60}
+      - video_creation_time_before=${video_creation_time_before:-5}
+      - video_creation_time_after=${video_creation_time_after:-5}
+#    command: bash -c "sleep 9000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4005/dashboards_status || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+
+  dashboard:
+    image: anyvision-docker.jfrog.io/dashboard:staging
+    restart: always
+    shm_size: 1024M
+    network_mode: host
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /home/anyvision:/home/anyvision
+      - /sftp/sftpuser/Uploads:/home/user/Uploads
+    environment:
+      - DISPLAY=$DISPLAY
+
+  # elk:
+  #   image: sebp/elk:562
+  #   volumes:
+  #     - elk_data:/var/lib/elasticsearch
+  #   network_mode: host
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     placement:
+  #       constraints: [node.role == manager]
+  #
+  # metricbeat:
+  #   image: docker.elastic.co/beats/metricbeat:5.6.2
+  #   depends_on:
+  #     - elk
+  #     - mongo
+  #     - nginx
+  #   user: root
+  #   volumes:
+  #     - /proc:/hostfs/proc:ro
+  #     - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+  #     - /:/hostfs:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - /root/installation/docker/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+  #   network_mode: host
+  #   entrypoint: ./metricbeat -e -system.hostfs=/hostfs
+
+volumes:
+  #elk_data:
+  db_data:
+  pipe_data:
