@@ -10,7 +10,7 @@ services:
     network_mode: host
 
   nginx-rtmp:
-    image: anyvision-docker-local.jfrog.io/nginx-rtmp
+    image: anyvision-docker.jfrog.io/nginx-rtmp
     restart: always
     network_mode: host
 
