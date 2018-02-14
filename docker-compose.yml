@@ -113,7 +113,7 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /home/anyvision:/home/anyvision
-      - /sftp/sftpuser/Uploads:/home/user/Uploads
+      - /var/sftp/uploads:/home/anyvision/uploads
     environment:
       - DISPLAY=$DISPLAY
 
