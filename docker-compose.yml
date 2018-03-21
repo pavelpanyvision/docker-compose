@@ -10,7 +10,7 @@ services:
     network_mode: host
 
   nginx-rtmp:
-    image: anyvision-docker.jfrog.io/nginx-rtmp
+    image: gcr.io/anyvision-training/nginx-rtmp
     restart: always
     network_mode: host
 
@@ -22,13 +22,12 @@ services:
     network_mode: host
 
   api:
-    image: anyvision-docker.jfrog.io/api:staging
+    image: gcr.io/anyvision-training/api:staging
     restart: always
     network_mode: host
     depends_on:
       - mongo
       - nginx
-      #- elk
     volumes:
       - /storage/logs:/root/Dash-API/logs
     environment:
@@ -45,13 +44,11 @@ services:
     network_mode: host
 
   backend:
-    image: anyvision-docker.jfrog.io/backend:staging
+    image: gcr.io/anyvision-training/backend:staging
     restart: always
-    #devices: #  - /dev/nvidia0
     network_mode: host
     depends_on:
       - api
-      #- elk
       - redis
     volumes:
       - /home/user/license:/home/user/license:ro
@@ -60,9 +57,11 @@ services:
       - /storage/logs:/var/www/html/logs
       - /storage/frame_store:/var/www/html/frame_store
       - /storage/pipe_store:/var/www/html/pipe_store
-      #- /root/installation/docker/backend/files/nvidiagpubeat/nvidiagpubeat.yml:/root/go/src/github.com/deepujain/nvidiagpubeat/nvidiagpubeat.yml:ro
     environment:
       - DISPLAY=$DISPLAY
+      # these path`s are the same as volumes 
+      - pipe_output_path=${pipe_output_path:-/var/www/html/pipe_store}
+      - frame_output_path=${frame_output_path:-/var/www/html/frame_store}
       - external_ip=${external_ip:-localhost}
       - flask_port=${flask_port:-4005}
       - api_service_ip=${api_service_ip:-127.0.0.1}
@@ -98,7 +97,6 @@ services:
       - tracks_stack_interval=${tracks_stack_interval:-60}
       - video_creation_time_before=${video_creation_time_before:-5}
       - video_creation_time_after=${video_creation_time_after:-5}
-#    command: bash -c "sleep 9000"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:4005/dashboards_status || exit 1"]
       interval: 15s
@@ -106,7 +104,7 @@ services:
       retries: 3
 
   dashboard:
-    image: anyvision-docker.jfrog.io/dashboard:staging
+    image: gcr.io/anyvision-training/dashboard:staging
     restart: always
     shm_size: 1024M
     network_mode: host
@@ -117,34 +115,6 @@ services:
     environment:
       - DISPLAY=$DISPLAY
 
-  # elk:
-  #   image: sebp/elk:562
-  #   volumes:
-  #     - elk_data:/var/lib/elasticsearch
-  #   network_mode: host
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #     placement:
-  #       constraints: [node.role == manager]
-  #
-  # metricbeat:
-  #   image: docker.elastic.co/beats/metricbeat:5.6.2
-  #   depends_on:
-  #     - elk
-  #     - mongo
-  #     - nginx
-  #   user: root
-  #   volumes:
-  #     - /proc:/hostfs/proc:ro
-  #     - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
-  #     - /:/hostfs:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - /root/installation/docker/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
-  #   network_mode: host
-  #   entrypoint: ./metricbeat -e -system.hostfs=/hostfs
-
 volumes:
-  #elk_data:
   db_data:
   pipe_data:
