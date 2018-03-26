@@ -60,8 +60,8 @@ services:
     environment:
       - DISPLAY=$DISPLAY
       # these path`s are the same as volumes 
-      - pipe_output_path=${pipe_output_path:-/var/www/html/pipe_store}
-      - frame_output_path=${frame_output_path:-/var/www/html/frame_store}
+      - pipe_output_path=${pipe_output_path:-/var/www/html/pipe_store/}
+      - frame_output_path=${frame_output_path:-/var/www/html/frame_store/}
       - external_ip=${external_ip:-localhost}
       - flask_port=${flask_port:-4005}
       - api_service_ip=${api_service_ip:-127.0.0.1}
