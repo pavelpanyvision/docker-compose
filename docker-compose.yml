@@ -27,7 +27,6 @@ services:
     network_mode: host
     depends_on:
       - mongo
-      - nginx
     volumes:
       - /storage/logs:/root/Dash-API/logs
     environment:
@@ -48,7 +47,6 @@ services:
     restart: always
     network_mode: host
     depends_on:
-      - api
       - redis
     volumes:
       - /home/user/license:/home/user/license:ro
