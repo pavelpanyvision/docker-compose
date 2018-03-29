@@ -7,6 +7,7 @@ services:
     restart: always
     volumes:
       - /storage:/usr/share/nginx/html:ro
+      - /etc/localtime:/etc/localtime:ro
     network_mode: host
 
   nginx-rtmp:
@@ -19,6 +20,7 @@ services:
     restart: always
     volumes:
       - db_data:/data/db
+      - /etc/localtime:/etc/localtime:ro
     network_mode: host
 
   api:
@@ -29,6 +31,7 @@ services:
       - mongo
     volumes:
       - /storage/logs:/root/Dash-API/logs
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - mongo_host=localhost
     healthcheck:
@@ -41,6 +44,8 @@ services:
     image: redis:4-alpine
     restart: always
     network_mode: host
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   backend:
     image: gcr.io/anyvision-training/backend:{{version_number}}
@@ -55,6 +60,7 @@ services:
       - /storage/logs:/var/www/html/logs
       - /storage/frame_store:/var/www/html/frame_store
       - /storage/pipe_store:/var/www/html/pipe_store
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - DISPLAY=$DISPLAY
     env_file:
@@ -74,6 +80,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /home/anyvision:/home/anyvision
       - /var/sftp/uploads:/home/anyvision/uploads
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - DISPLAY=$DISPLAY
 
