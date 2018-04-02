@@ -55,6 +55,7 @@ services:
       - redis
     volumes:
       - /home/user/license:/home/user/license:ro
+      - /home/anyvision:/home/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix
       - pipe_data:/root/pipe_data
       - /storage/logs:/var/www/html/logs
