@@ -32,6 +32,7 @@ services:
     volumes:
       - /storage/logs:/root/Dash-API/logs
       - /etc/localtime:/etc/localtime:ro
+      - /storage/pipe_store:/var/www/html/pipe_store
     environment:
       - mongo_host=localhost
       - APP_IP=127.0.0.1
