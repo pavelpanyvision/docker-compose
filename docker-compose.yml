@@ -30,9 +30,10 @@ services:
     depends_on:
       - mongo
     volumes:
-      - /storage/logs:/root/Dash-API/logs
+      - /storage/logs:/var/www/html/api-logs
+      - /storage/pipe_store:/var/www/html/pipe_store  ## HACK REQUIRED FOR PIPE-376
+      #- /storage/fake_pipe_store:/var/www/html/fake_pipe_store  ## FOR TAKING STATIC PHOTOS AS TRACKS
       - /etc/localtime:/etc/localtime:ro
-      - /storage/pipe_store:/var/www/html/pipe_store
     environment:
       - mongo_host=localhost
       - APP_IP=127.0.0.1
@@ -42,19 +43,19 @@ services:
       timeout: 10s
       retries: 3
 
-  redis:
-    image: redis:4-alpine
-    restart: always
-    network_mode: host
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
+#  redis:
+#    image: redis:4-alpine
+#    restart: always
+#    network_mode: host
+#    volumes:
+#      - /etc/localtime:/etc/localtime:ro
 
   backend:
     image: gcr.io/anyvision-training/backend:{{version_number}}
     restart: always
     network_mode: host
-    depends_on:
-      - redis
+#    depends_on:
+#      - redis
     volumes:
       - /home/user/license:/home/user/license:ro
       - /home/anyvision:/home/anyvision
