@@ -8,6 +8,7 @@ services:
     volumes:
       - /storage:/usr/share/nginx/html:ro
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro 
     network_mode: host
 
   nginx-rtmp:
@@ -21,6 +22,7 @@ services:
     volumes:
       - db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     network_mode: host
 
   api:
@@ -32,6 +34,7 @@ services:
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
       - mongo_host=localhost
       - APP_IP=127.0.0.1
@@ -52,6 +55,7 @@ services:
       - pipe_data:/root/pipe_data
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
       - DISPLAY=$DISPLAY
     env_file:
@@ -72,6 +76,7 @@ services:
       - /home/anyvision:/home/anyvision
       - /var/sftp/uploads:/home/anyvision/uploads
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
       - DISPLAY=$DISPLAY
 
