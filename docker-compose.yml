@@ -60,10 +60,10 @@ services:
       - DISPLAY=$DISPLAY
     env_file:
       - backend.env
-    sysctls:
-      - vm.swappiness=0
-      - vm.drop_caches=3
-      - fs.file-max=200000
+#    sysctls:
+#      - vm.swappiness=0
+#      - vm.drop_caches=3
+#      - fs.file-max=200000
     ulimits:
       nproc: 200000
       nofile:
