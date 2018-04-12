@@ -60,6 +60,15 @@ services:
       - DISPLAY=$DISPLAY
     env_file:
       - backend.env
+    sysctls:
+      - vm.swappiness=0
+      - vm.drop_caches=3
+      - fs.file-max=200000
+    ulimits:
+      nproc: 200000
+      nofile:
+        soft: 200000
+        hard: 200000
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:4005/dashboards_status || exit 1"]
       interval: 15s
