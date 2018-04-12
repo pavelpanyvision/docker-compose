@@ -26,7 +26,7 @@ services:
     network_mode: host
 
   api:
-    image: gcr.io/anyvision-training/api:{{version_number}}
+    image: gcr.io/anyvision-training/api:{{version_name}}
     restart: always
     network_mode: host
     depends_on:
@@ -45,7 +45,7 @@ services:
       retries: 3
 
   backend:
-    image: gcr.io/anyvision-training/backend:{{version_number}}
+    image: gcr.io/anyvision-training/backend:{{version_name}}
     restart: always
     network_mode: host
     volumes:
@@ -76,7 +76,7 @@ services:
       retries: 3
 
   dashboard:
-    image: gcr.io/anyvision-training/dashboard:{{version_number}}
+    image: gcr.io/anyvision-training/dashboard:{{version_name}}
     restart: always
     shm_size: 1024M
     network_mode: host
