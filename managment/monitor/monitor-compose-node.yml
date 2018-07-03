@@ -1,0 +1,140 @@
+version: '2.3'
+
+networks:
+  monitor-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.15.0.0/16
+          gateway: 172.15.0.1
+
+
+services:
+
+  nodeexporter:
+    image: prom/node-exporter:v0.16.0
+    user: root
+    privileged: true
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      #- /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      #- '--collector.systemd'
+    restart: always
+    ports:
+      - 9100:9100
+    networks:
+      - monitor-net
+    labels:
+      org.label-schema.group: "monitoring"
+    cpu_percent: 10
+    mem_limit: 1gb
+    logging:
+      options:
+        max-size: 1g
+
+  cadvisor:
+    image: google/cadvisor:v0.29.0
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+      #- /cgroup:/cgroup:ro
+      #- <path-where-nvml-is-present>:<path-where-nvml-is-present>
+    restart: always
+    ports:
+      - 9101:9101
+    networks:
+      - monitor-net
+    command:
+      - '--port=9101'
+    labels:
+      org.label-schema.group: "monitoring"
+#    environment:
+#      - LD_LIBRARY_PATH=<path-where-nvml-is-present>
+#    device_cgroup_rules:
+#      - 'c 195:* mrw'
+#    devices:
+#     - /dev/nvidiactl:/dev/nvidiactl
+#     - /dev/nvidia0:/dev/nvidia0
+    cpu_percent: 10
+    mem_limit: 1gb
+    logging:
+      options:
+        max-size: 1g
+
+#  nvidia-smi-exporter:
+#    image: petrgrishin/nvidia-smi-exporter
+#    restart: always
+#    ports:
+#      - "9102:9102"
+#    networks:
+#      - monitor-net
+#    labels:
+#      org.label-schema.group: "monitoring"
+#    cpu_percent: 10
+#    mem_limit: 1gb
+#    logging:
+#      options:
+#        max-size: 1g
+
+  blackbox:
+    image: prom/blackbox-exporter
+    restart: always
+    ports:
+      - "9115:9115"
+    networks:
+      - monitor-net
+    volumes:
+      - ./blackbox-exporter:/config
+    command:
+      - '--config.file=/config/blackbox.yml'
+    labels:
+      org.label-schema.group: "monitoring"
+    cpu_percent: 10
+    mem_limit: 1gb
+    logging:
+      options:
+        max-size: 1g
+
+
+
+#  snmpexporter:
+#    image: prom/snmp-exporter:v0.11.0
+#    restart: always
+#    ports:
+#      - "9116:9116"
+#    networks:
+#      - monitor-net
+#    labels:
+#      org.label-schema.group: "monitoring"
+#    cpu_percent: 10
+#    mem_limit: 1gb
+#    memswap_limit: 1gb
+#    logging:
+#      options:
+#        max-size: 1g
+
+#  netdata:
+#    image: firehol/netdata:latest
+#    cap_add:
+#      - SYS_PTRACE
+#    volumes:
+#      - /proc:/host/proc:ro
+#      - /sys:/host/sys:ro
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#    environment:
+#      NETDATA_PORT: "19999"
+#    ports:
+#      - "19999:19999"
+

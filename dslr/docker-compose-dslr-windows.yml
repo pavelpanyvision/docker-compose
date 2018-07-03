@@ -1,0 +1,28 @@
+version: '2.2'
+
+services:
+
+  dslr:
+    restart: always
+    networks:
+      - anyvision
+    image: gcr.io/anyvision-training/dslr
+    volumes:
+      - backend_data:/root/pipe_data
+      - c:/storage:/var/www/html
+      - c:/storage/cameraMount:/root/mount
+    env_file:
+      - dslr.env
+    privileged: true
+
+volumes:
+  backend_data:
+
+networks:
+  anyvision:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.14.0.0/16
+          gateway: 172.14.0.1

@@ -1,0 +1,33 @@
+version: '2.3'
+
+services:
+
+  guacamole:
+    image: gcr.io/anyvision-training/guacamole:0.9.14
+
+  sftp:
+    image: atmoz/sftp
+
+  desktop:
+    image: gcr.io/anyvision-training/desktop
+
+  nginx:
+    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+
+  mongodb:
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
+
+  redis:
+    image: gcr.io/anyvision-training/redis:latest
+
+  apigateway:
+    image: gcr.io/anyvision-training/api-gateway:development
+
+  api:
+    image: gcr.io/anyvision-training/api:development
+
+  backend:
+    image: gcr.io/anyvision-training/backend:development
+
+  dashboard:
+    image: gcr.io/anyvision-training/dashboard:development
