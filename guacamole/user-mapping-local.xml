@@ -2,7 +2,7 @@
     <authorize username="anyvision" password="C64D8D20BEE9394CEEFED8164FF2910A" encoding="md5">
         <protocol>vnc</protocol>
         <param name="hostname">172.14.0.1</param>
-        <param name="port">5901</param>
+        <param name="port">5900</param>
         <param name="password">123456</param>
         <param name="autoretry">100</param>
         <param name="read-only">false</param>
