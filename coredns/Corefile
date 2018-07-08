@@ -1,0 +1,6 @@
+.:53 {
+  file /conf/db.anyvision.local anyvision.local
+  proxy . 8.8.8.8:53
+  errors stdout
+  log stdout
+}
