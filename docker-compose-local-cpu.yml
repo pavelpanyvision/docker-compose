@@ -190,7 +190,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-cpu:embedded
+    image: gcr.io/anyvision-training/backend-cpu:development
     runtime: runc
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
