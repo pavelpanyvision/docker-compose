@@ -1,0 +1,206 @@
+version: '2.3'
+
+volumes:
+  mongo_db_data:
+  redis_db_data:
+  backend_data:
+  api_gateway_keys:
+
+
+
+networks:
+  anyvision:
+    name: prod
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.14.0.0/16
+          gateway: 172.14.0.1
+
+
+services:
+
+
+  nginx:
+    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    runtime: runc
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - nginx-${node_name:-localnode}.anyvision.local
+    ports:
+      - "1935:1935"
+      - "443:443"
+      - "80:80"
+    volumes:
+      - c:/anv/storage:/opt/nginx/html:ro
+      - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+    env_file:
+      - ../env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  mongodb:
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    runtime: runc
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - mongodb.anyvision.local
+    #ports:
+    #  - "27017:27017"
+    volumes:
+      - mongo_db_data:/data/db
+    env_file:
+      - ../env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  redis:
+    image: gcr.io/anyvision-training/redis:latest
+    runtime: runc
+    restart: always
+    networks:
+      - anyvision
+    sysctls:
+      - net.core.somaxconn=511
+    volumes:
+      - redis_db_data:/data:rw
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  apigateway:
+    image: gcr.io/anyvision-training/api-gateway:1.19.1
+    runtime: runc
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - apigateway.anyvision.local
+    ports:
+      - "9443:9443"
+    volumes:
+      - c:/anv/storage:/var/www/html
+      - api_gateway_keys:/home/user/api-gateway/config/keys
+      - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+    depends_on:
+      - redis
+    environment:
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+    env_file:
+      - ../env/api-gateway.env
+      - ../env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  api:
+    image: gcr.io/anyvision-training/api:1.19.1
+    runtime: runc
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - api.anyvision.local
+    ports:
+      - "5443:5443"
+    volumes:
+      - c:/anv/storage:/var/www/html
+      - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+    environment:
+      - API_IP=api.anyvision.local
+      - MONGO_DB_IP=mongodb.anyvision.local
+      - CA_HOST=apigateway.anyvision.local
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local
+    env_file:
+      - ../env/global.env
+      - ../env/api.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  backend:
+    image: gcr.io/anyvision-training/backend-cpu:embedded
+    runtime: runc
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - proc-${node_name:-localnode}.anyvision.local
+          - reid-${node_name:-localnode}.anyvision.local
+          - coll-${node_name:-localnode}.anyvision.local
+          - arch-${node_name:-localnode}.anyvision.local
+    ports:
+      #- "4005:4005"
+      #- "9067:9067"
+      #- "9068:9068"
+      #- "9069:9069"
+      - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
+    volumes:
+      - c:/anv/home/user/license:/home/user/license:ro
+      - backend_data:/root/pipe_data
+      - c:/anv/storage:/var/www/html
+      - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+    environment:
+      - pipe_cpu_mode=true
+      - DISPLAY=10.0.75.1:0.0                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - external_ip=proc-${node_name:-localnode}.anyvision.local
+      - storage_ip=nginx-${node_name:-localnode}.anyvision.local
+      - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
+      - redis_host=127.0.0.1
+      - api_service_ip=api.anyvision.local
+      - mongodb_host=mongodb.anyvision.local
+      - reid_service_ip=reid-${node_name:-localnode}.anyvision.local
+      - collate_service_ip=coll-${node_name:-localnode}.anyvision.local
+      - track_archive_service_ip=arch-${node_name:-localnode}.anyvision.local
+    env_file:
+      - ../env/backend.env
+      - ../env/global.env
+    logging:
+      options:
+        max-size: 1g
+    ipc: host
+
+
+
+  dashboard:
+    image: gcr.io/anyvision-training/dashboard:1.19.1
+    runtime: runc
+    restart: always
+    networks:
+      - anyvision
+    shm_size: 1024M
+    volumes:
+      - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
+      - c:/anv/mount:/mnt
+    environment:
+      - DISPLAY=10.0.75.1:0.0                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - ssl=true
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+    env_file:
+      - ../env/global.env
+      - ../env/api-gateway.env
+    logging:
+      options:
+        max-size: 1g
+    ipc: host

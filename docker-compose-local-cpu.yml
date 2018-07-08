@@ -1,6 +1,5 @@
 version: '2.3'
 
-
 volumes:
   mongo_db_data:
   redis_db_data:
@@ -11,7 +10,7 @@ volumes:
 
 networks:
   anyvision:
-    name: cloud
+    name: prod
     driver: bridge
     ipam:
       driver: default
@@ -22,65 +21,45 @@ networks:
 
 services:
 
-  guacamole:
-    image: gcr.io/anyvision-training/guacamole:0.9.14
-    runtime: runc
-    restart: always
-    networks:
-      - anyvision
-    ports:
-      - "8080:8080"
-    volumes:
-      - $PWD/guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
-      - /etc/localtime:/etc/localtime:ro
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
+
+  # guacamole:
+  #   image: gcr.io/anyvision-training/guacamole:0.9.14
+  #   runtime: runc
+  #   restart: always
+  #   networks:
+  #     - anyvision
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - $PWD/guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - /etc/timezone:/etc/timezone:ro
+  #   env_file:
+  #     - env/global.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
+  #
+  #
+  #
+  # sftp:
+  #   image: atmoz/sftp
+  #   runtime: runc
+  #   restart: always
+  #   networks:
+  #     - anyvision
+  #   volumes:
+  #     - /storage/sftp_data:/home/user
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - /etc/timezone:/etc/timezone:ro
+  #   command: user:pass:2000:2000:files
+  #   env_file:
+  #     - env/global.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
-
-  sftp:
-    image: atmoz/sftp
-    runtime: runc
-    restart: always
-    networks:
-      - anyvision
-    volumes:
-      - /storage/sftp_data:/home/user
-      - /etc/localtime:/etc/localtime:ro
-    command: user:pass:2000:2000:files
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  desktop:
-    image: gcr.io/anyvision-training/desktop
-    runtime: nvidia
-    restart: always
-    networks:
-      - anyvision
-    volumes:
-      - /storage/sftp_data:/sftp:ro
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /etc/localtime:/etc/localtime:ro
-    devices:
-      - "/dev/snd:/dev/snd"
-      - "/dev/dri:/dev/dri"
-    environment:
-      - DISPLAY=:0
-      - VNC_PASSWORD=123456
-    env_file:
-      - env/global.env
-    ipc: host
-    logging:
-      options:
-        max-size: 1g
 
   nginx:
     image: gcr.io/anyvision-training/nginx-rtmp:ssl
@@ -92,36 +71,19 @@ services:
           - nginx-${node_name:-localnode}.anyvision.local
     ports:
       - "1935:1935"
-      #- "443:443"
-      #- "80:80"
+      - "443:443"
+      - "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     env_file:
       - env/global.env
     logging:
       options:
         max-size: 1g
 
-  rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
-    runtime: runc
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - rabbitmq.anyvision.local
-#    ports:
-#      - "5761:5761"
-#      - "15761:15761"
-    volumes:
-      - /storage/rabbitmq:/var/lib/rabbitmq
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
 
 
   mongodb:
@@ -137,6 +99,7 @@ services:
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     env_file:
       - env/global.env
     logging:
@@ -156,39 +119,15 @@ services:
     volumes:
       - redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     logging:
       options:
         max-size: 1g
 
-  broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:development
-    runtime: runc
-    restart: always
-    hostname: broadcaster
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
-    networks:
-      anyvision:
-        aliases:
-          - broadcaster.anyvision.local
-    dns: 172.14.0.250                                                        ### internal DNS server address, replace this with external IP of CoreDNS server (A/B config)
-    volumes:
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /etc/localtime:/etc/localtime:ro
-    depends_on:
-      - api
-    environment:
-      - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-    env_file:
-      - env/global.env
-      - env/broadcaster.env
-    logging:
-      options:
-        max-size: 1g
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
+    image: gcr.io/anyvision-training/api-gateway:1.19.1
     runtime: runc
     restart: always
     networks:
@@ -202,6 +141,7 @@ services:
       - api_gateway_keys:/home/user/api-gateway/config/keys
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     depends_on:
       - redis
     environment:
@@ -217,7 +157,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-training/api:1.19.1
     runtime: runc
     restart: always
     networks:
@@ -230,6 +170,7 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
@@ -237,6 +178,7 @@ services:
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
       - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local
+      - TZ=Etc/UTC    ## DO NOT CHANGE
     env_file:
       - env/global.env
       - env/api.env
@@ -247,9 +189,10 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:development
-    runtime: nvidia
+    image: gcr.io/anyvision-training/backend-cpu:embedded
+    runtime: runc
     restart: always
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
         aliases:
@@ -270,8 +213,10 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
-      - DISPLAY=:0
+      - pipe_cpu_mode=true
+      - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - external_ip=proc-${node_name:-localnode}.anyvision.local
       - storage_ip=nginx-${node_name:-localnode}.anyvision.local
       - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
@@ -288,24 +233,26 @@ services:
       options:
         max-size: 1g
     ipc: host
-    devices:
-      - "/dev/dri:/dev/dri"
+
 
 
   dashboard:
-    image: gcr.io/anyvision-training/dashboard:development
+    image: gcr.io/anyvision-training/dashboard:1.19.1
     runtime: nvidia
     restart: always
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - anyvision
     shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
+      - /home/user/share:/home/user/share:rw
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
-      - DISPLAY=:0
+      - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - ssl=true
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
@@ -316,6 +263,3 @@ services:
       options:
         max-size: 1g
     ipc: host
-    devices:
-      - "/dev/snd:/dev/snd"
-      - "/dev/dri:/dev/dri"
