@@ -1,3 +1,4 @@
+#filename: docker-compose-local-a.yml
 version: '2.3'
 
 
@@ -62,7 +63,7 @@ services:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
     env_file:
-      - env-v1.19/global.env
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -82,7 +83,7 @@ services:
     volumes:
       - mongo_db_data:/data/db
     env_file:
-      - env-v1.19/global.env
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -130,8 +131,8 @@ services:
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
-      - env-v1.19/api-gateway.env
-      - env-v1.19/global.env
+      - env/api-gateway.env
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -163,8 +164,8 @@ services:
       - ENABLE_CHOWN=false
       - MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
     env_file:
-      - env-v1.19/global.env
-      - env-v1.19/api.env
+      - env/global.env
+      - env/api.env
     logging:
       options:
         max-size: 1g
@@ -209,8 +210,8 @@ services:
       - collate_service_ip=coll-b.anyvision.local
       - track_archive_service_ip=arch-b.anyvision.local
     env_file:
-      - env-v1.19/backend.env
-      - env-v1.19/global.env
+      - env/backend.env
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -240,7 +241,7 @@ services:
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
-      - env-v1.19/global.env
+      - env/global.env
     logging:
       options:
         max-size: 1g

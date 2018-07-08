@@ -1,3 +1,4 @@
+#filename: docker-compose-local-b.yml
 version: '2.3'
 
 volumes:
@@ -37,7 +38,7 @@ services:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
     env_file:
-      - env-v1.19/global.env
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -79,8 +80,8 @@ services:
       - collate_service_ip=coll-b.anyvision.local
       - track_archive_service_ip=arch-b.anyvision.local
     env_file:
-      - env-v1.19/backend.env
-      - env-v1.19/global.env
+      - env/backend.env
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -110,7 +111,7 @@ services:
       - RUN_AS_USER=root
       - ENABLE_CHOWN=true
     env_file:
-      - env-v1.19/global.env
+      - env/global.env
     logging:
       options:
         max-size: 1g

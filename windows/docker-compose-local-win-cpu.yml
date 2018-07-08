@@ -1,3 +1,4 @@
+#filename: docker-compose-local-win-cpu.yml
 version: '2.3'
 
 volumes:
