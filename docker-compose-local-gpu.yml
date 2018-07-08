@@ -231,7 +231,6 @@ services:
         max-size: 1g
 
 
-
   apigateway:
     image: gcr.io/anyvision-training/api-gateway:development
     runtime: runc

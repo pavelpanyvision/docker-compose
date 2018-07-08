@@ -156,7 +156,6 @@ services:
         max-size: 1g
 
 
-
   api:
     image: gcr.io/anyvision-training/api:1.19.1
     runtime: runc
