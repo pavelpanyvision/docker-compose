@@ -1,6 +1,7 @@
 #filename: docker-compose-local-cpu.yml
 version: '2.3'
 
+
 volumes:
   mongo_db_data:
   redis_db_data:
@@ -21,6 +22,77 @@ networks:
 
 
 services:
+
+
+  # coredns:
+  #   image: coredns/coredns
+  #   command: -conf /conf/Corefile
+  #   runtime: runc
+  #   restart: always
+  #   networks:
+  #     anyvision:
+  #       ipv4_address: 172.14.0.250
+  #   ports:
+  #     - "127.0.0.1:53:53/udp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
+  #     - "127.0.0.1:53:53/tcp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
+  #     - "9153:9153/tcp"
+  #   volumes:
+  #     - $PWD/coredns/Corefile:/conf/Corefile
+  #     - $PWD/coredns/db.anyvision.local:/conf/db.anyvision.local
+  #   cap_drop:
+  #     - ALL
+  #   cap_add:
+  #     - NET_BIND_SERVICE
+  #   read_only: true
+  #
+  #
+  #
+  # consul-bootstrap:
+  #   image: consul
+  #   restart: always
+  #   networks:
+  #     - anyvision
+  #   ports:
+  #     - "8300:8300"
+  #     - "8400:8400"
+  #     - "8500:8500"
+  #     - "172.14.0.1:53:8600/udp"
+  #     - "${HOST_EXTERNAL_IP}:53:8600/udp"
+  #   command:
+  #     - "agent"
+  #     - "-server"
+  #     - "-bootstrap"
+  #     - "-ui"
+  #     - "-data-dir=/tmp"
+  #     - "-advertise=${HOST_EXTERNAL_IP}"    ### Advertise using host environment variable ${HOST_EXTERNAL_IP}, so that we could do `curl ${HOST_EXTERNAL_IP}:8500/v1/catalog/services`
+  #     - "-client=0.0.0.0"
+  #     - "-node=bootstrap-node"
+  #     - "-recursor=8.8.8.8"
+  #     - "-domain=anyvision.local"
+  #   volumes:
+  #     - consul_data:/tmp/consul
+  #   environment:
+  #     - SERVICE_IGNORE=always               ### Ignore this container from Registrator
+  #     - CONSUL_ALLOW_PRIVILEGED_PORTS=
+  #   logging:
+  #     options:
+  #       max-size: 1g
+  #
+  #
+  #
+  # registrator:
+  #   image: gliderlabs/registrator
+  #   command: ["-ip", "${HOST_EXTERNAL_IP}", "consul://consul-bootstrap:8500"]
+  #   networks:
+  #     - anyvision
+  #   depends_on:
+  #     - consul-bootstrap
+  #   volumes:
+  #     - /var/run/docker.sock:/tmp/docker.sock
+  #   logging:
+  #     options:
+  #       max-size: 1g
+
 
 
   # guacamole:
@@ -72,8 +144,8 @@ services:
           - nginx-${node_name:-localnode}.anyvision.local
     ports:
       - "1935:1935"
-      - "443:443"
-      - "80:80"
+      #- "443:443"
+      #- "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -81,6 +153,27 @@ services:
       - /etc/timezone:/etc/timezone:ro
     env_file:
       - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  cron:
+    image: gcr.io/anyvision-training/supercronic:latest
+    runtime: runc
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - cron-${node_name:-localnode}.anyvision.local
+    volumes:
+      - /storage:/var/www/html
+      - $PWD/env/crontab:/etc/crontab
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - TO_DATE_TRACK_DELETE=30
     logging:
       options:
         max-size: 1g
@@ -137,6 +230,7 @@ services:
           - apigateway.anyvision.local
     ports:
       - "9443:9443"
+    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
@@ -167,6 +261,7 @@ services:
           - api.anyvision.local
     ports:
       - "5443:5443"
+    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -190,7 +285,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-cpu:1.19.1
+    image: gcr.io/anyvision-training/backend-cpu-pyconcrete:1.19.1
     runtime: runc
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -207,6 +302,7 @@ services:
       #- "9068:9068"
       #- "9069:9069"
       - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
+    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
@@ -225,9 +321,14 @@ services:
       - redis_host=127.0.0.1
       - api_service_ip=api.anyvision.local
       - mongodb_host=mongodb.anyvision.local
+      ########################################################################## use the configuration below to configure localhost services
       - reid_service_ip=reid-${node_name:-localnode}.anyvision.local
       - collate_service_ip=coll-${node_name:-localnode}.anyvision.local
       - track_archive_service_ip=arch-${node_name:-localnode}.anyvision.local
+      ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
+      #- reid_service_ip=reid-b.anyvision.local
+      #- collate_service_ip=coll-b.anyvision.local
+      #- track_archive_service_ip=arch-b.anyvision.local
     env_file:
       - env/backend.env
       - env/global.env
@@ -245,6 +346,7 @@ services:
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - anyvision
+    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
