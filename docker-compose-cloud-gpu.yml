@@ -285,7 +285,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:1.19.1
+    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.1
     runtime: nvidia
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE

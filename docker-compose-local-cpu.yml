@@ -190,7 +190,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-cpu:1.19.1
+    image: gcr.io/anyvision-training/backend-cpu-pyconcrete:1.19.1
     runtime: runc
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
