@@ -213,6 +213,7 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev:/dev:ro
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -247,9 +248,10 @@ services:
     shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
-      - /home/user/share:/home/user/share:rw
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /media:/home/user/media:ro
+      - /storage/share:/home/user/share:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
