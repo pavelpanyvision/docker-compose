@@ -195,11 +195,11 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:development
+    image: gcr.io/anyvision-training/broadcaster:1.19.1
     runtime: runc
     restart: always
     hostname: broadcaster
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.1 mode - disable chaperone init
     networks:
       anyvision:
         aliases:
@@ -224,7 +224,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
+    image: gcr.io/anyvision-training/api-gateway:1.19.1
     runtime: runc
     restart: always
     networks:
@@ -254,7 +254,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-training/api:1.19.1
     runtime: runc
     restart: always
     networks:
@@ -285,7 +285,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:development
+    image: gcr.io/anyvision-training/backend:1.19.1
     runtime: nvidia
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -332,7 +332,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-training/dashboard:development
+    image: gcr.io/anyvision-training/dashboard:1.19.1
     runtime: nvidia
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
