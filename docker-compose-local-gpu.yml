@@ -1,7 +1,6 @@
 #filename: docker-compose-local-gpu.yml
 version: '2.3'
 
-
 volumes:
   mongo_db_data:
   redis_db_data:
@@ -12,7 +11,7 @@ volumes:
 
 networks:
   anyvision:
-    name: devs
+    name: prod
     driver: bridge
     ipam:
       driver: default
@@ -95,19 +94,37 @@ services:
 
 
 
-  rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
+  guacamole:
+    image: gcr.io/anyvision-training/guacamole:0.9.14
     runtime: runc
     restart: always
     networks:
-      anyvision:
-        aliases:
-          - rabbitmq.anyvision.local
+      - anyvision
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "8080:8080"
     volumes:
-      - /storage/rabbitmq:/var/lib/rabbitmq
+      - $PWD/guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  sftp:
+    image: atmoz/sftp
+    runtime: runc
+    restart: always
+    networks:
+      - anyvision
+    volumes:
+      - /storage/sftp_data:/home/user
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    command: user:pass:2000:2000:files
     env_file:
       - env/global.env
     logging:
@@ -126,8 +143,8 @@ services:
           - nginx-${node_name:-localnode}.anyvision.local
     ports:
       - "1935:1935"
-      - "443:443"
-      - "80:80"
+      #- "443:443"
+      #- "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -162,6 +179,29 @@ services:
 
 
 
+  rabbitmq:
+    image: gcr.io/anyvision-training/rabbitmq:latest
+    runtime: runc
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - rabbitmq.anyvision.local
+    #ports:
+    # - "5761:5761"
+    # - "15761:15761"
+    volumes:
+      - /storage/rabbitmq:/var/lib/rabbitmq
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
   mongodb:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
     runtime: runc
@@ -170,8 +210,8 @@ services:
       anyvision:
         aliases:
           - mongodb.anyvision.local
-    ports:
-      - "27017:27017"
+    #ports:
+    #  - "27017:27017"
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
@@ -207,7 +247,6 @@ services:
     runtime: runc
     restart: always
     hostname: broadcaster
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.2-rc2 mode - disable chaperone init
     networks:
       anyvision:
         aliases:
@@ -220,9 +259,8 @@ services:
     depends_on:
       - api
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/broadcaster.env
@@ -236,14 +274,12 @@ services:
     image: gcr.io/anyvision-training/api-gateway:1.19.2-rc.2
     runtime: runc
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.2-rc2 mode - disable chaperone init
     networks:
       anyvision:
         aliases:
           - apigateway.anyvision.local
     ports:
       - "9443:9443"
-      - "38391:38391"
     #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /storage:/var/www/html
@@ -251,13 +287,11 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      #- /home/anyvision/Projects/API-gateway:/home/user/api-gateway         ### mount your local project directory to the container
     depends_on:
       - redis
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      - ENABLE_CHOWN=false
     env_file:
       - env/api-gateway.env
       - env/global.env
@@ -277,23 +311,21 @@ services:
           - api.anyvision.local
     ports:
       - "5443:5443"
-      - "38389:38389"
     #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
       - CA_HOST=apigateway.anyvision.local
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      - ENABLE_CHOWN=false
       - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
       #- MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
+      #- TZ=Etc/UTC    ## DO NOT CHANGE
     env_file:
       - env/global.env
       - env/api.env
@@ -307,7 +339,6 @@ services:
     image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2-rc.2
     runtime: nvidia
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.2-rc2 mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
@@ -317,10 +348,10 @@ services:
           - coll-${node_name:-localnode}.anyvision.local
           - arch-${node_name:-localnode}.anyvision.local
     ports:
-      - "4005:4005"
-      - "9067:9067"
-      - "9068:9068"
-      - "9069:9069"
+      #- "4005:4005"
+      #- "9067:9067"
+      #- "9068:9068"
+      #- "9069:9069"
       - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
     #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
@@ -329,10 +360,8 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-     #- /dev:/dev:ro
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - external_ip=proc-${node_name:-localnode}.anyvision.local
@@ -363,26 +392,24 @@ services:
     image: gcr.io/anyvision-training/dashboard:1.19.2-rc.2
     runtime: nvidia
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.2-rc2 mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - anyvision
     #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     shm_size: 1024M
     volumes:
+      - /storage/sftp_data:/sftp:rw
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /media:/home/user/media:ro
       - /storage/share:/home/user/share:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      #- /home/anyvision:/mnt                                                ### mount your home directory to the container
-      #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - ssl=true
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/api-gateway.env
