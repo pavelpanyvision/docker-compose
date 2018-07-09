@@ -195,7 +195,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:1.19.1
+    image: gcr.io/anyvision-training/broadcaster:1.19.2-rc2
     runtime: runc
     restart: always
     hostname: broadcaster
@@ -224,7 +224,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:1.19.1
+    image: gcr.io/anyvision-training/api-gateway:1.19.2-rc2
     runtime: runc
     restart: always
     networks:
@@ -254,7 +254,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:1.19.1
+    image: gcr.io/anyvision-training/api:1.19.2-rc2
     runtime: runc
     restart: always
     networks:
@@ -285,7 +285,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.1
+    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2.rc2
     runtime: nvidia
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -332,7 +332,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-training/dashboard:1.19.1
+    image: gcr.io/anyvision-training/dashboard:1.19.2-rc2
     runtime: nvidia
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
