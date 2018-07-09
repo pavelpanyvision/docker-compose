@@ -304,7 +304,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2.rc2
+    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2-rc.2
     runtime: nvidia
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.2-rc2 mode - disable chaperone init

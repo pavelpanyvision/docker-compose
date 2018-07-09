@@ -1,0 +1,2 @@
+* * * * * echo "hello from Supercronic"
+* * * * * track_delete=$(date --iso-8601=seconds  -d "$TO_DATE_TRACK_DELETE day ago") && curl -X "DELETE" http://api:3000/detections?toDate=$track_delete
