@@ -23,42 +23,6 @@ networks:
 services:
 
 
-
-  guacamole:
-    image: gcr.io/anyvision-training/guacamole:0.9.14
-    runtime: runc
-    restart: always
-    networks:
-      - anyvision
-    ports:
-      - "8080:8080"
-    volumes:
-      - $PWD/guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  sftp:
-    image: atmoz/sftp
-    runtime: runc
-    restart: always
-    networks:
-      - anyvision
-    volumes:
-      - c:/anv/storage/sftp_data:/home/user
-    command: user:pass:2000:2000:files
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
   nginx:
     image: gcr.io/anyvision-training/nginx-rtmp:ssl
     runtime: runc
@@ -188,14 +152,12 @@ services:
     image: gcr.io/anyvision-training/api-gateway:1.19.2-rc.2
     runtime: runc
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.2-rc2 mode - disable chaperone init
     networks:
       anyvision:
         aliases:
           - apigateway.anyvision.local
     ports:
       - "9443:9443"
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - c:/anv/storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
@@ -224,7 +186,6 @@ services:
           - api.anyvision.local
     ports:
       - "5443:5443"
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - c:/anv/storage:/var/www/html
       - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -250,7 +211,6 @@ services:
     image: gcr.io/anyvision-training/backend-cpu-pyconcrete:1.19.2-rc.2
     runtime: runc
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.2-rc2 mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
@@ -265,7 +225,6 @@ services:
       #- "9068:9068"
       #- "9069:9069"
       - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - c:/anv/home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
@@ -302,11 +261,9 @@ services:
     image: gcr.io/anyvision-training/dashboard:1.19.2-rc.2
     runtime: runc
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.2-rc2 mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - anyvision
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     shm_size: 1024M
     volumes:
       - c:/anv/storage/sftp_data:/sftp:rw
