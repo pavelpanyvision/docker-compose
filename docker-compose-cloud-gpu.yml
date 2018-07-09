@@ -12,7 +12,7 @@ volumes:
 
 networks:
   anyvision:
-    name: cloud
+    name: prod
     driver: bridge
     ipam:
       driver: default
@@ -297,7 +297,8 @@ services:
       - CA_HOST=apigateway.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
+      #- MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
       - TZ=Etc/UTC    ## DO NOT CHANGE
     env_file:
       - env/global.env
@@ -333,7 +334,6 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      #- /dev:/dev:ro
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:

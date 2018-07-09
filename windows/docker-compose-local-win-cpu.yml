@@ -33,8 +33,8 @@ services:
           - nginx-${node_name:-localnode}.anyvision.local
     ports:
       - "1935:1935"
-      - "443:443"
-      - "80:80"
+      #- "443:443"
+      #- "80:80"
     volumes:
       - c:/anv/storage:/opt/nginx/html:ro
       - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -129,7 +129,9 @@ services:
       - CA_HOST=apigateway.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
+      #- MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
+      - TZ=Etc/UTC    ## DO NOT CHANGE
     env_file:
       - ../env/global.env
       - ../env/api.env
@@ -140,9 +142,10 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-cpu:embedded
+    image: gcr.io/anyvision-training/backend-cpu-pyconcrete:1.19.1
     runtime: runc
     restart: always
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
         aliases:
@@ -170,9 +173,14 @@ services:
       - redis_host=127.0.0.1
       - api_service_ip=api.anyvision.local
       - mongodb_host=mongodb.anyvision.local
+      ########################################################################## use the configuration below to configure localhost services
       - reid_service_ip=reid-${node_name:-localnode}.anyvision.local
       - collate_service_ip=coll-${node_name:-localnode}.anyvision.local
       - track_archive_service_ip=arch-${node_name:-localnode}.anyvision.local
+      ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
+      #- reid_service_ip=reid-b.anyvision.local
+      #- collate_service_ip=coll-b.anyvision.local
+      #- track_archive_service_ip=arch-b.anyvision.local
     env_file:
       - ../env/backend.env
       - ../env/global.env
@@ -187,12 +195,14 @@ services:
     image: gcr.io/anyvision-training/dashboard:1.19.1
     runtime: runc
     restart: always
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - anyvision
     shm_size: 1024M
     volumes:
+      - c:/anv/storage/sftp_data:/sftp:rw
       - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
-      - c:/anv/mount:/mnt
+      - c:/anv/storage/share:/home/user/share:rw
     environment:
       - DISPLAY=10.0.75.1:0.0                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - ssl=true
