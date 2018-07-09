@@ -6,7 +6,7 @@ volumes:
   redis_db_data:
   backend_data:
   api_gateway_keys:
-
+  consul_data:
 
 
 networks:
@@ -94,42 +94,42 @@ services:
 
 
 
-  # guacamole:
-  #   image: gcr.io/anyvision-training/guacamole:0.9.14
-  #   runtime: runc
-  #   restart: always
-  #   networks:
-  #     - anyvision
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - $PWD/guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - /etc/timezone:/etc/timezone:ro
-  #   env_file:
-  #     - env/global.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-  #
-  #
-  #
-  # sftp:
-  #   image: atmoz/sftp
-  #   runtime: runc
-  #   restart: always
-  #   networks:
-  #     - anyvision
-  #   volumes:
-  #     - /storage/sftp_data:/home/user
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - /etc/timezone:/etc/timezone:ro
-  #   command: user:pass:2000:2000:files
-  #   env_file:
-  #     - env/global.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
+  guacamole:
+    image: gcr.io/anyvision-training/guacamole:0.9.14
+    runtime: runc
+    restart: always
+    networks:
+      - anyvision
+    ports:
+      - "8080:8080"
+    volumes:
+      - $PWD/guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  sftp:
+    image: atmoz/sftp
+    runtime: runc
+    restart: always
+    networks:
+      - anyvision
+    volumes:
+      - /storage/sftp_data:/home/user
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    command: user:pass:2000:2000:files
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
 
 
 
