@@ -109,9 +109,9 @@ services:
       anyvision:
         aliases:
           - rabbitmq.anyvision.local
-#    ports:
-#      - "5761:5761"
-#      - "15761:15761"
+    #ports:
+    # - "5761:5761"
+    # - "15761:15761"
     volumes:
       - c:/anv/storage/rabbitmq:/var/lib/rabbitmq
     env_file:
@@ -163,7 +163,6 @@ services:
     runtime: runc
     restart: always
     hostname: broadcaster
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.2-rc2 mode - disable chaperone init
     networks:
       anyvision:
         aliases:

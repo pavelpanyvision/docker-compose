@@ -7,12 +7,12 @@ volumes:
   redis_db_data:
   backend_data:
   api_gateway_keys:
-
+  consul_data:
 
 
 networks:
   anyvision:
-    name: cloud
+    name: prod
     driver: bridge
     ipam:
       driver: default
@@ -212,9 +212,9 @@ services:
       anyvision:
         aliases:
           - rabbitmq.anyvision.local
-#    ports:
-#      - "5761:5761"
-#      - "15761:15761"
+    #ports:
+    # - "5761:5761"
+    # - "15761:15761"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
@@ -272,12 +272,11 @@ services:
     runtime: runc
     restart: always
     hostname: broadcaster
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.1 mode - disable chaperone init
     networks:
       anyvision:
         aliases:
           - broadcaster.anyvision.local
-    dns: 172.14.0.250                                                        ### internal DNS server address, replace this with external IP of CoreDNS server (A/B config)
+    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
@@ -349,7 +348,8 @@ services:
       - CA_HOST=apigateway.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
+      #- MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
       #- TZ=Etc/UTC    ## DO NOT CHANGE
     env_file:
       - env/global.env
