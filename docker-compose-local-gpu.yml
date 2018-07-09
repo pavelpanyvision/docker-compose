@@ -1,7 +1,6 @@
 #filename: docker-compose-local-gpu.yml
 version: '2.3'
 
-
 volumes:
   mongo_db_data:
   redis_db_data:
@@ -12,7 +11,7 @@ volumes:
 
 networks:
   anyvision:
-    name: devs
+    name: prod
     driver: bridge
     ipam:
       driver: default
@@ -95,19 +94,37 @@ services:
 
 
 
-  rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
+  guacamole:
+    image: gcr.io/anyvision-training/guacamole:0.9.14
     runtime: runc
     restart: always
     networks:
-      anyvision:
-        aliases:
-          - rabbitmq.anyvision.local
+      - anyvision
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "8080:8080"
     volumes:
-      - /storage/rabbitmq:/var/lib/rabbitmq
+      - $PWD/guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  sftp:
+    image: atmoz/sftp
+    runtime: runc
+    restart: always
+    networks:
+      - anyvision
+    volumes:
+      - /storage/sftp_data:/home/user
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    command: user:pass:2000:2000:files
     env_file:
       - env/global.env
     logging:
@@ -162,6 +179,29 @@ services:
 
 
 
+  rabbitmq:
+    image: gcr.io/anyvision-training/rabbitmq:latest
+    runtime: runc
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - rabbitmq.anyvision.local
+    #ports:
+    # - "5761:5761"
+    # - "15761:15761"
+    volumes:
+      - /storage/rabbitmq:/var/lib/rabbitmq
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
   mongodb:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
     runtime: runc
@@ -170,8 +210,8 @@ services:
       anyvision:
         aliases:
           - mongodb.anyvision.local
-    ports:
-      - "27017:27017"
+    #ports:
+    #  - "27017:27017"
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
@@ -229,6 +269,7 @@ services:
     logging:
       options:
         max-size: 1g
+
 
 
   apigateway:
@@ -293,6 +334,7 @@ services:
       - ENABLE_CHOWN=true
       - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
       #- MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
+      #- TZ=Etc/UTC    ## DO NOT CHANGE
     env_file:
       - env/global.env
       - env/api.env
@@ -328,7 +370,6 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      # /dev:/dev:ro
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
@@ -369,6 +410,7 @@ services:
     #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     shm_size: 1024M
     volumes:
+      - /storage/sftp_data:/sftp:rw
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /media:/home/user/media:ro
