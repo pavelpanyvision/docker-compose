@@ -6,7 +6,7 @@ volumes:
   redis_db_data:
   backend_data:
   api_gateway_keys:
-  consul_data:
+
 
 
 networks:
