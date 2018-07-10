@@ -169,6 +169,7 @@ services:
     volumes:
       - /storage:/var/www/html
       - $PWD/env/crontab:/etc/crontab
+      - $PWD/migration:/root/migration
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -299,6 +300,30 @@ services:
       options:
         max-size: 1g
 
+  api-master:
+    image: gcr.io/anyvision-training/api-master:development
+    runtime: runc
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - api-master.anyvision.local
+    #dns: 172.14.0.1  ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
+    volumes:
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+      #- TZ=Etc/UTC    ## DO NOT CHANGE
+    env_file:
+      - env/global.env
+      - env/api-master.env
+    logging:
+      options:
+        max-size: 1g
 
 
   api:
