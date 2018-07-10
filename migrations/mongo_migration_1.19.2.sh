@@ -36,6 +36,6 @@ else
         #docker exec mongo bash -c "mongo localhost:27017/anyVision2 /tmp/$SCRIPT_NAME"
 fi
 # Start job every 1 minute
-* * * * * /root/migration/mongo_migration_1.19.2.sh /root/migration/ignoreMigration.js
+#* * * * * /root/migration/mongo_migration_1.19.2.sh /root/migration/ignoreMigration.js
 #echo "Stopping and Removing Mongo container for reuse"
 #docker rm -f mongo
