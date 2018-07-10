@@ -194,6 +194,7 @@ services:
     volumes:
       - /storage:/var/www/html
       - $PWD/env/crontab:/etc/crontab
+      - $PWD/migration:/root/migration
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
