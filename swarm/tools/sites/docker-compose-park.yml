@@ -1,0 +1,510 @@
+#filename: docker-compose-cloud-gpu.yml
+version: '3'
+
+
+volumes:
+  mongo_db_data:
+  redis_db_data:
+  backend_data:
+  api_gateway_keys:
+
+
+services:
+
+
+  registrator_park:
+    image: gliderlabs/registrator
+    command: ["consul://consul-bootstrap:8500"]
+    networks:
+      - anyvision
+    depends_on:
+      - consul-bootstrap
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  guacamole_park:
+    image: gcr.io/anyvision-training/guacamole:0.9.14
+    runtime: runc
+    networks:
+      - anyvision
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  sftp_park:
+    image: atmoz/sftp
+    runtime: runc
+    networks:
+      - anyvision
+    volumes:
+      - /storage/sftp_data:/home/user
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    command: user:pass:2000:2000:files
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  nginx_park:
+    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    runtime: runc
+    networks:
+      anyvision:
+        aliases:
+          - nginx-park.anyvision.local
+    ports:
+      - "1935:1935"
+      #- "443:443"
+      #- "80:80"
+    volumes:
+      - /storage:/opt/nginx/html:ro
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  desktop_park:
+    image: gcr.io/anyvision-training/desktop
+    runtime: nvidia
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      - anyvision
+    volumes:
+      - /storage/sftp_data:/sftp:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - DISPLAY=:0
+      - VNC_PASSWORD=123456
+    env_file:
+      - env/global.env
+    ipc: host
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  cron_park:
+    image: gcr.io/anyvision-training/supercronic:latest
+    runtime: runc
+    networks:
+      anyvision:
+        aliases:
+          - cron-park.anyvision.local
+    volumes:
+      - /storage:/var/www/html
+      - $PWD/env/crontab:/etc/crontab
+      - $PWD/migration:/root/migration
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - TO_DATE_TRACK_DELETE=30
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  rabbitmq_park:
+    image: gcr.io/anyvision-training/rabbitmq:latest
+    runtime: runc
+    networks:
+      anyvision:
+        aliases:
+          - rabbitmq-park.anyvision.local
+    #ports:
+    # - "5761:5761"
+    # - "15761:15761"
+    volumes:
+      - /storage/rabbitmq:/var/lib/rabbitmq
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  redis_park:
+    image: gcr.io/anyvision-training/redis:latest
+    runtime: runc
+    networks:
+      - anyvision
+    sysctls:
+      - net.core.somaxconn=511
+    volumes:
+      - redis_db_data:/data:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  broadcaster_park:
+    image: gcr.io/anyvision-training/broadcaster:1.19.2-rc.2
+    runtime: runc
+    hostname: broadcaster
+    networks:
+      anyvision:
+        aliases:
+          - broadcaster-park.anyvision.local
+    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
+    volumes:
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    depends_on:
+      - api
+    environment:
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+    env_file:
+      - env/global.env
+      - env/broadcaster.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  apigateway_park:
+    image: gcr.io/anyvision-training/api-gateway:1.19.2-rc.2
+    runtime: runc
+    networks:
+      anyvision:
+        aliases:
+          - apigateway-park.anyvision.local
+    ports:
+      - "9443:9443"
+    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
+    volumes:
+      - /storage:/var/www/html
+      - api_gateway_keys:/home/user/api-gateway/config/keys
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    depends_on:
+      - redis
+    environment:
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+    env_file:
+      - env/api-gateway.env
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  mongodb_park:
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    runtime: runc
+    networks:
+      anyvision:
+        aliases:
+          - mongodb-park.anyvision.local
+    #ports:
+    #  - "27017:27017"
+    volumes:
+      - mongo_db_data:/data/db
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  api_park:
+    image: gcr.io/anyvision-training/api:1.19.2-rc.2
+    runtime: runc
+    networks:
+      anyvision:
+        aliases:
+          - api-park.anyvision.local
+    ports:
+      - "5443:5443"
+    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
+    volumes:
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - API_IP=api-park.anyvision.local
+      - MONGO_DB_IP=mongodb-park.anyvision.local
+      - CA_HOST=apigateway-park.anyvision.local
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+      - MASS_IMPORT_IP=reid-park.anyvision.local          ### use this configuration to configure localhost reid service
+    env_file:
+      - env/global.env
+      - env/api.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+
+  backend_park:
+    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2-rc.2
+    runtime: nvidia
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      anyvision:
+        aliases:
+          - proc-park.anyvision.local
+          - reid-park.anyvision.local
+          - coll-park.anyvision.local
+          - arch-park.anyvision.local
+    ports:
+      #- "4005:4005"
+      #- "9067:9067"
+      #- "9068:9068"
+      #- "9069:9069"
+      - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
+    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
+    volumes:
+      - /home/user/license:/home/user/license:ro
+      - backend_data:/root/pipe_data
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - DISPLAY=:0
+      - external_ip=proc-park.anyvision.local
+      - storage_ip=nginx-park.anyvision.local
+      - frame_store_storage_ip=nginx-park.anyvision.local
+      - redis_host=127.0.0.1
+      - api_service_ip=api-park.anyvision.local
+      - mongodb_host=mongodb-park.anyvision.local
+      - reid_service_ip=reid-park.anyvision.local
+      - collate_service_ip=coll-park.anyvision.local
+      - track_archive_service_ip=arch-park.anyvision.local
+    env_file:
+      - env/backend.env
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    ipc: host
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
+
+  dashboard_park:
+    image: gcr.io/anyvision-training/dashboard:1.19.2-rc.2
+    runtime: nvidia
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      - anyvision
+    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
+    shm_size: 1024M
+    volumes:
+      - /storage/sftp_data:/sftp:rw
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /media:/home/user/media:ro
+      - /storage/share:/home/user/share:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - DISPLAY=:0
+      - ssl=true
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+    env_file:
+      - env/global.env
+      - env/api-gateway.env
+    logging:
+      options:
+        max-size: 1g
+    ipc: host
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==park
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
