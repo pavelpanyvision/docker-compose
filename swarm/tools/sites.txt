@@ -1,11 +1,9 @@
 aria
-park
 nyny
 excalibur
 luxor
-delano
-mandalay-bay
+mandalaybay
 bellagio
-circus
 mirage
-grand
+mgmgrand
+montecarlo
