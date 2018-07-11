@@ -1,5 +1,5 @@
 #filename: docker-compose-cloud-gpu.yml
-version: '2.3'
+version: '3.3'
 
 
 volumes:
@@ -12,13 +12,11 @@ volumes:
 
 networks:
   anyvision:
-    name: prod
     driver: bridge
     ipam:
       driver: default
       config:
         - subnet: 172.14.0.0/16
-          gateway: 172.14.0.1
 
 
 services:
@@ -27,7 +25,6 @@ services:
   # coredns:
   #   image: coredns/coredns
   #   command: -conf /conf/Corefile
-  #   runtime: runc
   #   restart: always
   #   networks:
   #     anyvision:
@@ -37,8 +34,8 @@ services:
   #     - "127.0.0.1:53:53/tcp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
   #     - "9153:9153/tcp"
   #   volumes:
-  #     - $PWD/coredns/Corefile:/conf/Corefile
-  #     - $PWD/coredns/db.anyvision.local:/conf/db.anyvision.local
+  #     - ./coredns/Corefile:/conf/Corefile
+  #     - ./coredns/db.anyvision.local:/conf/db.anyvision.local
   #   cap_drop:
   #     - ALL
   #   cap_add:
@@ -97,14 +94,13 @@ services:
 
   guacamole:
     image: gcr.io/anyvision-training/guacamole:0.9.14
-    runtime: runc
     restart: always
     networks:
       - anyvision
     ports:
       - "8080:8080"
     volumes:
-      - $PWD/guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
+      - ./guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     env_file:
@@ -117,7 +113,6 @@ services:
 
   sftp:
     image: atmoz/sftp
-    runtime: runc
     restart: always
     networks:
       - anyvision
@@ -136,7 +131,6 @@ services:
 
   nginx:
     image: gcr.io/anyvision-training/nginx-rtmp:ssl
-    runtime: runc
     restart: always
     networks:
       anyvision:
@@ -161,7 +155,6 @@ services:
 
   desktop:
     image: gcr.io/anyvision-training/desktop
-    runtime: nvidia
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
@@ -185,7 +178,6 @@ services:
 
   cron:
     image: gcr.io/anyvision-training/supercronic:latest
-    runtime: runc
     restart: always
     networks:
       anyvision:
@@ -193,8 +185,8 @@ services:
           - cron-${node_name:-localnode}.anyvision.local
     volumes:
       - /storage:/var/www/html
-      - $PWD/env/crontab:/etc/crontab
-      - $PWD/migration:/root/migration
+      - ./env/crontab:/etc/crontab
+      - ./migration:/root/migration
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -207,7 +199,6 @@ services:
 
   rabbitmq:
     image: gcr.io/anyvision-training/rabbitmq:latest
-    runtime: runc
     restart: always
     networks:
       anyvision:
@@ -230,7 +221,6 @@ services:
 
   mongodb:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
-    runtime: runc
     restart: always
     networks:
       anyvision:
@@ -252,7 +242,6 @@ services:
 
   redis:
     image: gcr.io/anyvision-training/redis:latest
-    runtime: runc
     restart: always
     networks:
       - anyvision
@@ -270,7 +259,6 @@ services:
 
   broadcaster:
     image: gcr.io/anyvision-training/broadcaster:1.19.2-rc.2
-    runtime: runc
     restart: always
     hostname: broadcaster
     networks:
@@ -298,7 +286,6 @@ services:
 
   apigateway:
     image: gcr.io/anyvision-training/api-gateway:1.19.2-rc.2
-    runtime: runc
     restart: always
     networks:
       anyvision:
@@ -325,9 +312,10 @@ services:
       options:
         max-size: 1g
 
+
+
   api-master:
     image: gcr.io/anyvision-training/api-master:development
-    runtime: runc
     restart: always
     networks:
       anyvision:
@@ -350,9 +338,10 @@ services:
       options:
         max-size: 1g
 
+
+
   api:
     image: gcr.io/anyvision-training/api:1.19.2-rc.2
-    runtime: runc
     restart: always
     networks:
       anyvision:
@@ -386,7 +375,6 @@ services:
 
   backend:
     image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2-rc.2
-    runtime: nvidia
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
@@ -439,7 +427,6 @@ services:
 
   dashboard:
     image: gcr.io/anyvision-training/dashboard:1.19.2-rc.2
-    runtime: nvidia
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
