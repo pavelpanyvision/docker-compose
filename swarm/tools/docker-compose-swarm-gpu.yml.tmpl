@@ -8,15 +8,20 @@ volumes:
   backend_data:
   api_gateway_keys:
 
+### create overlay network by: docker network create -d overlay prod
+
+networks:
+  prod:
+    external: true
 
 services:
 
 
-  registrator_{{'default' | env('SITE_NAME')}}:
+  registrator:
     image: gliderlabs/registrator
     command: ["consul://consul-bootstrap:8500"]
     networks:
-      - anyvision
+      - prod
     depends_on:
       - consul-bootstrap
     volumes:
@@ -38,15 +43,14 @@ services:
 
 
 
-  guacamole_{{'default' | env('SITE_NAME')}}:
+  guacamole:
     image: gcr.io/anyvision-training/guacamole:0.9.14
-    runtime: runc
     networks:
-      - anyvision
+      - prod
     ports:
       - "8080:8080"
     volumes:
-      - ./guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
+      - /storage/guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     env_file:
@@ -68,11 +72,10 @@ services:
 
 
 
-  sftp_{{'default' | env('SITE_NAME')}}:
+  sftp:
     image: atmoz/sftp
-    runtime: runc
     networks:
-      - anyvision
+      - prod
     volumes:
       - /storage/sftp_data:/home/user
       - /etc/localtime:/etc/localtime:ro
@@ -97,11 +100,10 @@ services:
 
 
 
-  nginx_{{'default' | env('SITE_NAME')}}:
+  nginx:
     image: gcr.io/anyvision-training/nginx-rtmp:ssl
-    runtime: runc
     networks:
-      anyvision:
+      prod:
         aliases:
           - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
     ports:
@@ -132,12 +134,11 @@ services:
 
 
 
-  desktop_{{'default' | env('SITE_NAME')}}:
+  desktop:
     image: gcr.io/anyvision-training/desktop
     runtime: nvidia
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
-      - anyvision
+      - prod
     volumes:
       - /storage/sftp_data:/sftp:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
@@ -148,7 +149,6 @@ services:
       - VNC_PASSWORD=123456
     env_file:
       - env/global.env
-    ipc: host
     logging:
       options:
         max-size: 1g
@@ -166,17 +166,15 @@ services:
 
 
 
-  cron_{{'default' | env('SITE_NAME')}}:
+  cron:
     image: gcr.io/anyvision-training/supercronic:latest
-    runtime: runc
     networks:
-      anyvision:
+      prod:
         aliases:
           - cron-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/var/www/html
-      - $PWD/env/crontab:/etc/crontab
-      - $PWD/migration:/root/migration
+      - /storage/crontab:/etc/crontab
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -198,11 +196,10 @@ services:
 
 
 
-  rabbitmq_{{'default' | env('SITE_NAME')}}:
+  rabbitmq:
     image: gcr.io/anyvision-training/rabbitmq:latest
-    runtime: runc
     networks:
-      anyvision:
+      prod:
         aliases:
           - rabbitmq-{{'default' | env('SITE_NAME')}}.anyvision.local
     #ports:
@@ -231,13 +228,10 @@ services:
 
 
 
-  redis_{{'default' | env('SITE_NAME')}}:
+  redis:
     image: gcr.io/anyvision-training/redis:latest
-    runtime: runc
     networks:
-      - anyvision
-    sysctls:
-      - net.core.somaxconn=511
+      - prod
     volumes:
       - redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
@@ -259,12 +253,11 @@ services:
 
 
 
-  broadcaster_{{'default' | env('SITE_NAME')}}:
+  broadcaster:
     image: gcr.io/anyvision-training/broadcaster:1.19.2-rc.2
-    runtime: runc
     hostname: broadcaster
     networks:
-      anyvision:
+      prod:
         aliases:
           - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
     #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
@@ -297,11 +290,10 @@ services:
 
 
 
-  apigateway_{{'default' | env('SITE_NAME')}}:
+  apigateway:
     image: gcr.io/anyvision-training/api-gateway:1.19.2-rc.2
-    runtime: runc
     networks:
-      anyvision:
+      prod:
         aliases:
           - apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
     ports:
@@ -338,11 +330,10 @@ services:
 
 
 
-  mongodb_{{'default' | env('SITE_NAME')}}:
+  mongodb:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
-    runtime: runc
     networks:
-      anyvision:
+      prod:
         aliases:
           - mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
     #ports:
@@ -370,11 +361,10 @@ services:
 
 
 
-  api_{{'default' | env('SITE_NAME')}}:
+  api:
     image: gcr.io/anyvision-training/api:1.19.2-rc.2
-    runtime: runc
     networks:
-      anyvision:
+      prod:
         aliases:
           - api-{{'default' | env('SITE_NAME')}}.anyvision.local
     ports:
@@ -412,12 +402,11 @@ services:
 
 
 
-  backend_{{'default' | env('SITE_NAME')}}:
+  backend:
     image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2-rc.2
     runtime: nvidia
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
-      anyvision:
+      prod:
         aliases:
           - proc-{{'default' | env('SITE_NAME')}}.anyvision.local
           - reid-{{'default' | env('SITE_NAME')}}.anyvision.local
@@ -455,7 +444,6 @@ services:
     logging:
       options:
         max-size: 1g
-    ipc: host
     deploy:
       mode: replicated
       replicas: 1
@@ -469,14 +457,12 @@ services:
         window: 120s
 
 
-  dashboard_{{'default' | env('SITE_NAME')}}:
+  dashboard:
     image: gcr.io/anyvision-training/dashboard:1.19.2-rc.2
     runtime: nvidia
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
-      - anyvision
+      - prod
     #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
-    shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
@@ -496,7 +482,6 @@ services:
     logging:
       options:
         max-size: 1g
-    ipc: host
     deploy:
       mode: replicated
       replicas: 1
