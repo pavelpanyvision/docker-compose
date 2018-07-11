@@ -168,6 +168,8 @@ services:
       - /etc/timezone:/etc/timezone:ro
     environment:
       - TO_DATE_TRACK_DELETE=30
+    env_file:
+      - env/global.env
     logging:
       options:
         max-size: 1g
