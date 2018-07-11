@@ -426,6 +426,7 @@ services:
     env_file:
       - env/global.env
       - env/api-gateway.env
+      - env/dashboard.env
     logging:
       options:
         max-size: 1g
