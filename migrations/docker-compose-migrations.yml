@@ -1,0 +1,32 @@
+version: '3.3'
+
+volumes:
+  mongo_db_data:
+
+
+services:
+
+  mongodb:
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    restart: always
+    volumes:
+      - mongo_db_data:/data/db
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+  migration:
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    restart: "no"
+    volumes:
+     - mongo_db_data:/data/db
+     - /etc/localtime:/etc/localtime:ro
+     - /etc/timezone:/etc/timezone:ro
+     - ./migration:/tmp/migration
+    environment:
+        - COMPOSE_PROJECT_NAME=anyvision
+    working_dir: /tmp/migration
+    depends_on:
+     - mongodb
+    links:
+     - mongodb
+    command: bash -c "sleep 10 && mongo mongodb:27017/anyVision2 /tmp/migration/ignoreMigration.js"
