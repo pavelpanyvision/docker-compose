@@ -1,4 +1,4 @@
-version: '2.3'
+version: '3.3'
 
 networks:
   docker_registry:
@@ -7,7 +7,6 @@ networks:
       driver: default
       config:
         - subnet: 172.16.0.0/16
-          gateway: 172.16.0.1
 
 
 services:
@@ -23,26 +22,11 @@ services:
      - 5000:5000
     volumes:
       - /storage/dockerregistry:/var/lib/registry
+      #- /usr/local/share/ca-certificates/anyvision:/certs
     environment:
       - REGISTRY_HTTP_ADDR=0.0.0.0:5000
+      #- REGISTRY_HTTP_TLS_CERTIFICATE=/certs/anyvisionCA.pem
+      #- REGISTRY_HTTP_TLS_KEY=/certs/anyvisionCA.key.pem
     logging:
       options:
         max-size: 1g
-
-#From server:
-#docker-compose -f docker-registry.yml up -d
-#docker-compose -f docker-compose-pull-stack.yml pull
-#docker tag api:development <server ip>/api:development
-#docker push
-
-
-#from client:
-#
-#docker-compose pull --allow-insecure-registry
-#docker-compose up --allow-insecure-registry
-
-
-#From:
-#https://hackernoon.com/create-a-private-local-docker-registry-5c79ce912620
-#https://docs.docker.com/registry/deploying
-#https://www.digitalocean.com/community/tutorials/how-to-set-up-a-private-docker-registry-on-ubuntu-14-04
