@@ -5,44 +5,31 @@ services:
 
   portainer:
     restart: always
-    image: gcr.io/anyvision-training/portainer:latest
-    command: -H unix:///var/run/docker.sock --templates http://nginx-${node_name:-localnode}.anyvision.local/templates.json
+    image: portainer/portainer:1.18.1
+    command: -H unix:///var/run/docker.sock
+    #command: -H unix:///var/run/docker.sock --templates http://nginx-${node_name:-localnode}.anyvision.local/templates.json
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
       - /usr/local/share/ca-certificates/anyvision:/certs
     ports:
       - 9000:9000
-    environment:
-      - TZ=Etc/UTC
-      - LINES=40
-      - COLUMNS=160
     logging:
       options:
         max-size: 1g
 
 
-  glances:
-    restart: always
-    image: nicolargo/glances
-    volumes:
-      #- $PWD/glances/glances.conf:/glances/conf/glances.conf
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      - GLANCES_OPT=-w --disable-plugin wifi
-      - NVIDIA_VISIBLE_DEVICES=all
-    network_mode: "host"
-    pid: "host"
-
-
-networks:
-  mgmt:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.15.0.0/16
-          gateway: 172.15.0.1
+  # glances:
+  #   restart: always
+  #   image: nicolargo/glances
+  #   volumes:
+  #     #- $PWD/glances/glances.conf:/glances/conf/glances.conf
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   environment:
+  #     - GLANCES_OPT=-w --disable-plugin wifi
+  #     - NVIDIA_VISIBLE_DEVICES=all
+  #   network_mode: "host"
+  #   pid: "host"
 
 
 volumes:
