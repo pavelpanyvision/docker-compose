@@ -1,4 +1,4 @@
-#filename: docker-compose-cloud-gpu.yml
+#filename: docker-compose-swarm-mgmt.yml
 version: '3'
 
 
@@ -92,7 +92,6 @@ services:
       - anyvision
     command:
       - "agent"
-      - "-server"
       - "-retry-join consul-bootstrap"
       - "-ui"
       - "-data-dir=/tmp"
