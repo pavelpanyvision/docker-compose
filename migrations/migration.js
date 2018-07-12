@@ -11,7 +11,7 @@ while (cursor.hasNext()){
 
 db.suspects.remove({ignore: true})
 db.detections.remove({label: 'ignored'})
-db.suspect_groups.update({_id: ObjectId("000000000000000000000002")}, { $set:{title:"Low Quality Images"}}
+db.suspect_groups.update({_id: ObjectId("000000000000000000000002")}, { $set:{title:"Low Quality Images"}})
 
 detectionsCursor = db.detections.find();
 while (detectionsCursor.hasNext()) {
