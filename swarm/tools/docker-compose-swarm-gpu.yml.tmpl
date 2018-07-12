@@ -14,6 +14,7 @@ networks:
   prod:
     external: true
 
+
 services:
 
 
@@ -75,7 +76,9 @@ services:
   sftp:
     image: atmoz/sftp
     networks:
-      - prod
+      prod:
+        aliases:
+          - sftp-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage/sftp_data:/home/user
       - /etc/localtime:/etc/localtime:ro
@@ -136,9 +139,10 @@ services:
 
   desktop:
     image: gcr.io/anyvision-training/desktop
-    runtime: nvidia
     networks:
-      - prod
+      prod:
+        aliases:
+          - desktop-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage/sftp_data:/sftp:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
@@ -231,7 +235,9 @@ services:
   redis:
     image: gcr.io/anyvision-training/redis:latest
     networks:
-      - prod
+      prod:
+        aliases:
+          - redis-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
@@ -254,7 +260,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:1.19.2-rc.2
+    image: gcr.io/anyvision-training/broadcaster:1.19.2
     hostname: broadcaster
     networks:
       prod:
@@ -291,7 +297,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:1.19.2-rc.2
+    image: gcr.io/anyvision-training/api-gateway:1.19.2
     networks:
       prod:
         aliases:
@@ -362,7 +368,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:1.19.2-rc.2
+    image: gcr.io/anyvision-training/api:1.19.2
     networks:
       prod:
         aliases:
@@ -403,7 +409,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2-rc.2
+    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2
     runtime: nvidia
     networks:
       prod:
@@ -458,8 +464,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-training/dashboard:1.19.2-rc.2
-    runtime: nvidia
+    image: gcr.io/anyvision-training/dashboard:1.19.2
     networks:
       - prod
     #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
@@ -479,6 +484,7 @@ services:
     env_file:
       - env/global.env
       - env/api-gateway.env
+      - env/dashboard.env
     logging:
       options:
         max-size: 1g
