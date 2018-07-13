@@ -7,13 +7,61 @@ volumes:
   consul_server_data:
   consul_client_data:
 
+networks:
+  prod:
+    external: true
+
 services:
+
+
+  traefik:
+    image: traefik
+    networks:
+      - prod
+    ports:
+      - "80:80"
+      - "27017:80"
+      - "443:443"
+      - "9443:443"
+      - "5443:443"
+      - "4005:443"
+      - "9067:443"
+      - "9068:443"
+      - "9069:443"
+      - "8081:8080"
+    command: 
+      - "--api" 
+      - "--docker"
+      - "--docker.domain=anyvision.local" 
+      - "--docker.swarmMode"
+      - "--docker.tls"
+      - "--docker.tls.ca=/ssl/ca.pem"
+      - "--docker.tls.cert=/ssl/server.pem"
+      - "--docker.tls.key=/ssl/server-key.pem"
+      - "--docker.tls.insecureSkipVerify"
+      - "--logLevel=DEBUG"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /storage/traefik/traefik.toml:/etc/traefik/traefik.toml
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+
 
 
   consul-bootstrap:
     image: consul
     networks:
-      - anyvision
+      - prod
     ports:
       # - "8300:8300"
       # - "8400:8400"
@@ -23,7 +71,7 @@ services:
     command:
       - "agent"
       - "-server"
-      - "-bootstrap-expect 3"
+      - "-bootstrap-expect=3"
       - "-ui"
       - "-data-dir=/tmp"
       - "-client=0.0.0.0"
@@ -51,106 +99,105 @@ services:
 
 
 
-  consul-server:
-    image: consul
-    networks:
-      - anyvision
-    command:
-      - "agent"
-      - "-server"
-      - "-retry-join consul-bootstrap"
-      - "-ui"
-      - "-data-dir=/tmp"
-      - "-client=0.0.0.0"
-      - "-recursor=8.8.8.8"
-      - "-domain=anyvision.local"
-    volumes:
-      - consul_server_data:/tmp/consul
-    environment:
-      - SERVICE_IGNORE=always               ### Ignore this container from Registrator
-      - CONSUL_ALLOW_PRIVILEGED_PORTS=
-    logging:
-      options:
-        max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 2
-      # placement:
-      #   constraints:
-      #     - node.role == manager
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
+#  consulserver:
+#    image: consul
+#    networks:
+#      - prod
+#    command:
+#      - "agent"
+#      - "-server"
+#      - "-retry-join=consul-bootstrap"
+#      - "-ui"
+#      - "-data-dir=/tmp"
+#      - "-client=0.0.0.0"
+#      - "-recursor=8.8.8.8"
+#      - "-domain=anyvision.local"
+#    volumes:
+#     - consul_server_data:/tmp/consul
+#    environment:
+#      - SERVICE_IGNORE=always               ### Ignore this container from Registrator
+#      - CONSUL_ALLOW_PRIVILEGED_PORTS=
+#    logging:
+#      options:
+#        max-size: 1g
+#    deploy:
+#      mode: replicated
+#      replicas: 2
+#      # placement:
+#      #   constraints:
+#      #     - node.role == manager
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 10
+#        window: 120s
+#
 
 
+#  consul-client:
+#    image: consul
+#    networks:
+#      - prod
+#    command:
+#      - "agent"
+#      - "-retry-join consul-bootstrap"
+#      - "-ui"
+#      - "-data-dir=/tmp"
+#      - "-client=0.0.0.0"
+#      - "-recursor=8.8.8.8"
+#      - "-domain=anyvision.local"
+#    volumes:
+#      - consul_client_data:/tmp/consul
+#    environment:
+#      - SERVICE_IGNORE=always               ### Ignore this container from Registrator
+#      - CONSUL_ALLOW_PRIVILEGED_PORTS=
+#    logging:
+#      options:
+#        max-size: 1g
+#    deploy:
+#      mode: replicated
+#      replicas: 2
+#      # placement:
+#      #   constraints:
+#      #     - node.role == manager
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 10
+#        window: 120s
+#
 
-  consul-client:
-    image: consul
-    networks:
-      - anyvision
-    command:
-      - "agent"
-      - "-retry-join consul-bootstrap"
-      - "-ui"
-      - "-data-dir=/tmp"
-      - "-client=0.0.0.0"
-      - "-recursor=8.8.8.8"
-      - "-domain=anyvision.local"
-    volumes:
-      - consul_client_data:/tmp/consul
-    environment:
-      - SERVICE_IGNORE=always               ### Ignore this container from Registrator
-      - CONSUL_ALLOW_PRIVILEGED_PORTS=
-    logging:
-      options:
-        max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 2
-      # placement:
-      #   constraints:
-      #     - node.role == manager
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
-
-
-  api-master:
-    image: gcr.io/anyvision-training/api-master:development
-    runtime: runc
-    networks:
-      anyvision:
-        aliases:
-          - api-master.anyvision.local
-    #dns: 172.14.0.1  ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
-    volumes:
-      - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    environment:
-      - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-      #- TZ=Etc/UTC    ## DO NOT CHANGE
-    env_file:
-      - env/global.env
-      - env/api-master.env
-    logging:
-      options:
-        max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      # placement:
-      #   constraints:
-      #     - node.role == manager
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
+#  api-master:
+#    image: gcr.io/anyvision-training/api-master:development
+#    networks:
+#      prod:
+#        aliases:
+#          - api-master.anyvision.local
+#    #dns: 172.14.0.1  ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
+#    volumes:
+#      - /storage:/var/www/html
+#      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+#      - /etc/localtime:/etc/localtime:ro
+#      - /etc/timezone:/etc/timezone:ro
+#    environment:
+#      - RUN_AS_USER=user
+#      - ENABLE_CHOWN=false
+#      #- TZ=Etc/UTC    ## DO NOT CHANGE
+#    env_file:
+#      - env/global.env
+#      - env/api-master.env
+#    logging:
+#      options:
+#        max-size: 1g
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#      # placement:
+#      #   constraints:
+#      #     - node.role == manager
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 10
+#        window: 120s
