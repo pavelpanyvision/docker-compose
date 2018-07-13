@@ -20,30 +20,36 @@ services:
       - prod
     ports:
       - "80:80"
-      - "27017:80"
-      - "443:443"
-      - "9443:443"
-      - "5443:443"
-      - "4005:443"
-      - "9067:443"
-      - "9068:443"
-      - "9069:443"
+      - "8080:80"
+      #- "27017:80"
+      #- "443:443"
+      #- "9443:443"
+      #- "5443:443"
+      #- "4005:443"
+      #- "9067:443"
+      #- "9068:443"
+      #- "9069:443"
       - "8081:8080"
     command: 
-      - "--api" 
+      - "--api"
+      - "--entrypoints=Name:http Address::80"
+      #- "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
+      #- "--entrypoints=Name:https Address::443 TLS"
+      #- "--defaultentrypoints=http,https"
+      - "--defaultentrypoints=http"
       - "--docker"
       - "--docker.domain=anyvision.local" 
       - "--docker.swarmMode"
-      - "--docker.tls"
-      - "--docker.tls.ca=/ssl/ca.pem"
-      - "--docker.tls.cert=/ssl/server.pem"
-      - "--docker.tls.key=/ssl/server-key.pem"
-      - "--docker.tls.insecureSkipVerify"
+      - "--docker.exposedByDefault=false"
+      #- "--docker.tls"
+      #- "--docker.tls.ca=/usr/local/share/ca-certificates/anyvision/anyvisionCA.pem"
+      #- "--docker.tls.cert=/usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt"
+      #- "--docker.tls.key=/usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem"
+      #- "--docker.tls.insecureSkipVerify"
       - "--logLevel=DEBUG"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /storage/traefik/traefik.toml:/etc/traefik/traefik.toml
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      #- /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
     deploy:
       mode: replicated
       replicas: 1
