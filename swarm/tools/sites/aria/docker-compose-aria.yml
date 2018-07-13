@@ -1,5 +1,5 @@
 #filename: docker-compose-cloud-gpu.yml
-version: '3'
+version: '3.3'
 
 
 volumes:
@@ -46,12 +46,13 @@ services:
 
   guacamole:
     image: gcr.io/anyvision-training/guacamole:0.9.14
+    restart: always
     networks:
       - prod
     ports:
       - "8080:8080"
     volumes:
-      - /storage/guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
+      - ./guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     env_file:
@@ -75,6 +76,7 @@ services:
 
   sftp:
     image: atmoz/sftp
+    restart: always
     networks:
       prod:
         aliases:
@@ -105,6 +107,7 @@ services:
 
   nginx:
     image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    restart: always
     networks:
       prod:
         aliases:
@@ -139,6 +142,8 @@ services:
 
   desktop:
     image: gcr.io/anyvision-training/desktop
+    restart: always
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       prod:
         aliases:
@@ -153,6 +158,7 @@ services:
       - VNC_PASSWORD=123456
     env_file:
       - env/global.env
+    ipc: host
     logging:
       options:
         max-size: 1g
@@ -172,13 +178,14 @@ services:
 
   cron:
     image: gcr.io/anyvision-training/supercronic:latest
+    restart: always
     networks:
       prod:
         aliases:
           - cron-aria.anyvision.local
     volumes:
       - /storage:/var/www/html
-      - /storage/crontab:/etc/crontab
+      - ./env/crontab:/etc/crontab
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -202,6 +209,7 @@ services:
 
   rabbitmq:
     image: gcr.io/anyvision-training/rabbitmq:latest
+    restart: always
     networks:
       prod:
         aliases:
@@ -234,10 +242,13 @@ services:
 
   redis:
     image: gcr.io/anyvision-training/redis:latest
+    restart: always
     networks:
       prod:
         aliases:
           - redis-aria.anyvision.local
+    #sysctls:
+      #- net.core.somaxconn=511
     volumes:
       - redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
@@ -261,6 +272,7 @@ services:
 
   broadcaster:
     image: gcr.io/anyvision-training/broadcaster:1.19.2
+    restart: always
     hostname: broadcaster
     networks:
       prod:
@@ -298,6 +310,7 @@ services:
 
   apigateway:
     image: gcr.io/anyvision-training/api-gateway:1.19.2
+    restart: always
     networks:
       prod:
         aliases:
@@ -369,6 +382,7 @@ services:
 
   api:
     image: gcr.io/anyvision-training/api:1.19.2
+    restart: always
     networks:
       prod:
         aliases:
@@ -410,7 +424,8 @@ services:
 
   backend:
     image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2
-    runtime: nvidia
+    restart: always
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       prod:
         aliases:
@@ -450,6 +465,7 @@ services:
     logging:
       options:
         max-size: 1g
+    ipc: host
     deploy:
       mode: replicated
       replicas: 1
@@ -465,9 +481,12 @@ services:
 
   dashboard:
     image: gcr.io/anyvision-training/dashboard:1.19.2
+    restart: always
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - prod
     #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
+    shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
@@ -488,6 +507,7 @@ services:
     logging:
       options:
         max-size: 1g
+    ipc: host
     deploy:
       mode: replicated
       replicas: 1

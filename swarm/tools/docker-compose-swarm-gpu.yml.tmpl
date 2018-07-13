@@ -1,5 +1,5 @@
 #filename: docker-compose-cloud-gpu.yml
-version: '3'
+version: '3.3'
 
 
 volumes:
@@ -410,7 +410,6 @@ services:
 
   backend:
     image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2
-    runtime: nvidia
     networks:
       prod:
         aliases:
