@@ -183,6 +183,27 @@ services:
 
 
 
+  mongodb:
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - mongodb-excalibur.anyvision.local
+    #ports:
+      #- "27017:27017"
+    volumes:
+      - mongo_db_data:/data/db
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
   redis:
     image: gcr.io/anyvision-training/redis:latest
     restart: always
@@ -217,6 +238,8 @@ services:
     depends_on:
       - api
     environment:
+      - api_service_ip=api-excalibur.anyvision.local
+      - BCAST_SOCKETIO_API_URL="https://apigateway-excalibur.anyvision.local:5443"
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -246,30 +269,16 @@ services:
     depends_on:
       - redis
     environment:
+      - GATEWAY_HOST=apigateway-excalibur.anyvision.local
+      - API_HOST=api-excalibur.anyvision.local
+      - DASH_API_URL=https://api-excalibur.anyvision.local:5443
+      - GATEWAY_SECURE_URL=https://apigateway-excalibur.anyvision.local:9443
+      - GATEWAY_URL=http://apigateway-excalibur.anyvision.local:8080
+      - REDIS_HOST=redis-excalibur.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
       - env/api-gateway.env
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
-    networks:
-      prod:
-        aliases:
-          - mongodb-excalibur.anyvision.local
-    #ports:
-      #- "27017:27017"
-    volumes:
-      - mongo_db_data:/data/db
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    env_file:
       - env/global.env
     logging:
       options:
@@ -371,6 +380,7 @@ services:
     environment:
       - DISPLAY=:0
       - ssl=true
+      - GATEWAY_HOST=apigateway-excalibur.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:

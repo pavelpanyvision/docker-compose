@@ -205,8 +205,8 @@ services:
         aliases:
           - rabbitmq.anyvision.local
     #ports:
-    # - "5761:5761"
-    # - "15761:15761"
+      #- "5761:5761"
+      #- "15761:15761"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
@@ -227,7 +227,7 @@ services:
         aliases:
           - mongodb.anyvision.local
     #ports:
-    #  - "27017:27017"
+      #- "27017:27017"
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
@@ -275,6 +275,8 @@ services:
     depends_on:
       - api
     environment:
+      - api_service_ip=api.anyvision.local
+      - BCAST_SOCKETIO_API_URL="https://apigateway.anyvision.local:5443"
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -305,6 +307,12 @@ services:
     depends_on:
       - redis
     environment:
+      - GATEWAY_HOST=apigateway.anyvision.local
+      - API_HOST=api.anyvision.local
+      - DASH_API_URL=https://api.anyvision.local:5443
+      - GATEWAY_SECURE_URL=https://apigateway.anyvision.local:9443
+      - GATEWAY_URL=http://apigateway.anyvision.local:8080
+      - REDIS_HOST=redis.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -330,6 +338,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
+      - MONGO_DB_IP=mongodb.anyvision.local
+      - api_service_ip=api.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
       #- TZ=Etc/UTC    ## DO NOT CHANGE
@@ -361,11 +371,9 @@ services:
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
       - CA_HOST=apigateway.anyvision.local
+- MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
-      #- MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
-      #- TZ=Etc/UTC    ## DO NOT CHANGE
     env_file:
       - env/global.env
       - env/api.env
@@ -446,6 +454,7 @@ services:
     environment:
       - DISPLAY=:0
       - ssl=true
+      - GATEWAY_HOST=apigateway.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
