@@ -1,6 +1,4 @@
-#filename: docker-compose-cloud-gpu.yml
 version: '3.3'
-
 
 volumes:
   mongo_db_data:
@@ -8,7 +6,20 @@ volumes:
   backend_data:
   api_gateway_keys:
 
-### create overlay network by: docker network create -d overlay prod
+
+### Steps:
+### 1) Create an Overlay network on the Swarm Master (one time) using:
+### docker network create --driver=overlay --attachable prod
+###
+### 2) Join the Overlay network with a temp container (required because of bug https://github.com/docker/compose/issues/4601):
+### docker run -d --rm --name nginx_prod_join --network prod nginx
+###
+### Run this compose up:
+### docker-compose -f ... up -d
+###
+### Remove the temp container:
+### docker stop nginx_prod_join
+
 
 networks:
   prod:
@@ -18,29 +29,27 @@ networks:
 services:
 
 
-  registrator:
-    image: gliderlabs/registrator
-    command: ["consul://consul-bootstrap:8500"]
-    networks:
-      - prod
-    depends_on:
-      - consul-bootstrap
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock
-    logging:
-      options:
-        max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
+#  registrator:
+#    image: gliderlabs/registrator
+#    command: ["consul://consul-bootstrap:8500"]
+#    networks:
+#      - prod
+#    volumes:
+#      - /var/run/docker.sock:/tmp/docker.sock
+#    logging:
+#      options:
+#        max-size: 1g
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#      placement:
+#        constraints:
+#          - node.labels.site==mgmgrand
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 10
+#        window: 120s
 
 
 
@@ -60,17 +69,6 @@ services:
     logging:
       options:
         max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -91,17 +89,6 @@ services:
     logging:
       options:
         max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -126,17 +113,6 @@ services:
     logging:
       options:
         max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -162,17 +138,6 @@ services:
     logging:
       options:
         max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -193,17 +158,6 @@ services:
     logging:
       options:
         max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -215,8 +169,8 @@ services:
         aliases:
           - rabbitmq-mgmgrand.anyvision.local
     #ports:
-    # - "5761:5761"
-    # - "15761:15761"
+      #- "5761:5761"
+      #- "15761:15761"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
@@ -226,17 +180,6 @@ services:
     logging:
       options:
         max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -247,8 +190,8 @@ services:
       prod:
         aliases:
           - redis-mgmgrand.anyvision.local
-    #sysctls:
-      #- net.core.somaxconn=511
+    sysctls:
+      - net.core.somaxconn=511
     volumes:
       - redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
@@ -256,17 +199,6 @@ services:
     logging:
       options:
         max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -278,7 +210,6 @@ services:
       prod:
         aliases:
           - broadcaster-mgmgrand.anyvision.local
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
@@ -294,17 +225,6 @@ services:
     logging:
       options:
         max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -317,7 +237,6 @@ services:
           - apigateway-mgmgrand.anyvision.local
     ports:
       - "9443:9443"
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
@@ -335,17 +254,6 @@ services:
     logging:
       options:
         max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -356,7 +264,7 @@ services:
         aliases:
           - mongodb-mgmgrand.anyvision.local
     #ports:
-    #  - "27017:27017"
+      #- "27017:27017"
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
@@ -366,17 +274,6 @@ services:
     logging:
       options:
         max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -389,7 +286,6 @@ services:
           - api-mgmgrand.anyvision.local
     ports:
       - "5443:5443"
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -399,26 +295,15 @@ services:
       - API_IP=api-mgmgrand.anyvision.local
       - MONGO_DB_IP=mongodb-mgmgrand.anyvision.local
       - CA_HOST=apigateway-mgmgrand.anyvision.local
+      - MASS_IMPORT_IP=reid-mgmgrand.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
-      - MASS_IMPORT_IP=reid-mgmgrand.anyvision.local          ### use this configuration to configure localhost reid service
     env_file:
       - env/global.env
       - env/api.env
     logging:
       options:
         max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -439,7 +324,6 @@ services:
       #- "9068:9068"
       #- "9069:9069"
       - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
@@ -466,17 +350,7 @@ services:
       options:
         max-size: 1g
     ipc: host
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
+
 
 
   dashboard:
@@ -485,7 +359,6 @@ services:
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - prod
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
@@ -508,14 +381,3 @@ services:
       options:
         max-size: 1g
     ipc: host
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site==mgmgrand
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
