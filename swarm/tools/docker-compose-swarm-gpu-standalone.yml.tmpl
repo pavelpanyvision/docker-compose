@@ -6,7 +6,6 @@ volumes:
   backend_data:
   api_gateway_keys:
 
-
 ### Steps:
 ### 1) Create an Overlay network on the Swarm Master (one time) using:
 ### docker network create --driver=overlay --attachable prod
@@ -57,7 +56,9 @@ services:
     image: gcr.io/anyvision-training/guacamole:0.9.14
     restart: always
     networks:
-      - prod
+      prod:
+        aliases:
+          - guacamole-{{'default' | env('SITE_NAME')}}.anyvision.local
     ports:
       - "8080:8080"
     volumes:

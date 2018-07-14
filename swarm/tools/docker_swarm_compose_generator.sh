@@ -16,7 +16,8 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     echo "Generating Docker Stack file for $SITE_NAME"
     export SITE_NAME="$SITE_NAME"
     mkdir -p sites/$SITE_NAME
-    /usr/local/bin/meta-compose -t docker-compose-swarm-gpu-standalone.yml.tmpl -o sites/$SITE_NAME/docker-compose-$SITE_NAME.yml
+    #/usr/local/bin/meta-compose -t docker-compose-swarm-gpu-standalone.yml.tmpl -o sites/$SITE_NAME/docker-compose-$SITE_NAME.yml
+    /usr/local/bin/meta-compose -t docker-compose-swarm-gpu.yml.tmpl -o sites/$SITE_NAME/docker-compose-$SITE_NAME.yml
     cp -R ../../env ../../guacamole sites/$SITE_NAME/
     rm sites/$SITE_NAME/guacamole/user-mapping-local.xml
     sed -i 's/>desktop</>desktop-'$SITE_NAME'\.anyvision\.local</g' sites/$SITE_NAME/guacamole/user-mapping-cloud.xml

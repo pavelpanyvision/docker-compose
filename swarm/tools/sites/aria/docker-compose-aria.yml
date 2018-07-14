@@ -6,19 +6,7 @@ volumes:
   backend_data:
   api_gateway_keys:
 
-
-### Steps:
-### 1) Create an Overlay network on the Swarm Master (one time) using:
-### docker network create --driver=overlay --attachable prod
-###
-### 2) Join the Overlay network with a temp container (required because of bug https://github.com/docker/compose/issues/4601):
-### docker run -d --rm --name nginx_prod_join --network prod nginx
-###
-### Run this compose up:
-### docker-compose -f ... up -d
-###
-### Remove the temp container:
-### docker stop nginx_prod_join
+### create overlay network by: docker network create -d overlay prod
 
 
 networks:
@@ -55,13 +43,14 @@ services:
 
   guacamole:
     image: gcr.io/anyvision-training/guacamole:0.9.14
-    restart: always
     networks:
-      - prod
-    ports:
-      - "8080:8080"
+      prod:
+        aliases:
+          - guacamole-aria.anyvision.local
+    #ports:
+      #- "8080:8080"
     volumes:
-      - ./guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
+      - /storage/guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     env_file:
@@ -69,12 +58,22 @@ services:
     logging:
       options:
         max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
 
   sftp:
     image: atmoz/sftp
-    restart: always
     networks:
       prod:
         aliases:
@@ -89,18 +88,28 @@ services:
     logging:
       options:
         max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
 
   nginx:
     image: gcr.io/anyvision-training/nginx-rtmp:ssl
-    restart: always
     networks:
       prod:
         aliases:
           - nginx-aria.anyvision.local
-    ports:
-      - "1935:1935"
+    #ports:
+      #- "1935:1935"
       #- "443:443"
       #- "80:80"
     volumes:
@@ -113,13 +122,22 @@ services:
     logging:
       options:
         max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
 
   desktop:
     image: gcr.io/anyvision-training/desktop
-    restart: always
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       prod:
         aliases:
@@ -134,23 +152,32 @@ services:
       - VNC_PASSWORD=123456
     env_file:
       - env/global.env
-    ipc: host
     logging:
       options:
         max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
 
   cron:
     image: gcr.io/anyvision-training/supercronic:latest
-    restart: always
     networks:
       prod:
         aliases:
           - cron-aria.anyvision.local
     volumes:
       - /storage:/var/www/html
-      - ./env/crontab:/etc/crontab
+      - /storage/crontab:/etc/crontab
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -158,12 +185,22 @@ services:
     logging:
       options:
         max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
 
   rabbitmq:
     image: gcr.io/anyvision-training/rabbitmq:latest
-    restart: always
     networks:
       prod:
         aliases:
@@ -180,12 +217,22 @@ services:
     logging:
       options:
         max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
 
   mongodb:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
-    restart: always
     networks:
       prod:
         aliases:
@@ -201,18 +248,26 @@ services:
     logging:
       options:
         max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
 
   redis:
     image: gcr.io/anyvision-training/redis:latest
-    restart: always
     networks:
       prod:
         aliases:
           - redis-aria.anyvision.local
-    sysctls:
-      - net.core.somaxconn=511
     volumes:
       - redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
@@ -220,12 +275,22 @@ services:
     logging:
       options:
         max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
 
   broadcaster:
     image: gcr.io/anyvision-training/broadcaster:1.19.2
-    restart: always
     hostname: broadcaster
     networks:
       prod:
@@ -248,18 +313,28 @@ services:
     logging:
       options:
         max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
 
   apigateway:
     image: gcr.io/anyvision-training/api-gateway:1.19.2
-    restart: always
     networks:
       prod:
         aliases:
           - apigateway-aria.anyvision.local
-    ports:
-      - "9443:9443"
+    #ports:
+      #- "9443:9443"
     volumes:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
@@ -283,18 +358,28 @@ services:
     logging:
       options:
         max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
 
   api:
     image: gcr.io/anyvision-training/api:1.19.2
-    restart: always
     networks:
       prod:
         aliases:
           - api-aria.anyvision.local
-    ports:
-      - "5443:5443"
+    #ports:
+      #- "5443:5443"
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -313,13 +398,22 @@ services:
     logging:
       options:
         max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
 
   backend:
     image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2
-    restart: always
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       prod:
         aliases:
@@ -327,12 +421,12 @@ services:
           - reid-aria.anyvision.local
           - coll-aria.anyvision.local
           - arch-aria.anyvision.local
-    ports:
+    #ports:
       #- "4005:4005"
       #- "9067:9067"
       #- "9068:9068"
       #- "9069:9069"
-      - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
+      #- "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
@@ -358,36 +452,52 @@ services:
     logging:
       options:
         max-size: 1g
-    ipc: host
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site==aria
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
 
 
-
-  dashboard:
-    image: gcr.io/anyvision-training/dashboard:1.19.2
-    restart: always
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
-    networks:
-      - prod
-    shm_size: 1024M
-    volumes:
-      - /storage/sftp_data:/sftp:rw
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /media:/home/user/media:ro
-      - /storage/share:/home/user/share:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    environment:
-      - DISPLAY=:0
-      - ssl=true
-      - GATEWAY_HOST=apigateway-aria.anyvision.local
-      - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-    env_file:
-      - env/global.env
-      - env/api-gateway.env
-      - env/dashboard.env
-    logging:
-      options:
-        max-size: 1g
-    ipc: host
+#  dashboard:
+#    image: gcr.io/anyvision-training/dashboard:1.19.2
+#    networks:
+#      - prod
+#    volumes:
+#      - /storage/sftp_data:/sftp:rw
+#      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
+#      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+#      - /media:/home/user/media:ro
+#      - /storage/share:/home/user/share:rw
+#      - /etc/localtime:/etc/localtime:ro
+#      - /etc/timezone:/etc/timezone:ro
+#    environment:
+#      - DISPLAY=:0
+#      - ssl=true
+#      - GATEWAY_HOST=apigateway-aria.anyvision.local
+#      - RUN_AS_USER=user
+#      - ENABLE_CHOWN=false
+#    env_file:
+#      - env/global.env
+#      - env/api-gateway.env
+#      - env/dashboard.env
+#    logging:
+#      options:
+#        max-size: 1g
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#      placement:
+#        constraints:
+#          - node.labels.site==aria
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 10
+#        window: 120s
