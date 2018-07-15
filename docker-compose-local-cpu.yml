@@ -146,7 +146,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
-      - limit_rate_speed=1m
+      - limit_rate_speed=0
     env_file:
       - env/global.env
     logging:
