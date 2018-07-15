@@ -22,76 +22,6 @@ networks:
 services:
 
 
-  # coredns:
-  #   image: coredns/coredns
-  #   command: -conf /conf/Corefile
-  #   restart: always
-  #   networks:
-  #     anyvision:
-  #       ipv4_address: 172.14.0.250
-  #   ports:
-  #     - "127.0.0.1:53:53/udp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
-  #     - "127.0.0.1:53:53/tcp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
-  #     - "9153:9153/tcp"
-  #   volumes:
-  #     - ./coredns/Corefile:/conf/Corefile
-  #     - ./coredns/db.anyvision.local:/conf/db.anyvision.local
-  #   cap_drop:
-  #     - ALL
-  #   cap_add:
-  #     - NET_BIND_SERVICE
-  #   read_only: true
-  #
-  #
-  #
-  # consul-bootstrap:
-  #   image: consul
-  #   restart: always
-  #   networks:
-  #     - anyvision
-  #   ports:
-  #     - "8300:8300"
-  #     - "8400:8400"
-  #     - "8500:8500"
-  #     - "172.14.0.1:53:8600/udp"
-  #     - "${HOST_EXTERNAL_IP}:53:8600/udp"
-  #   command:
-  #     - "agent"
-  #     - "-server"
-  #     - "-bootstrap"
-  #     - "-ui"
-  #     - "-data-dir=/tmp"
-  #     - "-advertise=${HOST_EXTERNAL_IP}"    ### Advertise using host environment variable ${HOST_EXTERNAL_IP}, so that we could do `curl ${HOST_EXTERNAL_IP}:8500/v1/catalog/services`
-  #     - "-client=0.0.0.0"
-  #     - "-node=bootstrap-node"
-  #     - "-recursor=8.8.8.8"
-  #     - "-domain=anyvision.local"
-  #   volumes:
-  #     - consul_data:/tmp/consul
-  #   environment:
-  #     - SERVICE_IGNORE=always               ### Ignore this container from Registrator
-  #     - CONSUL_ALLOW_PRIVILEGED_PORTS=
-  #   logging:
-  #     options:
-  #       max-size: 1g
-  #
-  #
-  #
-  # registrator:
-  #   image: gliderlabs/registrator
-  #   command: ["-ip", "${HOST_EXTERNAL_IP}", "consul://consul-bootstrap:8500"]
-  #   networks:
-  #     - anyvision
-  #   depends_on:
-  #     - consul-bootstrap
-  #   volumes:
-  #     - /var/run/docker.sock:/tmp/docker.sock
-  #   logging:
-  #     options:
-  #       max-size: 1g
-
-
-
   guacamole:
     image: gcr.io/anyvision-training/guacamole:0.9.14
     restart: always
@@ -371,7 +301,7 @@ services:
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
       - CA_HOST=apigateway.anyvision.local
-- MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -386,7 +316,6 @@ services:
   backend:
     image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2
     restart: always
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
         aliases:
@@ -438,7 +367,6 @@ services:
   dashboard:
     image: gcr.io/anyvision-training/dashboard:1.19.2
     restart: always
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - anyvision
     #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
