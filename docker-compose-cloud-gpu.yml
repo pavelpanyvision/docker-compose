@@ -145,6 +145,8 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    environment:
+      - limit_rate_speed=1m
     env_file:
       - env/global.env
     logging:
