@@ -29,7 +29,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - nginx-${node_name:-localnode}.anyvision.local
+          - nginx-a1.anyvision.local
     ports:
       - "1935:1935"
       - "443:443"
@@ -53,7 +53,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - proc-${node_name:-localnode}.anyvision.local
+          - proc-a1.anyvision.local
     ports:
       - "4005:4005"
       - "9067:9067"
@@ -70,9 +70,9 @@ services:
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
-      - external_ip=proc-${node_name:-localnode}.anyvision.local
-      - storage_ip=nginx-${node_name:-localnode}.anyvision.local
-      - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
+      - external_ip=proc-a1.anyvision.local
+      - storage_ip=nginx-b.anyvision.local
+      - frame_store_storage_ip=nginx-a1.anyvision.local
       - redis_host=127.0.0.1
       - api_service_ip=api.anyvision.local
       - mongodb_host=mongodb.anyvision.local
