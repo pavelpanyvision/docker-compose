@@ -183,9 +183,10 @@ services:
       anyvision:
         aliases:
           - rabbitmq.anyvision.local
-    #ports:
-    # - "5761:5761"
-    # - "15761:15761"
+    ports:
+     - "5761:5761"
+     - "5762:5762"
+     - "15761:15761"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
