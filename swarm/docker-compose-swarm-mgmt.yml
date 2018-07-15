@@ -10,14 +10,21 @@ volumes:
 networks:
   prod:
     external: true
+  proxy:
+    external: true
+
+# secrets:
+#   anv_cert:
+#     file: ./tls/cert.pem
+#   anv_key:
+#     file: ./tls/key.pem
 
 services:
-
 
   traefik:
     image: traefik
     networks:
-      - prod
+      - proxy
     ports:
       - "80:80"
       - "8080:80"
@@ -30,7 +37,7 @@ services:
       #- "9068:443"
       #- "9069:443"
       - "8081:8080"
-    command: 
+    command:
       - "--api"
       - "--entrypoints=Name:http Address::80"
       #- "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
@@ -38,18 +45,30 @@ services:
       #- "--defaultentrypoints=http,https"
       - "--defaultentrypoints=http"
       - "--docker"
-      - "--docker.domain=anyvision.local" 
-      - "--docker.swarmMode"
+      - "--docker.domain=anyvision.local"
+      - "--docker.swarmMode=true"
+      - "--docker.watch=true"
       - "--docker.exposedByDefault=false"
       #- "--docker.tls"
-      #- "--docker.tls.ca=/usr/local/share/ca-certificates/anyvision/anyvisionCA.pem"
-      #- "--docker.tls.cert=/usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt"
-      #- "--docker.tls.key=/usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem"
+      ##- "--docker.tls.ca=/usr/local/share/ca-certificates/anyvision/anyvisionCA.pem"
+      ##- "--docker.tls.cert=/usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt"
+      #- "--docker.tls.cert=/run/secrets/cert.pem"
+      ##- "--docker.tls.key=/usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem"
+      #- "--docker.tls.key=/run/secrets/key.pem"
       #- "--docker.tls.insecureSkipVerify"
       - "--logLevel=DEBUG"
+    # secrets:
+    # - source: anv_cert
+    #   target: cert.pem
+    #   uid: "0"
+    #   mode: 400
+    # - source: anv_key
+    #   target: key.pem
+    #   uid: "0"
+    #   mode: 400
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      #- /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      ##- /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
     deploy:
       mode: replicated
       replicas: 1
@@ -180,6 +199,7 @@ services:
 #      prod:
 #        aliases:
 #          - api-master.anyvision.local
+#      - proxy
 #    #dns: 172.14.0.1  ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
 #    volumes:
 #      - /storage:/var/www/html

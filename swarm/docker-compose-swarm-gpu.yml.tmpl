@@ -12,6 +12,22 @@ volumes:
 networks:
   prod:
     external: true
+  proxy:
+    external: true
+
+
+configs:
+  {{'default' | env('SITE_NAME')}}_guacamole_mapping:
+    file: ./guacamole/user-mapping-cloud.xml
+
+
+# secrets:
+#   anv_cert:
+#     file: ./tls/cert.pem
+#   anv_key:
+#     file: ./tls/key.pem
+#   anv_ca:
+#     file: ./tls/ca.pem
 
 
 services:
@@ -21,6 +37,7 @@ services:
 #    image: gliderlabs/registrator
 #    command: ["consul://consul-bootstrap:8500"]
 #    networks:
+#      - proxy
 #      - prod
 #    volumes:
 #      - /var/run/docker.sock:/tmp/docker.sock
@@ -32,7 +49,7 @@ services:
 #      replicas: 1
 #      placement:
 #        constraints:
-#          - node.labels.site==luxor
+#          - node.labels.site=={{'default' | env('SITE_NAME')}}
 #      restart_policy:
 #        condition: on-failure
 #        delay: 5s
@@ -44,15 +61,33 @@ services:
   guacamole:
     image: gcr.io/anyvision-training/guacamole:0.9.14
     networks:
+      - proxy
       prod:
         aliases:
-          - guacamole-luxor.anyvision.local
+          - guacamole-{{'default' | env('SITE_NAME')}}.anyvision.local
     #ports:
       #- "8080:8080"
     volumes:
-      - /storage/guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
+      #- /storage/guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    configs:
+      - source: {{'default' | env('SITE_NAME')}}_guacamole_mapping
+        target: /etc/guacamole/user-mapping.xml
+        mode: 444
+    #secrets:
+    #  - source: anv_cert
+    #    target: cert.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_key
+    #    target: key.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_ca
+    #    target: ca.pem
+    #    uid: "0"
+    #    mode: 400
     env_file:
       - env/global.env
     logging:
@@ -63,12 +98,17 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
         max_attempts: 10
         window: 120s
+      labels:
+        - traefik.frontend.rule=PathPrefixStrip:/{{'default' | env('SITE_NAME')}}/
+        - traefik.docker.network=proxy
+        - traefik.port=8080
+        - traefik.enable=true
 
 
 
@@ -77,7 +117,7 @@ services:
     networks:
       prod:
         aliases:
-          - sftp-luxor.anyvision.local
+          - sftp-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage/sftp_data:/home/user
       - /etc/localtime:/etc/localtime:ro
@@ -93,7 +133,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -105,9 +145,10 @@ services:
   nginx:
     image: gcr.io/anyvision-training/nginx-rtmp:ssl
     networks:
+      - proxy
       prod:
         aliases:
-          - nginx-luxor.anyvision.local
+          - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
     #ports:
       #- "1935:1935"
       #- "443:443"
@@ -117,6 +158,19 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    #secrets:
+    #  - source: anv_cert
+    #    target: cert.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_key
+    #    target: key.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_ca
+    #    target: ca.pem
+    #    uid: "0"
+    #    mode: 400
     env_file:
       - env/global.env
     logging:
@@ -127,7 +181,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -141,7 +195,7 @@ services:
     networks:
       prod:
         aliases:
-          - desktop-luxor.anyvision.local
+          - desktop-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage/sftp_data:/sftp:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
@@ -160,7 +214,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -174,7 +228,7 @@ services:
     networks:
       prod:
         aliases:
-          - cron-luxor.anyvision.local
+          - cron-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/var/www/html
       - /storage/crontab:/etc/crontab
@@ -190,7 +244,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -204,7 +258,7 @@ services:
     networks:
       prod:
         aliases:
-          - rabbitmq-luxor.anyvision.local
+          - rabbitmq-{{'default' | env('SITE_NAME')}}.anyvision.local
     #ports:
       #- "5761:5761"
       #- "15761:15761"
@@ -222,7 +276,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -236,7 +290,7 @@ services:
     networks:
       prod:
         aliases:
-          - mongodb-luxor.anyvision.local
+          - mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
     #ports:
       #- "27017:27017"
     volumes:
@@ -253,7 +307,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -267,7 +321,7 @@ services:
     networks:
       prod:
         aliases:
-          - redis-luxor.anyvision.local
+          - redis-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
@@ -280,7 +334,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -293,18 +347,32 @@ services:
     image: gcr.io/anyvision-training/broadcaster:1.19.2
     hostname: broadcaster
     networks:
+      - proxy
       prod:
         aliases:
-          - broadcaster-luxor.anyvision.local
+          - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    #secrets:
+    #  - source: anv_cert
+    #    target: cert.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_key
+    #    target: key.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_ca
+    #    target: ca.pem
+    #    uid: "0"
+    #    mode: 400
     depends_on:
       - api
     environment:
-      - api_service_ip=api-luxor.anyvision.local
-      - BCAST_SOCKETIO_API_URL="https://apigateway-luxor.anyvision.local:5443"
+      - api_service_ip=api-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - BCAST_SOCKETIO_API_URL="https://apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local:5443"
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -318,7 +386,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -330,9 +398,10 @@ services:
   apigateway:
     image: gcr.io/anyvision-training/api-gateway:1.19.2
     networks:
+      - proxy
       prod:
         aliases:
-          - apigateway-luxor.anyvision.local
+          - apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
     #ports:
       #- "9443:9443"
     volumes:
@@ -341,15 +410,28 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    #secrets:
+    #  - source: anv_cert
+    #    target: cert.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_key
+    #    target: key.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_ca
+    #    target: ca.pem
+    #    uid: "0"
+    #    mode: 400
     depends_on:
       - redis
     environment:
-      - GATEWAY_HOST=apigateway-luxor.anyvision.local
-      - API_HOST=api-luxor.anyvision.local
-      - DASH_API_URL=https://api-luxor.anyvision.local:5443
-      - GATEWAY_SECURE_URL=https://apigateway-luxor.anyvision.local:9443
-      - GATEWAY_URL=http://apigateway-luxor.anyvision.local:8080
-      - REDIS_HOST=redis-luxor.anyvision.local
+      - GATEWAY_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - API_HOST=api-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - DASH_API_URL=https://api-{{'default' | env('SITE_NAME')}}.anyvision.local:5443
+      - GATEWAY_SECURE_URL=https://apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local:9443
+      - GATEWAY_URL=http://apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local:8080
+      - REDIS_HOST=redis-{{'default' | env('SITE_NAME')}}.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -363,7 +445,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -375,9 +457,10 @@ services:
   api:
     image: gcr.io/anyvision-training/api:1.19.2
     networks:
+      - proxy
       prod:
         aliases:
-          - api-luxor.anyvision.local
+          - api-{{'default' | env('SITE_NAME')}}.anyvision.local
     #ports:
       #- "5443:5443"
     volumes:
@@ -385,11 +468,24 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    #secrets:
+    #  - source: anv_cert
+    #    target: cert.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_key
+    #    target: key.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_ca
+    #    target: ca.pem
+    #    uid: "0"
+    #    mode: 400
     environment:
-      - API_IP=api-luxor.anyvision.local
-      - MONGO_DB_IP=mongodb-luxor.anyvision.local
-      - CA_HOST=apigateway-luxor.anyvision.local
-      - MASS_IMPORT_IP=reid-luxor.anyvision.local
+      - API_IP=api-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - MONGO_DB_IP=mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - CA_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - MASS_IMPORT_IP=reid-{{'default' | env('SITE_NAME')}}.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -403,7 +499,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -417,10 +513,10 @@ services:
     networks:
       prod:
         aliases:
-          - proc-luxor.anyvision.local
-          - reid-luxor.anyvision.local
-          - coll-luxor.anyvision.local
-          - arch-luxor.anyvision.local
+          - proc-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - reid-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - coll-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - arch-{{'default' | env('SITE_NAME')}}.anyvision.local
     #ports:
       #- "4005:4005"
       #- "9067:9067"
@@ -435,17 +531,30 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    #secrets:
+    #  - source: anv_cert
+    #    target: cert.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_key
+    #    target: key.pem
+    #    uid: "0"
+    #    mode: 400
+    #  - source: anv_ca
+    #    target: ca.pem
+    #    uid: "0"
+    #    mode: 400
     environment:
       - DISPLAY=:0
-      - external_ip=proc-luxor.anyvision.local
-      - storage_ip=nginx-luxor.anyvision.local
-      - frame_store_storage_ip=nginx-luxor.anyvision.local
+      - external_ip=proc-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - storage_ip=nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - frame_store_storage_ip=nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
       - redis_host=127.0.0.1
-      - api_service_ip=api-luxor.anyvision.local
-      - mongodb_host=mongodb-luxor.anyvision.local
-      - reid_service_ip=reid-luxor.anyvision.local
-      - collate_service_ip=coll-luxor.anyvision.local
-      - track_archive_service_ip=arch-luxor.anyvision.local
+      - api_service_ip=api-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - mongodb_host=mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - reid_service_ip=reid-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - collate_service_ip=coll-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - track_archive_service_ip=arch-{{'default' | env('SITE_NAME')}}.anyvision.local
     env_file:
       - env/backend.env
       - env/global.env
@@ -457,7 +566,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site==luxor
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -477,10 +586,23 @@ services:
 #      - /storage/share:/home/user/share:rw
 #      - /etc/localtime:/etc/localtime:ro
 #      - /etc/timezone:/etc/timezone:ro
+#    #secrets:
+#    #  - source: anv_cert
+#    #    target: cert.pem
+#    #    uid: "0"
+#    #    mode: 400
+#    #  - source: anv_key
+#    #    target: key.pem
+#    #    uid: "0"
+#    #    mode: 400
+#    #  - source: anv_ca
+#    #    target: ca.pem
+#    #    uid: "0"
+#    #    mode: 400
 #    environment:
 #      - DISPLAY=:0
 #      - ssl=true
-#      - GATEWAY_HOST=apigateway-luxor.anyvision.local
+#      - GATEWAY_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
 #      - RUN_AS_USER=user
 #      - ENABLE_CHOWN=false
 #    env_file:
@@ -495,7 +617,7 @@ services:
 #      replicas: 1
 #      placement:
 #        constraints:
-#          - node.labels.site==luxor
+#          - node.labels.site=={{'default' | env('SITE_NAME')}}
 #      restart_policy:
 #        condition: on-failure
 #        delay: 5s
