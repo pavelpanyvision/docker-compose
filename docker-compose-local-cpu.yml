@@ -160,6 +160,12 @@ services:
       anyvision:
         aliases:
           - cron-${node_name:-localnode}.anyvision.local
+    # those port should be opened only development
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "15672:15672"
+      - "15671:15671"
     volumes:
       - /storage:/var/www/html
       - ./env/crontab:/etc/crontab
@@ -183,10 +189,6 @@ services:
       anyvision:
         aliases:
           - rabbitmq.anyvision.local
-    ports:
-     - "5761:5761"
-     - "5762:5762"
-     - "15761:15761"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
