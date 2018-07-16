@@ -1,0 +1,73 @@
+#filename: docker-compose-local-cpu.yml
+version: '3.3'
+
+
+volumes:
+  backend_data:
+  api_gateway_keys:
+
+networks:
+  anyvision:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.14.0.0/16
+
+
+services:
+
+
+  backend:
+    image: gcr.io/anyvision-training/backend-cpu:on-demand-MonaLisa-PIPE-788
+    restart: always
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      - anyvision
+#       aliases:
+#         - proc-${node_name:-localnode}.anyvision.local
+#         - reid-${node_name:-localnode}.anyvision.local
+#         - coll-${node_name:-localnode}.anyvision.local
+#         - arch-${node_name:-localnode}.anyvision.local
+    ports:
+      #- "4005:4005"
+       - 5005:5005 # this port is the monalisa port
+      #- "9067:9067"
+      #- "9068:9068"
+      #- "9069:9069"
+      #- "5000-5025:5000-5025/udp"                                          
+    #dns: 172.14.0.1                                                      
+    volumes:
+      - /home/user/license:/home/user/license:ro
+      - backend_data:/root/pipe_data
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+#     - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - pipe_cpu_mode=true
+      #- DISPLAY                  ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - dfe_service_ip=0.0.0.0
+      - dfe_service_port=5005
+#     - external_ip=proc-${node_name:-localnode}.anyvision.local
+#     - storage_ip=nginx-${node_name:-localnode}.anyvision.local
+#     - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
+      - redis_host=127.0.0.1
+#     - api_service_ip=api.anyvision.local
+#     - mongodb_host=mongodb.anyvision.local
+      #################################################### use the configuration below to configure localhost services
+#     - reid_service_ip=reid-${node_name:-localnode}.anyvision.local
+#     - collate_service_ip=coll-${node_name:-localnode}.anyvision.local
+#    - track_archive_service_ip=arch-${node_name:-localnode}.anyvision.local
+      #################################################### use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
+      #- reid_service_ip=reid-b.anyvision.local
+      #- collate_service_ip=coll-b.anyvision.local
+      #- track_archive_service_ip=arch-b.anyvision.local
+    env_file:
+      - env/backend.env
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+#    ipc: host
