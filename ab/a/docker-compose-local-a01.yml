@@ -1,35 +1,28 @@
 #filename: docker-compose-local-b.yml
-version: '2.3'
+version: '3.3'
 
 volumes:
-  mongo_db_data:
-  redis_db_data:
   backend_data:
-  api_gateway_keys:
-
 
 
 networks:
   anyvision:
-    name: devs
     driver: bridge
     ipam:
       driver: default
       config:
         - subnet: 172.14.0.0/16
-          gateway: 172.14.0.1
 
 
 services:
 
   nginx:
     image: gcr.io/anyvision-training/nginx-rtmp:ssl
-    runtime: runc
     restart: always
     networks:
       anyvision:
         aliases:
-          - nginx-a1.anyvision.local
+          - nginx-a01.anyvision.local
     ports:
       - "1935:1935"
       - "443:443"
@@ -49,13 +42,12 @@ services:
 
   backend:
     image: gcr.io/anyvision-training/backend:development
-    runtime: nvidia
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     networks:
       anyvision:
         aliases:
-          - proc-a1.anyvision.local
+          - proc-a01.anyvision.local
     ports:
       - "4005:4005"
       - "9067:9067"
@@ -72,9 +64,9 @@ services:
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
-      - external_ip=proc-a1.anyvision.local
+      - external_ip=proc-a01.anyvision.local
       - storage_ip=nginx-b.anyvision.local
-      - frame_store_storage_ip=nginx-a1.anyvision.local
+      - frame_store_storage_ip=nginx-a01.anyvision.local
       - redis_host=127.0.0.1
       - api_service_ip=api.anyvision.local
       - mongodb_host=mongodb.anyvision.local
