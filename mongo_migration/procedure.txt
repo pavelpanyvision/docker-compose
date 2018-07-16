@@ -2,6 +2,7 @@ Instructions for mongo db migration script
 check for mongodb container  with the command docker ps and search for mongodb container is running
 important- backup the database before running the script!
 backup mongodb with the command mongodump --host HOSTNAME (hostname of the mongo db container )
+After entering the mongo container , enter mongo shell with the command : mongo , then check if anyVision2 db exists with the command : show dbs and then command : use anyVision2 
 how to check if migration went well:
 before the script, run in mongo the next commands and save the results:
 db.suspects.count({ignore:true})
