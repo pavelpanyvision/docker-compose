@@ -325,7 +325,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
-      - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - DISPLAY=${DISPLAY:-:1}
       - ssl=true
       - GATEWAY_HOST=apigateway.anyvision.local
       - RUN_AS_USER=user
