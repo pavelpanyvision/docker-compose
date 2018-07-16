@@ -37,8 +37,8 @@ services:
       - "127.0.0.1:53:53/tcp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
       - "9153:9153/tcp"
     volumes:
-      - $PWD/coredns/Corefile:/conf/Corefile
-      - $PWD/coredns/db.anyvision.local:/conf/db.anyvision.local
+      - ../../coredns/Corefile:/conf/Corefile
+      - ../../coredns/db.anyvision.local:/conf/db.anyvision.local
     cap_drop:
       - ALL
     cap_add:
@@ -62,8 +62,10 @@ services:
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+    environment:
+      - limit_rate_speed=0
     env_file:
-      - env/global.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
@@ -83,7 +85,7 @@ services:
     volumes:
       - mongo_db_data:/data/db
     env_file:
-      - env/global.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
@@ -131,8 +133,8 @@ services:
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
-      - env/api-gateway.env
-      - env/global.env
+      - ../../env/api-gateway.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
@@ -164,8 +166,8 @@ services:
       - ENABLE_CHOWN=false
       - MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
     env_file:
-      - env/global.env
-      - env/api.env
+      - ../../env/global.env
+      - ../../env/api.env
     logging:
       options:
         max-size: 1g
@@ -209,9 +211,21 @@ services:
       - reid_service_ip=reid-b.anyvision.local
       - collate_service_ip=coll-b.anyvision.local
       - track_archive_service_ip=arch-b.anyvision.local
+      - ENABLE_DOCKERIZE=true
+      - ENABLE_MKDIR=true
+      - ENABLE_CONFD=true
+      - ENABLE_BUFFER_CLEANER=true
+      - ENABLE_FRAMESTORE_CLEANER=false
+      - ENABLE_PROCESS_SERVICE=false
+      - ENABLE_REID_SERVICE=true
+      - ENABLE_TRACK_ARCHIVE_SERVICE=true
+      - ENABLE_COLLATE_SERVICE=true
+      - ENABLE_REDIS_SERVICE=true
+      - ENABLE_XPRA_SERVICE=false
+      - ENABLE_CRON_PIPE_IMG_TEMPORARY=false
     env_file:
-      - env/backend.env
-      - env/global.env
+      - ../../env/backend.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
@@ -241,7 +255,7 @@ services:
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
-      - env/global.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
