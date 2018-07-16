@@ -83,44 +83,45 @@ services:
 
 
 
-  consul-bootstrap:
-    image: consul
-    networks:
-      - prod
-    ports:
-      # - "8300:8300"
-      # - "8400:8400"
-      - "8500:8500"
-      #- "172.14.0.1:53:8600/udp"
-      #- "${HOST_EXTERNAL_IP}:53:8600/udp"
-    command:
-      - "agent"
-      - "-server"
-      - "-bootstrap-expect=3"
-      - "-ui"
-      - "-data-dir=/tmp"
-      - "-client=0.0.0.0"
-      - "-recursor=8.8.8.8"
-      - "-domain=anyvision.local"
-    volumes:
-      - consul_bootstrap_data:/tmp/consul
-    environment:
-      - SERVICE_IGNORE=always               ### Ignore this container from Registrator
-      - CONSUL_ALLOW_PRIVILEGED_PORTS=
-    logging:
-      options:
-        max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
+#  consul-bootstrap:
+#    image: consul
+#    networks:
+#      - prod
+#    ports:
+#      # - "8300:8300"
+#      # - "8400:8400"
+#      - "8500:8500"
+#      #- "172.14.0.1:53:8600/udp"
+#      #- "${HOST_EXTERNAL_IP}:53:8600/udp"
+#    command:
+#      - "agent"
+#      - "-server"
+#      - "-bootstrap-expect=3"
+#      - "-ui"
+#      - "-data-dir=/tmp"
+#      - "-client=0.0.0.0"
+#      - '-bind="{{ GetAllInterfaces | include "network" "10.0.0.0/8" }}"'
+#      - "-recursor=8.8.8.8"
+#      - "-domain=anyvision.local"
+#    volumes:
+#      - consul_bootstrap_data:/tmp/consul
+#    environment:
+#      - SERVICE_IGNORE=always               ### Ignore this container from Registrator
+#      - CONSUL_ALLOW_PRIVILEGED_PORTS=
+#    logging:
+#      options:
+#        max-size: 1g
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#      placement:
+#        constraints:
+#          - node.role == manager
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 10
+#        window: 120s
 
 
 
@@ -135,6 +136,7 @@ services:
 #      - "-ui"
 #      - "-data-dir=/tmp"
 #      - "-client=0.0.0.0"
+#      - "-bind='{{ GetInterfaceIP \"ens4\" }}'"      
 #      - "-recursor=8.8.8.8"
 #      - "-domain=anyvision.local"
 #    volumes:
@@ -156,7 +158,7 @@ services:
 #        delay: 5s
 #        max_attempts: 10
 #        window: 120s
-#
+
 
 
 #  consul-client:

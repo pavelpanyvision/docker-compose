@@ -96,7 +96,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
     environment:
       - DISPLAY=:0
-      - VNC_PASSWORD=123456
+      - VNC_OPTIONS="-auth /home/user/.Xauthority -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0"
     env_file:
       - env/global.env
     ipc: host

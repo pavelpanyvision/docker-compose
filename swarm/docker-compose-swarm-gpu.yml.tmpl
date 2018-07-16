@@ -6,7 +6,8 @@ volumes:
   backend_data:
   api_gateway_keys:
 
-### create overlay network by: docker network create -d overlay prod
+### create prod overlay network: docker network create -d overlay --attachable prod
+### create proxy overlay network: docker network create -d overlay --attachable proxy
 
 
 networks:
@@ -61,10 +62,10 @@ services:
   guacamole:
     image: gcr.io/anyvision-training/guacamole:0.9.14
     networks:
-      - proxy
+      proxy:
       prod:
         aliases:
-          - guacamole-{{'default' | env('SITE_NAME')}}.anyvision.local
+         - guacamole-{{'default' | env('SITE_NAME')}}.anyvision.local
     #ports:
       #- "8080:8080"
     volumes:
@@ -145,10 +146,10 @@ services:
   nginx:
     image: gcr.io/anyvision-training/nginx-rtmp:ssl
     networks:
-      - proxy
+      proxy:
       prod:
         aliases:
-          - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+         - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
     #ports:
       #- "1935:1935"
       #- "443:443"
@@ -171,6 +172,8 @@ services:
     #    target: ca.pem
     #    uid: "0"
     #    mode: 400
+    environment:
+      - limit_rate_speed=0
     env_file:
       - env/global.env
     logging:
@@ -203,7 +206,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
     environment:
       - DISPLAY=:0
-      - VNC_PASSWORD=123456
+      - VNC_OPTIONS=-auth /home/user/.Xauthority -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0 -noshm
     env_file:
       - env/global.env
     logging:
@@ -347,7 +350,7 @@ services:
     image: gcr.io/anyvision-training/broadcaster:1.19.2
     hostname: broadcaster
     networks:
-      - proxy
+      proxy:
       prod:
         aliases:
           - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
@@ -398,7 +401,7 @@ services:
   apigateway:
     image: gcr.io/anyvision-training/api-gateway:1.19.2
     networks:
-      - proxy
+      proxy:
       prod:
         aliases:
           - apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
@@ -457,7 +460,7 @@ services:
   api:
     image: gcr.io/anyvision-training/api:1.19.2
     networks:
-      - proxy
+      proxy:
       prod:
         aliases:
           - api-{{'default' | env('SITE_NAME')}}.anyvision.local
