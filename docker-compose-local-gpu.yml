@@ -7,7 +7,6 @@ volumes:
   redis_db_data:
   backend_data:
   api_gateway_keys:
-  consul_data:
 
 
 networks:
@@ -93,7 +92,6 @@ services:
     volumes:
       - /storage:/var/www/html
       - ./env/crontab:/etc/crontab
-      - ./migration:/root/migration
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -174,7 +172,6 @@ services:
       anyvision:
         aliases:
           - broadcaster.anyvision.local
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
@@ -204,7 +201,6 @@ services:
           - apigateway.anyvision.local
     ports:
       - "9443:9443"
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
@@ -240,7 +236,6 @@ services:
           - api.anyvision.local
     ports:
       - "5443:5443"
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -279,7 +274,6 @@ services:
       #- "9068:9068"
       #- "9069:9069"
       - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
@@ -321,7 +315,6 @@ services:
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - anyvision
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw

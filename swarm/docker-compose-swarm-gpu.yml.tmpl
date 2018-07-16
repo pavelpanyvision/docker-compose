@@ -69,7 +69,6 @@ services:
     #ports:
       #- "8080:8080"
     volumes:
-      #- /storage/guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     configs:
@@ -555,9 +554,14 @@ services:
       - redis_host=127.0.0.1
       - api_service_ip=api-{{'default' | env('SITE_NAME')}}.anyvision.local
       - mongodb_host=mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
+      ########################################################################## use the configuration below to configure localhost services
       - reid_service_ip=reid-{{'default' | env('SITE_NAME')}}.anyvision.local
       - collate_service_ip=coll-{{'default' | env('SITE_NAME')}}.anyvision.local
       - track_archive_service_ip=arch-{{'default' | env('SITE_NAME')}}.anyvision.local
+      ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
+      #- reid_service_ip=reid-b.anyvision.local
+      #- collate_service_ip=coll-b.anyvision.local
+      #- track_archive_service_ip=arch-b.anyvision.local
     env_file:
       - env/backend.env
       - env/global.env
