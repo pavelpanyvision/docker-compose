@@ -285,7 +285,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
     environment:
       - pipe_cpu_mode=true
-      - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - DISPLAY=${DISPLAY:-:1}
       - external_ip=proc-${node_name:-localnode}.anyvision.local
       - storage_ip=nginx-${node_name:-localnode}.anyvision.local
       - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
