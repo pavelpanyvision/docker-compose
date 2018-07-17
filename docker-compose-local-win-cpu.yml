@@ -39,7 +39,7 @@ services:
       - c:/anv/storage:/opt/nginx/html:ro
       - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
     env_file:
-      - ../env/global.env
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -79,7 +79,7 @@ services:
     volumes:
       - c:/anv/storage/rabbitmq:/var/lib/rabbitmq
     env_file:
-      - ../env/global.env
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -99,7 +99,7 @@ services:
     volumes:
       - mongo_db_data:/data/db
     env_file:
-      - ../env/global.env
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -140,8 +140,8 @@ services:
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
-      - ../env/global.env
-      - ../env/broadcaster.env
+      - env/global.env
+      - env/broadcaster.env
     logging:
       options:
         max-size: 1g
@@ -168,8 +168,8 @@ services:
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
-      - ../env/api-gateway.env
-      - ../env/global.env
+      - env/api-gateway.env
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -199,8 +199,8 @@ services:
       #- MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
       #- TZ=Etc/UTC    ## DO NOT CHANGE
     env_file:
-      - ../env/global.env
-      - ../env/api.env
+      - env/global.env
+      - env/api.env
     logging:
       options:
         max-size: 1g
@@ -248,8 +248,8 @@ services:
       #- collate_service_ip=coll-b.anyvision.local
       #- track_archive_service_ip=arch-b.anyvision.local
     env_file:
-      - ../env/backend.env
-      - ../env/global.env
+      - env/backend.env
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -275,8 +275,8 @@ services:
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
-      - ../env/global.env
-      - ../env/api-gateway.env
+      - env/global.env
+      - env/api-gateway.env
     logging:
       options:
         max-size: 1g
