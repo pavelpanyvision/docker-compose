@@ -22,7 +22,7 @@ networks:
 services:
 
   coredns:
-    image: coredns/coredns
+    image: coredns/coredns:1.2.0
     command: -conf /conf/Corefile
     restart: always
     networks:
@@ -63,7 +63,7 @@ services:
 
 
   sftp:
-    image: atmoz/sftp
+    image: atmoz/sftp:latest
     restart: always
     networks:
       - anyvision
