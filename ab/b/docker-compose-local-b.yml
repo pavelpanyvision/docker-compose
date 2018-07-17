@@ -271,10 +271,6 @@ services:
       options:
         max-size: 1g
     ipc: host
-    devices:
-      - "/dev/dri:/dev/dri"
-      #- "/dev/video0:/dev/video0"                                           ### USB or built-in camera device
-
 
   dashboard:
     image: 'gcr.io/anyvision-production/dashboard:1.19.2'
