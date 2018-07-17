@@ -2,6 +2,12 @@
 version: '3.3'
 
 
+volumes:
+  mongo_db_data:
+  redis_db_data:
+  backend_data:
+
+
 networks:
   anyvision:
     external: true
