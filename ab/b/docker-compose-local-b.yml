@@ -51,7 +51,7 @@ services:
       ports:
         - "8080:8080"
       volumes:
-        - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
+        - ../../guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
         - /etc/localtime:/etc/localtime:ro
         - /etc/timezone:/etc/timezone:ro
       env_file:
