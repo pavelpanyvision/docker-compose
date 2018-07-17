@@ -31,7 +31,7 @@ compose_file_dir=$(dirname "$compose_file")
 mkdir -p "$destination"
 
 # Clear images.txt
-rm -f "$destination/images.txt"
+#rm -f "$destination/images.txt"
 
 # Pull the Docker Registry Image
 echo "pull and save Docker Registry Image"
@@ -52,9 +52,9 @@ for IMG in $(cat $compose_file | awk '{if ($1 == "image:") print $2;}'); do
     #echo "$sanitized_img.tar.gz" >> "$destination/images.txt"
   fi
 
-  if [ ! -f "$destination/images.txt" ] ; then
-    touch "$destination/images.txt"
-  fi
+#  if [ ! -f "$destination/images.txt" ] ; then
+#    touch "$destination/images.txt"
+#  fi
 
 #  file_content=$( cat "$destination/images.txt" )
 #  if [[ " $file_content " =~ $sanitized_img.tar.gz ]] ; then
