@@ -7,7 +7,6 @@ volumes:
   redis_db_data:
   backend_data:
   api_gateway_keys:
-  consul_data:
 
 
 networks:
@@ -20,76 +19,6 @@ networks:
 
 
 services:
-
-
-  # coredns:
-  #   image: coredns/coredns
-  #   command: -conf /conf/Corefile
-  #   restart: always
-  #   networks:
-  #     anyvision:
-  #       ipv4_address: 172.14.0.250
-  #   ports:
-  #     - "127.0.0.1:53:53/udp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
-  #     - "127.0.0.1:53:53/tcp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
-  #     - "9153:9153/tcp"
-  #   volumes:
-  #     - ./coredns/Corefile:/conf/Corefile
-  #     - ./coredns/db.anyvision.local:/conf/db.anyvision.local
-  #   cap_drop:
-  #     - ALL
-  #   cap_add:
-  #     - NET_BIND_SERVICE
-  #   read_only: true
-  #
-  #
-  #
-  # consul-bootstrap:
-  #   image: consul
-  #   restart: always
-  #   networks:
-  #     - anyvision
-  #   ports:
-  #     - "8300:8300"
-  #     - "8400:8400"
-  #     - "8500:8500"
-  #     - "172.14.0.1:53:8600/udp"
-  #     - "${HOST_EXTERNAL_IP}:53:8600/udp"
-  #   command:
-  #     - "agent"
-  #     - "-server"
-  #     - "-bootstrap"
-  #     - "-ui"
-  #     - "-data-dir=/tmp"
-  #     - "-advertise=${HOST_EXTERNAL_IP}"    ### Advertise using host environment variable ${HOST_EXTERNAL_IP}, so that we could do `curl ${HOST_EXTERNAL_IP}:8500/v1/catalog/services`
-  #     - "-client=0.0.0.0"
-  #     - "-node=bootstrap-node"
-  #     - "-recursor=8.8.8.8"
-  #     - "-domain=anyvision.local"
-  #   volumes:
-  #     - consul_data:/tmp/consul
-  #   environment:
-  #     - SERVICE_IGNORE=always               ### Ignore this container from Registrator
-  #     - CONSUL_ALLOW_PRIVILEGED_PORTS=
-  #   logging:
-  #     options:
-  #       max-size: 1g
-  #
-  #
-  #
-  # registrator:
-  #   image: gliderlabs/registrator
-  #   command: ["-ip", "${HOST_EXTERNAL_IP}", "consul://consul-bootstrap:8500"]
-  #   networks:
-  #     - anyvision
-  #   depends_on:
-  #     - consul-bootstrap
-  #   volumes:
-  #     - /var/run/docker.sock:/tmp/docker.sock
-  #   logging:
-  #     options:
-  #       max-size: 1g
-
 
 
   guacamole:
@@ -165,7 +94,6 @@ services:
     volumes:
       - /storage:/var/www/html
       - ./env/crontab:/etc/crontab
-      - ./migration:/root/migration
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -211,7 +139,7 @@ services:
         aliases:
           - mongodb.anyvision.local
     #ports:
-    #  - "27017:27017"
+      #- "27017:27017"
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
@@ -228,7 +156,9 @@ services:
     image: gcr.io/anyvision-training/redis:latest
     restart: always
     networks:
-      - anyvision
+      anyvision:
+        aliases:
+          - redis.anyvision.local
     sysctls:
       - net.core.somaxconn=511
     volumes:
@@ -250,7 +180,6 @@ services:
       anyvision:
         aliases:
           - broadcaster.anyvision.local
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
@@ -259,6 +188,8 @@ services:
       - api
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+      - api_service_ip=api.anyvision.local
+      - BCAST_SOCKETIO_API_URL="https://apigateway.anyvision.local:5443"
       - RUN_AS_USER=user
       - ENABLE_CHOWN=true
     env_file:
@@ -293,37 +224,17 @@ services:
       - redis
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+      - GATEWAY_HOST=apigateway.anyvision.local
+      - API_HOST=api.anyvision.local
+      - DASH_API_URL=https://api.anyvision.local:5443
+      - GATEWAY_SECURE_URL=https://apigateway.anyvision.local:9443
+      - GATEWAY_URL=http://apigateway.anyvision.local:8080
+      - REDIS_HOST=redis.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=true
     env_file:
       - env/api-gateway.env
       - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  api-master:
-    image: gcr.io/anyvision-training/api-master:development
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - api-master.anyvision.local
-    #dns: 172.14.0.1  ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
-    volumes:
-      - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    environment:
-      - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-      #- TZ=Etc/UTC    ## DO NOT CHANGE
-    env_file:
-      - env/global.env
-      - env/api-master.env
     logging:
       options:
         max-size: 1g
@@ -340,7 +251,6 @@ services:
     ports:
       - "5443:5443"
       - "38389:38389"
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -352,11 +262,9 @@ services:
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
       - CA_HOST=apigateway.anyvision.local
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
       - ENABLE_CHOWN=true
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
-      #- MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
-      #- TZ=Etc/UTC    ## DO NOT CHANGE
     env_file:
       - env/global.env
       - env/api.env
@@ -370,7 +278,7 @@ services:
     image: gcr.io/anyvision-training/backend:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
         aliases:
@@ -384,11 +292,11 @@ services:
       - "9068:9068"
       - "9069:9069"
       - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
+      - /dev:/dev       ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
@@ -427,7 +335,6 @@ services:
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - anyvision
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
@@ -442,6 +349,7 @@ services:
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - ssl=true
+      - GATEWAY_HOST=apigateway.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=true
     env_file:
