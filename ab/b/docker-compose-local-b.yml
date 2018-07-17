@@ -277,6 +277,7 @@ services:
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    dns: 172.14.0.250
     networks:
       - anyvision
     shm_size: 1024M
