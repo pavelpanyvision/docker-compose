@@ -75,7 +75,7 @@ services:
       - reid_service_ip=reid-b.anyvision.local
       - collate_service_ip=coll-b.anyvision.local
       - track_archive_service_ip=arch-b.anyvision.local
-      - ENABLE_DOCKERIZE=true
+      - ENABLE_DOCKERIZE=false
       - ENABLE_MKDIR=true
       - ENABLE_CONFD=true
       - ENABLE_BUFFER_CLEANER=true
