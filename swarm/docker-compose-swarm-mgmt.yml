@@ -3,15 +3,17 @@ version: '3'
 
 
 volumes:
-  consul_bootstrap_data:
-  consul_server_data:
-  consul_client_data:
+  consul:
+
 
 networks:
   prod:
     external: true
   proxy:
     external: true
+#  consul:
+#    external: true
+
 
 # secrets:
 #   anv_cert:
@@ -19,7 +21,9 @@ networks:
 #   anv_key:
 #     file: ./tls/key.pem
 
+
 services:
+
 
   traefik:
     image: traefik
@@ -83,36 +87,24 @@ services:
 
 
 
-  consul-bootstrap:
-    image: consul
-    networks:
-      - prod
-    ports:
-      # - "8300:8300"
-      # - "8400:8400"
-      - "8500:8500"
-      #- "172.14.0.1:53:8600/udp"
-      #- "${HOST_EXTERNAL_IP}:53:8600/udp"
-    command:
-      - "agent"
-      - "-server"
-      - "-bootstrap-expect=3"
-      - "-ui"
-      - "-data-dir=/tmp"
-      - "-client=0.0.0.0"
-      - "-recursor=8.8.8.8"
-      - "-domain=anyvision.local"
+  consul:
+    image: consul:1.2.1
     volumes:
-      - consul_bootstrap_data:/tmp/consul
+      - consul:/consul
+    ports:
+      - "8500:8500"
+    networks:
+      prod:
+        aliases:
+          - consul.cluster
     environment:
-      - SERVICE_IGNORE=always               ### Ignore this container from Registrator
-      - CONSUL_ALLOW_PRIVILEGED_PORTS=
-    logging:
-      options:
-        max-size: 1g
+      - 'CONSUL_LOCAL_CONFIG={ "skip_leave_on_interrupt": true, "leave_on_terminate": true, "datacenter":"dc1", "data_dir":"/consul/data", "server":true }'
+      - CONSUL_BIND_INTERFACE=eth0
+      #- CONSUL_BIND_ADDRESS=0.0.0.0
+    command: agent -ui -data-dir /consul/data -server -client 0.0.0.0 -bootstrap-expect=3 -retry-join consul.cluster
     deploy:
-      mode: replicated
-      replicas: 1
+#      endpoint_mode: dnsrr
+      mode: global
       placement:
         constraints:
           - node.role == manager
@@ -122,75 +114,6 @@ services:
         max_attempts: 10
         window: 120s
 
-
-
-#  consulserver:
-#    image: consul
-#    networks:
-#      - prod
-#    command:
-#      - "agent"
-#      - "-server"
-#      - "-retry-join=consul-bootstrap"
-#      - "-ui"
-#      - "-data-dir=/tmp"
-#      - "-client=0.0.0.0"
-#      - "-recursor=8.8.8.8"
-#      - "-domain=anyvision.local"
-#    volumes:
-#     - consul_server_data:/tmp/consul
-#    environment:
-#      - SERVICE_IGNORE=always               ### Ignore this container from Registrator
-#      - CONSUL_ALLOW_PRIVILEGED_PORTS=
-#    logging:
-#      options:
-#        max-size: 1g
-#    deploy:
-#      mode: replicated
-#      replicas: 2
-#      # placement:
-#      #   constraints:
-#      #     - node.role == manager
-#      restart_policy:
-#        condition: on-failure
-#        delay: 5s
-#        max_attempts: 10
-#        window: 120s
-#
-
-
-#  consul-client:
-#    image: consul
-#    networks:
-#      - prod
-#    command:
-#      - "agent"
-#      - "-retry-join consul-bootstrap"
-#      - "-ui"
-#      - "-data-dir=/tmp"
-#      - "-client=0.0.0.0"
-#      - "-recursor=8.8.8.8"
-#      - "-domain=anyvision.local"
-#    volumes:
-#      - consul_client_data:/tmp/consul
-#    environment:
-#      - SERVICE_IGNORE=always               ### Ignore this container from Registrator
-#      - CONSUL_ALLOW_PRIVILEGED_PORTS=
-#    logging:
-#      options:
-#        max-size: 1g
-#    deploy:
-#      mode: replicated
-#      replicas: 2
-#      # placement:
-#      #   constraints:
-#      #     - node.role == manager
-#      restart_policy:
-#        condition: on-failure
-#        delay: 5s
-#        max_attempts: 10
-#        window: 120s
-#
 
 
 #  api-master:
