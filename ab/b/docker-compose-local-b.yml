@@ -44,7 +44,7 @@ services:
     read_only: true
 
   guacamole:
-      image: gcr.io/anyvision-training/guacamole:0.9.14
+      image: gcr.io/anyvision-production/guacamole:0.9.14
       restart: always
       networks:
         - anyvision
@@ -81,7 +81,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    image: gcr.io/anyvision-production/nginx-rtmp:ssl
     restart: always
     networks:
       anyvision:
@@ -107,7 +107,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: 'gcr.io/anyvision-production/mongo:3.6-jessie'
     restart: always
     networks:
       anyvision:
@@ -128,7 +128,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:latest
+    image: 'gcr.io/anyvision-production/redis:latest'
     restart: always
     networks:
       - anyvision
@@ -145,7 +145,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
+    image: 'gcr.io/anyvision-production/api-gateway:1.19.2'
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     networks:
@@ -179,7 +179,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: 'gcr.io/anyvision-production/api:1.19.2'
     restart: always
     networks:
       anyvision:
@@ -213,7 +213,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:development
+    image: 'gcr.io/anyvision-production/backend-pyconcrete:1.19.2'
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -237,6 +237,7 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev:/dev
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
@@ -276,18 +277,18 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-training/dashboard:development
+    image: 'gcr.io/anyvision-production/dashboard:1.19.2'
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - anyvision
-    dns: 172.14.0.250                                                        ### internal DNS server address, replace this with external IP of CoreDNS server (A/B config)
     shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev:/dev      
       - /media:/home/user/media:ro
       - /storage/share:/home/user/share:rw
       - /etc/localtime:/etc/localtime:ro
@@ -297,14 +298,14 @@ services:
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - ssl=true
+      - GATEWAY_HOST=apigateway.anyvision.local
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
+      - ENABLE_CHOWN=true
     env_file:
-      - ../../env/global.env
+      - env/global.env
+      - env/api-gateway.env
+      - env/dashboard.env
     logging:
       options:
         max-size: 1g
     ipc: host
-    devices:
-      - "/dev/snd:/dev/snd"
-      - "/dev/dri:/dev/dri"
