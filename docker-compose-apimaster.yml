@@ -124,11 +124,16 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
+      - api_service_ip=api.anyvision.local
+      - api_service_port=3000
+      - MONGO_DB_IP=mongodb.anyvision.local
+      - MONGO_DB_PORT=27017
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/api-master.env
+      - env/api.env
     logging:
       options:
         max-size: 1g
