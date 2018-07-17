@@ -17,7 +17,7 @@ networks:
 services:
 
   nginx:
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    image: gcr.io/anyvision-production/nginx-rtmp:ssl
     restart: always
     networks:
       anyvision:
@@ -41,7 +41,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:development
+    image: 'gcr.io/anyvision-production/backend-pyconcrete:1.19.2'
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     networks:
