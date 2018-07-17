@@ -29,8 +29,8 @@ services:
       anyvision:
         ipv4_address: 172.14.0.250
     ports:
-      - "127.0.0.1:53:53/udp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
-      - "127.0.0.1:53:53/tcp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
+      - "<external b server ip>:53:53/udp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
+      - "<external b server ip>:53:53/tcp"                                                ### replace 127.0.0.1 bind address with server external IP for listening to remote connections (A/B config)
       - "9153:9153/tcp"
     volumes:
       - ../../coredns/Corefile:/conf/Corefile
@@ -298,9 +298,9 @@ services:
       - RUN_AS_USER=user
       - ENABLE_CHOWN=true
     env_file:
-      - env/global.env
-      - env/api-gateway.env
-      - env/dashboard.env
+      - ../../env/global.env
+      - ../../env/api-gateway.env
+      - ../../env/dashboard.env
     logging:
       options:
         max-size: 1g
