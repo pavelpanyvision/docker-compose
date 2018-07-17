@@ -139,7 +139,7 @@ services:
         aliases:
           - mongodb.anyvision.local
     #ports:
-      #- "27017:27017"
+      - "27017:27017"
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
