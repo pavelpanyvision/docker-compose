@@ -40,7 +40,7 @@ docker pull registry:2
 docker save docker.io/registry:2 | gzip -c > "$destination/docker-io.registry.tar.gz"
 #echo "docker-io.registry.tar.gz" > images.txt
 
-for IMAGE in $(docker-compose -f $compose_file config | awk '{if ($1 == "image:") print $2;}'); do
+for IMAGE in $(cat $compose_file | awk '{if ($1 == "image:") print $2;}'); do
   echo "Pulling image $IMAGE"
   docker pull $IMAGE
   sanitized_img=$(echo $IMAGE | sed -e 's/\//_/g' | sed -e 's/\:/__/g')
