@@ -55,7 +55,7 @@ services:
         - /etc/localtime:/etc/localtime:ro
         - /etc/timezone:/etc/timezone:ro
       env_file:
-        - env/global.env
+        - ../../env/global.env
       logging:
         options:
           max-size: 1g
@@ -73,7 +73,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
     command: user:pass:2000:2000:files
     env_file:
-      - env/global.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
