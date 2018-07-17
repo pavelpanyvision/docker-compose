@@ -160,6 +160,8 @@ services:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro      
       #- /home/anyvision/Projects/API-gateway:/home/user/api-gateway         ### mount your local project directory to the container
     depends_on:
       - redis
