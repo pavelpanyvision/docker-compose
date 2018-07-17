@@ -10,7 +10,11 @@ volumes:
 
 networks:
   anyvision:
-    external: true
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.14.0.0/16
 
 
 services:
