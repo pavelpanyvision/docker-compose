@@ -43,6 +43,7 @@ services:
   backend:
     image: 'gcr.io/anyvision-production/backend-pyconcrete:1.19.2'
     restart: always
+    privileged: true
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     networks:
       anyvision:
@@ -61,6 +62,7 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev:/dev
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
@@ -94,7 +96,3 @@ services:
       options:
         max-size: 1g
     ipc: host
-    devices:
-      - "/dev/dri:/dev/dri"
-      #- "/dev/video0:/dev/video0"                                           ### USB or built-in camera device
-
