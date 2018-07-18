@@ -1,4 +1,6 @@
+#filename: docker-compose-swarm-gpu.yml.tmpl
 version: '3.3'
+
 
 volumes:
   mongo_db_data:
@@ -8,7 +10,6 @@ volumes:
 
 ### create prod overlay network: docker network create -d overlay --attachable prod
 ### create proxy overlay network: docker network create -d overlay --attachable proxy
-
 
 networks:
   prod:
@@ -20,6 +21,8 @@ networks:
 configs:
   {{'default' | env('SITE_NAME')}}_guacamole_mapping:
     file: ./guacamole/user-mapping-cloud.xml
+  {{'default' | env('SITE_NAME')}}_cron_config:
+    file: ./env/crontab
 
 
 # secrets:
@@ -60,14 +63,12 @@ services:
 
 
   guacamole:
-    image: gcr.io/anyvision-training/guacamole:0.9.14
+    image: gcr.io/anyvision-production/guacamole:0.9.14
     networks:
       proxy:
       prod:
         aliases:
          - guacamole-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "8080:8080"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -88,6 +89,8 @@ services:
     #    target: ca.pem
     #    uid: "0"
     #    mode: 400
+    environment:
+      - GUACD_LOGLEVEL=info
     env_file:
       - env/global.env
     logging:
@@ -143,16 +146,12 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    image: gcr.io/anyvision-production/nginx-rtmp:ssl
     networks:
       proxy:
       prod:
         aliases:
          - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "1935:1935"
-      #- "443:443"
-      #- "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -193,7 +192,7 @@ services:
 
 
   desktop:
-    image: gcr.io/anyvision-training/desktop
+    image: gcr.io/anyvision-production/desktop
     networks:
       prod:
         aliases:
@@ -205,7 +204,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
     environment:
       - DISPLAY=:0
-      - VNC_OPTIONS=-auth /home/user/.Xauthority -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0 -noshm
+      - VNC_OPTIONS=-auth guess -noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
     env_file:
       - env/global.env
     logging:
@@ -226,16 +225,19 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:latest
+    image: gcr.io/anyvision-production/supercronic:latest
     networks:
       prod:
         aliases:
           - cron-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/var/www/html
-      - /storage/crontab:/etc/crontab
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    configs:
+      - source: {{'default' | env('SITE_NAME')}}_cron_config
+        target: /etc/crontab
+        mode: 444
     environment:
       - TO_DATE_TRACK_DELETE=30
     logging:
@@ -256,7 +258,7 @@ services:
 
 
   rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
+    image: gcr.io/anyvision-production/rabbitmq:latest
     networks:
       prod:
         aliases:
@@ -288,7 +290,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     networks:
       prod:
         aliases:
@@ -319,7 +321,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:latest
+    image: gcr.io/anyvision-production/redis:latest
     networks:
       prod:
         aliases:
@@ -346,7 +348,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:1.19.2
+    image: gcr.io/anyvision-production/broadcaster:1.19.2
     hostname: broadcaster
     networks:
       proxy:
@@ -398,14 +400,12 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:1.19.2
+    image: gcr.io/anyvision-production/api-gateway:1.19.2
     networks:
       proxy:
       prod:
         aliases:
           - apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "9443:9443"
     volumes:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
@@ -457,14 +457,12 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:1.19.2
+    image: gcr.io/anyvision-production/api:1.19.2
     networks:
       proxy:
       prod:
         aliases:
           - api-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "5443:5443"
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -511,7 +509,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.19.2
     networks:
       prod:
         aliases:
@@ -519,12 +517,6 @@ services:
           - reid-{{'default' | env('SITE_NAME')}}.anyvision.local
           - coll-{{'default' | env('SITE_NAME')}}.anyvision.local
           - arch-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "4005:4005"
-      #- "9067:9067"
-      #- "9068:9068"
-      #- "9069:9069"
-      #- "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
@@ -582,7 +574,7 @@ services:
 
 
 #  dashboard:
-#    image: gcr.io/anyvision-training/dashboard:1.19.2
+#    image: gcr.io/anyvision-production/dashboard:1.19.2
 #    networks:
 #      - prod
 #    volumes:
