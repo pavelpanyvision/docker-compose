@@ -2,8 +2,8 @@
 #set -e
 
 display_usage() {
-  echo -e "\nUsage:\n$0 <docker compose file> <destination path>\n"
-  echo -e "Example:\n$0 docker-compose.yml /tmp/docker_images\n"
+  echo -e "\nUsage:\n$0 <docker compose file> <destination path> <force or skip>\n"
+  echo -e "Example:\n$0 docker-compose.yml /tmp/docker_images force\n"
 }
 
 docker_warning() {
@@ -11,7 +11,7 @@ docker_warning() {
 }
 
 # Check params
-if [ $# -lt 2 ]; then
+if [ $# -lt 3 ]; then
   display_usage
   exit 1
 fi
@@ -25,6 +25,7 @@ fi
 
 compose_file="$1"
 destination="$2"
+force_or_skip="$3"
 compose_file_dir=$(dirname "$compose_file")
 
 # Create destination dir
@@ -44,7 +45,7 @@ for IMG in $(cat $compose_file | awk '{if ($1 == "image:") print $2;}'); do
   IMAGE=$(echo $IMG | tr -d "'")
   docker pull $IMAGE
   sanitized_img=$(echo $IMAGE | sed -e 's/\//_/g' | sed -e 's/\:/__/g')
-  if [ -f "$destination/$sanitized_img.tar.gz" ] ; then
+  if [ -f "$destination/$sanitized_img.tar.gz" ] && [ $force_or_skip == 'skip' ] ; then
     echo "the file $destination/$sanitized_img.tar.gz aleady exist. skipping"
   else
     echo "Saving $IMAGE to $destination/$sanitized_img.tar.gz"
