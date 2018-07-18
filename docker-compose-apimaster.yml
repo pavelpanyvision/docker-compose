@@ -4,7 +4,6 @@ version: '3.3'
 
 volumes:
   mongo_db_data:
-  redis_db_data:
   backend_data:
 
 
@@ -20,16 +19,14 @@ networks:
 services:
 
 
-  nginx:
-    #image: gcr.io/anyvision-training/nginx-dashboard:development
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+  dashboard-master:
+    image: gcr.io/anyvision-training/dashboard-master:development
     restart: always
     networks:
       anyvision:
         aliases:
-          - nginx-${node_name:-localnode}.anyvision.local
+          - dashboard-master-${node_name:-localnode}.anyvision.local
     ports:
-      - "1935:1935"
       - "443:443"
       - "80:80"
     volumes:
@@ -39,28 +36,6 @@ services:
       - /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  cron:
-    image: gcr.io/anyvision-training/supercronic:latest
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - cron-${node_name:-localnode}.anyvision.local
-    volumes:
-      - /storage:/var/www/html
-      - ./env/crontab:/etc/crontab
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    environment:
-      - TO_DATE_TRACK_DELETE=30
     env_file:
       - env/global.env
     logging:
@@ -84,25 +59,6 @@ services:
       - /etc/timezone:/etc/timezone:ro
     env_file:
       - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  redis:
-    image: gcr.io/anyvision-training/redis:latest
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - redis.anyvision.local
-    sysctls:
-      - net.core.somaxconn=511
-    volumes:
-      - redis_db_data:/data:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     logging:
       options:
         max-size: 1g
