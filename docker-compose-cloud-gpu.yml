@@ -11,18 +11,13 @@ volumes:
 
 networks:
   anyvision:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.14.0.0/16
 
 
 services:
 
 
   guacamole:
-    image: gcr.io/anyvision-training/guacamole:0.9.14
+    image: gcr.io/anyvision-production/guacamole:0.9.14
     restart: always
     networks:
       - anyvision
@@ -32,6 +27,8 @@ services:
       - ./guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    environment:
+      - GUACD_LOGLEVEL=info
     env_file:
       - env/global.env
     logging:
@@ -59,7 +56,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    image: gcr.io/anyvision-production/nginx-rtmp:ssl
     restart: always
     networks:
       anyvision:
@@ -74,6 +71,8 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    environment:
+      - limit_rate_speed=0
     env_file:
       - env/global.env
     logging:
@@ -106,7 +105,7 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:latest
+    image: gcr.io/anyvision-production/supercronic:latest
     restart: always
     networks:
       anyvision:
@@ -126,7 +125,7 @@ services:
 
 
   rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
+    image: gcr.io/anyvision-production/rabbitmq:latest
     restart: always
     networks:
       anyvision:
@@ -148,7 +147,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     restart: always
     networks:
       anyvision:
@@ -169,7 +168,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:latest
+    image: gcr.io/anyvision-production/redis:latest
     restart: always
     networks:
       anyvision:
@@ -188,7 +187,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:1.19.2
+    image: gcr.io/anyvision-production/broadcaster:1.19.2
     restart: always
     hostname: broadcaster
     networks:
@@ -216,7 +215,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:1.19.2
+    image: gcr.io/anyvision-production/api-gateway:1.19.2
     restart: always
     networks:
       anyvision:
@@ -251,7 +250,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:1.19.2
+    image: gcr.io/anyvision-production/api:1.19.2
     restart: always
     networks:
       anyvision:
@@ -281,7 +280,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.19.2
     restart: always
     networks:
       anyvision:
@@ -331,7 +330,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-training/dashboard:1.19.2
+    image: gcr.io/anyvision-production/dashboard:1.19.2
     restart: always
     networks:
       - anyvision
