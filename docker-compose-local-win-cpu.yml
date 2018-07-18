@@ -1,5 +1,6 @@
 #filename: docker-compose-local-win-cpu.yml
-version: '2.3'
+version: '3.3'
+
 
 volumes:
   mongo_db_data:
@@ -8,16 +9,8 @@ volumes:
   api_gateway_keys:
 
 
-
 networks:
   anyvision:
-    name: prod
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.14.0.0/16
-          gateway: 172.14.0.1
 
 
 services:
@@ -25,7 +18,6 @@ services:
 
   nginx:
     image: gcr.io/anyvision-training/nginx-rtmp:ssl
-    runtime: runc
     restart: always
     networks:
       anyvision:
@@ -38,6 +30,8 @@ services:
     volumes:
       - c:/anv/storage:/opt/nginx/html:ro
       - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+    environment:
+      - limit_rate_speed=0
     env_file:
       - env/global.env
     logging:
@@ -48,7 +42,6 @@ services:
 
   cron:
     image: gcr.io/anyvision-training/supercronic:latest
-    runtime: runc
     restart: always
     networks:
       anyvision:
@@ -56,7 +49,7 @@ services:
           - cron-${node_name:-localnode}.anyvision.local
     volumes:
       - c:/anv/storage:/var/www/html
-      - $PWD/env/crontab:/etc/crontab
+      - ./env/crontab:/etc/crontab
     environment:
       - TO_DATE_TRACK_DELETE=30
     logging:
@@ -67,15 +60,14 @@ services:
 
   rabbitmq:
     image: gcr.io/anyvision-training/rabbitmq:latest
-    runtime: runc
     restart: always
     networks:
       anyvision:
         aliases:
           - rabbitmq.anyvision.local
     #ports:
-    # - "5761:5761"
-    # - "15761:15761"
+      #- "5761:5761"
+      #- "15761:15761"
     volumes:
       - c:/anv/storage/rabbitmq:/var/lib/rabbitmq
     env_file:
@@ -88,14 +80,13 @@ services:
 
   mongodb:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
-    runtime: runc
     restart: always
     networks:
       anyvision:
         aliases:
           - mongodb.anyvision.local
     #ports:
-    #  - "27017:27017"
+      #- "27017:27017"
     volumes:
       - mongo_db_data:/data/db
     env_file:
@@ -108,10 +99,11 @@ services:
 
   redis:
     image: gcr.io/anyvision-training/redis:latest
-    runtime: runc
     restart: always
     networks:
-      - anyvision
+      anyvision:
+        aliases:
+          - redis.anyvision.local
     sysctls:
       - net.core.somaxconn=511
     volumes:
@@ -124,7 +116,6 @@ services:
 
   broadcaster:
     image: gcr.io/anyvision-training/broadcaster:development
-    runtime: runc
     restart: always
     hostname: broadcaster
     networks:
@@ -137,6 +128,8 @@ services:
     depends_on:
       - api
     environment:
+      - api_service_ip=api.anyvision.local
+      - BCAST_SOCKETIO_API_URL="https://apigateway.anyvision.local:5443"
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -150,7 +143,6 @@ services:
 
   apigateway:
     image: gcr.io/anyvision-training/api-gateway:development
-    runtime: runc
     restart: always
     networks:
       anyvision:
@@ -165,6 +157,12 @@ services:
     depends_on:
       - redis
     environment:
+      - GATEWAY_HOST=apigateway.anyvision.local
+      - API_HOST=api.anyvision.local
+      - DASH_API_URL=https://api.anyvision.local:5443
+      - GATEWAY_SECURE_URL=https://apigateway.anyvision.local:9443
+      - GATEWAY_URL=http://apigateway.anyvision.local:8080
+      - REDIS_HOST=redis.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -178,7 +176,6 @@ services:
 
   api:
     image: gcr.io/anyvision-training/api:development
-    runtime: runc
     restart: always
     networks:
       anyvision:
@@ -193,11 +190,9 @@ services:
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
       - CA_HOST=apigateway.anyvision.local
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
-      #- MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
-      #- TZ=Etc/UTC    ## DO NOT CHANGE
     env_file:
       - env/global.env
       - env/api.env
@@ -209,9 +204,8 @@ services:
 
   backend:
     image: gcr.io/anyvision-training/backend-cpu:development
-    runtime: runc
     restart: always
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
         aliases:
@@ -232,7 +226,7 @@ services:
       - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
     environment:
       - pipe_cpu_mode=true
-      - DISPLAY=10.0.75.1:0.0                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - DISPLAY=10.0.75.1:0.0
       - external_ip=proc-${node_name:-localnode}.anyvision.local
       - storage_ip=nginx-${node_name:-localnode}.anyvision.local
       - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
@@ -259,7 +253,6 @@ services:
 
   dashboard:
     image: gcr.io/anyvision-training/dashboard:development
-    runtime: runc
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
@@ -270,13 +263,16 @@ services:
       - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
       - c:/anv/storage/share:/home/user/share:rw
     environment:
-      - DISPLAY=10.0.75.1:0.0                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - DISPLAY=10.0.75.1:0.0
       - ssl=true
+      - GATEWAY_HOST=apigateway.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
+      - isPersonEnabled=false
     env_file:
       - env/global.env
       - env/api-gateway.env
+      - env/dashboard.env
     logging:
       options:
         max-size: 1g

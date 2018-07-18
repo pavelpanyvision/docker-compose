@@ -11,11 +11,6 @@ volumes:
 
 networks:
   anyvision:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.14.0.0/16
 
 
 services:
@@ -32,6 +27,8 @@ services:
       - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    environment:
+      - GUACD_LOGLEVEL=info
     env_file:
       - env/global.env
     logging:
