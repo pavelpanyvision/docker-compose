@@ -82,7 +82,7 @@ services:
 
 
   desktop:
-    image: gcr.io/anyvision-training/desktop
+    image: gcr.io/anyvision-production/desktop
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
