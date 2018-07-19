@@ -389,9 +389,11 @@ services:
       - DASH_API_URL=https://api-{{'default' | env('SITE_NAME')}}.anyvision.local:5443
       - GATEWAY_SECURE_URL=https://apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local:9443
       - GATEWAY_URL=http://apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local:8080
-      - REDIS_HOST=redis-{{'default' | env('SITE_NAME')}}.anyvision.local
+      #- REDIS_HOST=redis-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - REDIS_HOST=redis
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
+      - ENABLE_CREATE_SSL=false
     env_file:
       - env/api-gateway.env
       - env/global.env
