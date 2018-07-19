@@ -99,6 +99,10 @@ services:
         - traefik.docker.network=proxy
         - traefik.port=8080
         - traefik.enable=true
+        - com.df.notify=true
+        - com.df.servicePath=/{{'default' | env('SITE_NAME')}}
+        - com.df.reqPathSearchReplace=/{{'default' | env('SITE_NAME')}},
+        - com.df.port=8080
 
 
 
@@ -177,6 +181,11 @@ services:
         - traefik.nginx_http.port=80
         - traefik.nginx_https.port=443
         - traefik.enable=true
+        - com.df.notify=true
+        - com.df.reqMode=http
+        - com.df.serviceDomain=nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+        - com.df.port=443
+        - com.df.srcPort=443
 
 
 
@@ -412,9 +421,16 @@ services:
         - traefik.frontend.rule=Host:apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
         - traefik.docker.network=proxy
         - traefik.frontend.entryPoints=https
+        - traefik.protocol=https
+        - traefik.frontend.passHostHeader=true
+        - traefik.frontend.passTLSCert=true
         - traefik.port=9443
         - traefik.enable=true
-
+        - com.df.notify=true
+        #- com.df.serviceDomain=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
+        - com.df.port=9443
+        - com.df.srcPort=9443
+        - com.df.reqMode=tcp
 
 
   api:

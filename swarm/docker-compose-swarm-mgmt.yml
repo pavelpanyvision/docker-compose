@@ -33,93 +33,129 @@ secrets:
 services:
 
 
-  traefik:
-    image: traefik
-    networks:
-      - proxy
+
+  proxy:
+    image: dockerflow/docker-flow-proxy
     ports:
       - "80:80"
-      - "8080:80"
-      #- "27017:80"
       - "443:443"
-      - "9443:443"
-      #- "5443:443"
-      #- "4005:443"
-      #- "9067:443"
-      #- "9068:443"
-      #- "9069:443"
-      - "8081:8080"
-    command:
-      - "--api"
-      - "--entrypoints=Name:http Address::80"
-      #- "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
-      - "--entrypoints=Name:https Address::443 TLS:/run/secrets/cert.pem,/run/secrets/key.pem"
-      #- "--defaultentrypoints=http,https"
-      - "--defaultentrypoints=http"
-      - "--InsecureSkipVerify"
-      - "--docker"
-      - "--docker.domain=anyvision.local"
-      - "--docker.swarmMode=true"
-      - "--docker.watch=true"
-      - "--docker.exposedByDefault=false"
-      #- "--docker.endpoint=unix://var/run/docker.sock"
-      #- "--docker.tls.insecureSkipVerify"
-      - "--logLevel=DEBUG"
-    secrets:
-      - source: anv_cert
-        target: cert.pem
-        uid: "0"
-        mode: 400
-      - source: anv_key
-        target: key.pem
-        uid: "0"
-        mode: 400
-      - source: anv_ca
-        target: ca.pem
-        uid: "0"
-        mode: 400
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - "9443:9443"
+    networks:
+      - proxy
+    environment:
+      - LISTENER_ADDRESS=swarm-listener
+      - MODE=swarm
     deploy:
-      mode: replicated
       replicas: 1
       placement:
-        constraints:
-          - node.role == manager
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
+        constraints: [node.role == manager]
 
 
 
-  consul:
-    image: consul:1.2.1
-    volumes:
-      - consul:/consul
-    ports:
-      - "8500:8500"
+  swarm-listener:
+    image: dockerflow/docker-flow-swarm-listener
     networks:
-      prod:
-        aliases:
-          - consul.cluster
+      - proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - 'CONSUL_LOCAL_CONFIG={ "skip_leave_on_interrupt": true, "leave_on_terminate": true, "datacenter":"dc1", "data_dir":"/consul/data", "server":true }'
-      - CONSUL_BIND_INTERFACE=eth0
-      #- CONSUL_BIND_ADDRESS=0.0.0.0
-    command: agent -ui -data-dir /consul/data -server -client 0.0.0.0 -bootstrap-expect=1 -retry-join consul.cluster
+      - DF_NOTIFY_CREATE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/reconfigure
+      - DF_NOTIFY_REMOVE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/remove
     deploy:
-#      endpoint_mode: dnsrr
-      mode: global
       placement:
-        constraints:
-          - node.role == manager
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
+        constraints: [node.role == manager]
+
+
+
+
+
+#  traefik:
+#    image: traefik
+#    networks:
+#      - proxy
+#    ports:
+#      - "80:80"
+#      - "8080:80"
+#      #- "27017:80"
+#      - "443:443"
+#      - "9443:443"
+#      #- "5443:443"
+#      #- "4005:443"
+#      #- "9067:443"
+#      #- "9068:443"
+#      #- "9069:443"
+#      - "8081:8080"
+#    command:
+#      - "--api"
+#      - "--entrypoints=Name:http Address::80"
+#      #- "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
+#      - "--entrypoints=Name:https Address::443 TLS:/run/secrets/cert.pem,/run/secrets/key.pem"
+#      #- "--defaultentrypoints=http,https"
+#      - "--defaultentrypoints=http"
+#      - "--InsecureSkipVerify"
+#      - "--docker"
+#      - "--docker.domain=anyvision.local"
+#      - "--docker.swarmMode=true"
+#      - "--docker.watch=true"
+#      - "--docker.exposedByDefault=false"
+#      #- "--docker.endpoint=unix://var/run/docker.sock"
+#      #- "--docker.tls.insecureSkipVerify"
+#      - "--logLevel=DEBUG"
+#    secrets:
+#      - source: anv_cert
+#        target: cert.pem
+#        uid: "0"
+#        mode: 400
+#      - source: anv_key
+#        target: key.pem
+#        uid: "0"
+#        mode: 400
+#      - source: anv_ca
+#        target: ca.pem
+#        uid: "0"
+#        mode: 400
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#      placement:
+#        constraints:
+#          - node.role == manager
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 10
+#        window: 120s
+#
+#
+#
+#  consul:
+#    image: consul:1.2.1
+#    volumes:
+#      - consul:/consul
+#    ports:
+#      - "8500:8500"
+#    networks:
+#      prod:
+#        aliases:
+#          - consul.cluster
+#    environment:
+#      - 'CONSUL_LOCAL_CONFIG={ "skip_leave_on_interrupt": true, "leave_on_terminate": true, "datacenter":"dc1", "data_dir":"/consul/data", "server":true }'
+#      - CONSUL_BIND_INTERFACE=eth0
+#      #- CONSUL_BIND_ADDRESS=0.0.0.0
+#    command: agent -ui -data-dir /consul/data -server -client 0.0.0.0 -bootstrap-expect=1 -retry-join consul.cluster
+#    deploy:
+##      endpoint_mode: dnsrr
+#      mode: global
+#      placement:
+#        constraints:
+#          - node.role == manager
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 10
+#        window: 120s
 
 
 

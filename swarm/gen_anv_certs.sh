@@ -50,7 +50,7 @@ if [ ! -f "$CA_CERTS_DIR/apigateway.anyvision.local.full.pem" ] ; then
 	echo "creating ssl"
 	create_ssl
 	## ADD ALL THE CA-CERTIFICATES OF THE WORLD TO ENABLE SSL CONNECTIVITY TO THE WWW
-	curl https://mkcert.org/generate/ >> $CA_CERTS_DIR/anyvisionCA.pem
+	#curl https://mkcert.org/generate/ >> $CA_CERTS_DIR/anyvisionCA.pem
 else
 	echo "The key $CA_CERTS_DIR/apigateway.anyvision.local.full.pem already exist. skip creating ssl"
 fi
