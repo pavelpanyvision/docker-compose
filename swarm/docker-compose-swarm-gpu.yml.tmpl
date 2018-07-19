@@ -23,8 +23,6 @@ configs:
     file: ./guacamole/user-mapping-cloud.xml
   {{'default' | env('SITE_NAME')}}_cron_config:
     file: ./env/crontab
-  nginx_config:
-    file: ./config/nginx.conf
 
 
 secrets:
@@ -63,10 +61,7 @@ services:
 #        constraints:
 #          - node.labels.site=={{'default' | env('SITE_NAME')}}
 #      restart_policy:
-#        condition: on-failure
 #        delay: 5s
-#        max_attempts: 10
-#        window: 120s
 
 
 
@@ -98,10 +93,7 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
       labels:
         - traefik.frontend.rule=PathPrefixStrip:/{{'default' | env('SITE_NAME')}}/
         - traefik.docker.network=proxy
@@ -133,10 +125,7 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -149,24 +138,19 @@ services:
          - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/opt/nginx/html:ro
-      #- /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    configs:
-      - source: nginx_config
-        target: /opt/nginx/conf/nginx.conf
-        mode: 444
     secrets:
       - source: anv_cert
-        target: cert.pem
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
         uid: "0"
         mode: 400
       - source: anv_key
-        target: key.pem
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
         uid: "0"
         mode: 400
       - source: passinfo
-        target: passinfo
+        target: /usr/local/share/ca-certificates/anyvision/passinfo
         uid: "0"
         mode: 400
     environment:
@@ -183,10 +167,7 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
       labels:
         - traefik.nginx_http.frontend.rule=Host:nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
         - traefik.nginx_https.frontend.rule=Host:nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
@@ -225,10 +206,7 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -258,10 +236,7 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -287,10 +262,7 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -316,10 +288,7 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -343,10 +312,7 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -386,10 +352,7 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -442,10 +405,7 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
       labels:
         - traefik.frontend.rule=Host:apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
         - traefik.docker.network=proxy
@@ -499,10 +459,7 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
@@ -519,7 +476,6 @@ services:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
-      #- /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -565,58 +521,44 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
-#  dashboard:
-#    image: gcr.io/anyvision-production/dashboard:1.19.2
-#    networks:
-#      - prod
-#    volumes:
-#      - /storage/sftp_data:/sftp:rw
-#      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
-#      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-#      - /media:/home/user/media:ro
-#      - /storage/share:/home/user/share:rw
-#      - /etc/localtime:/etc/localtime:ro
-#      - /etc/timezone:/etc/timezone:ro
-#    #secrets:
-#    #  - source: anv_cert
-#    #    target: cert.pem
-#    #    uid: "0"
-#    #    mode: 400
-#    #  - source: anv_key
-#    #    target: key.pem
-#    #    uid: "0"
-#    #    mode: 400
-#    #  - source: anv_ca
-#    #    target: ca.pem
-#    #    uid: "0"
-#    #    mode: 400
-#    environment:
-#      - DISPLAY=:0
-#      - ssl=true
-#      - GATEWAY_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
-#      - RUN_AS_USER=user
-#      - ENABLE_CHOWN=false
-#    env_file:
-#      - env/global.env
-#      - env/api-gateway.env
-#      - env/dashboard.env
-#    logging:
-#      options:
-#        max-size: 1g
-#    deploy:
-#      mode: replicated
-#      replicas: 1
-#      placement:
-#        constraints:
-#          - node.labels.site=={{'default' | env('SITE_NAME')}}
-#      restart_policy:
-#        condition: on-failure
-#        delay: 5s
-#        max_attempts: 10
-#        window: 120s
+  dashboard:
+    image: gcr.io/anyvision-production/dashboard:1.19.2
+    networks:
+      - prod
+    volumes:
+      - /storage/sftp_data:/sftp:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /media:/home/user/media:ro
+      - /storage/share:/home/user/share:rw
+      - /dev/shm:/dev/shm:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    secrets:
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
+    environment:
+      - DISPLAY=:0
+      - ssl=true
+      - GATEWAY_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+    env_file:
+      - env/global.env
+      - env/api-gateway.env
+      - env/dashboard.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
+      restart_policy:
+        delay: 5s
