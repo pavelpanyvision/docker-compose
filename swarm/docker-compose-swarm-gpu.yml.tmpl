@@ -23,15 +23,23 @@ configs:
     file: ./guacamole/user-mapping-cloud.xml
   {{'default' | env('SITE_NAME')}}_cron_config:
     file: ./env/crontab
+  nginx_config:
+    file: ./config/nginx.conf
 
 
-# secrets:
-#   anv_cert:
-#     file: ./tls/cert.pem
-#   anv_key:
-#     file: ./tls/key.pem
-#   anv_ca:
-#     file: ./tls/ca.pem
+secrets:
+  anv_cert:
+    file: ./tls/apigateway.anyvision.local.crt
+  anv_key:
+    file: ./tls/apigateway.anyvision.local.key.pem
+  anv_ca:
+    file: ./tls/anyvisionCA.pem
+  anv_full:
+    file: ./tls/apigateway.anyvision.local.full.pem
+  anv_csr:
+    file: ./tls/apigateway.anyvision.local.csr
+  passinfo:
+    file: ./tls/passinfo
 
 
 services:
@@ -76,19 +84,6 @@ services:
       - source: {{'default' | env('SITE_NAME')}}_guacamole_mapping
         target: /etc/guacamole/user-mapping.xml
         mode: 444
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
     environment:
       - GUACD_LOGLEVEL=info
     env_file:
@@ -154,22 +149,26 @@ services:
          - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/opt/nginx/html:ro
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      #- /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
+    configs:
+      - source: nginx_config
+        target: /opt/nginx/conf/nginx.conf
+        mode: 444
+    secrets:
+      - source: anv_cert
+        target: cert.pem
+        uid: "0"
+        mode: 400
+      - source: anv_key
+        target: key.pem
+        uid: "0"
+        mode: 400
+      - source: passinfo
+        target: passinfo
+        uid: "0"
+        mode: 400
     environment:
       - limit_rate_speed=0
     env_file:
@@ -188,6 +187,15 @@ services:
         delay: 5s
         max_attempts: 10
         window: 120s
+      labels:
+        - traefik.nginx_http.frontend.rule=Host:nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+        - traefik.nginx_https.frontend.rule=Host:nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+        - traefik.docker.network=proxy
+        - traefik.nginx_http.frontend.entryPoints=http
+        - traefik.nginx_https.frontend.entryPoints=https
+        - traefik.nginx_http.port=80
+        - traefik.nginx_https.port=443
+        - traefik.enable=true
 
 
 
@@ -204,7 +212,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
     environment:
       - DISPLAY=:0
-      - VNC_OPTIONS=-auth guess -noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
+      - VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
     env_file:
       - env/global.env
     logging:
@@ -263,9 +271,6 @@ services:
       prod:
         aliases:
           - rabbitmq-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "5761:5761"
-      #- "15761:15761"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
@@ -295,8 +300,6 @@ services:
       prod:
         aliases:
           - mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "27017:27017"
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
@@ -356,22 +359,13 @@ services:
         aliases:
           - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
+    secrets:
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
     depends_on:
       - api
     environment:
@@ -409,22 +403,21 @@ services:
     volumes:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
+    secrets:
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 444
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
+      - source: anv_full
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.full.pem
+        uid: "0"
+        mode: 444
     depends_on:
       - redis
     environment:
@@ -453,6 +446,12 @@ services:
         delay: 5s
         max_attempts: 10
         window: 120s
+      labels:
+        - traefik.frontend.rule=Host:apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
+        - traefik.docker.network=proxy
+        - traefik.frontend.entryPoints=https
+        - traefik.port=9443
+        - traefik.enable=true
 
 
 
@@ -465,22 +464,21 @@ services:
           - api-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
+    secrets:
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 444
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
+      - source: anv_full
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.full.pem
+        uid: "0"
+        mode: 444
     environment:
       - API_IP=api-{{'default' | env('SITE_NAME')}}.anyvision.local
       - MONGO_DB_IP=mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
@@ -521,23 +519,23 @@ services:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      #- /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
+    secrets:
+      - source: anv_cert
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
+        uid: "0"
+        mode: 444
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 444
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
     environment:
       - DISPLAY=:0
       - external_ip=proc-{{'default' | env('SITE_NAME')}}.anyvision.local

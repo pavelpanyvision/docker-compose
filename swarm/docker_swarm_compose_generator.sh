@@ -20,7 +20,7 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     mkdir -p sites/"$SITE_NAME"
     #/usr/local/bin/meta-compose -t docker-compose-swarm-gpu-standalone.yml.tmpl -o sites/$SITE_NAME/docker-compose-$SITE_NAME.yml
     /usr/local/bin/meta-compose -t docker-compose-swarm-gpu.yml.tmpl -o sites/"$SITE_NAME"/docker-compose-"$SITE_NAME".yml
-    cp -R ../env ../guacamole sites/"$SITE_NAME"/
+    cp -R config ../env ../guacamole sites/"$SITE_NAME"/
     if [ -d "$certdir" ]; then
       cp -R "$certdir" sites/"$SITE_NAME"/
     fi
