@@ -528,7 +528,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
     environment:
       - DISPLAY=:0
-      - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
+      - VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
     env_file:
       - env/global.env
     logging:

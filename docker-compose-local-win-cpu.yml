@@ -243,10 +243,10 @@ services:
     env_file:
       - env/backend.env
       - env/global.env
+    ipc: host
     logging:
       options:
         max-size: 1g
-    ipc: host
 
 
 
@@ -270,7 +270,7 @@ services:
       - env/global.env
       - env/api-gateway.env
       - env/dashboard.env
+    ipc: host
     logging:
       options:
         max-size: 1g
-    ipc: host
