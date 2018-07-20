@@ -95,14 +95,10 @@ services:
       restart_policy:
         delay: 5s
       labels:
-        - traefik.frontend.rule=PathPrefixStrip:/{{'default' | env('SITE_NAME')}}/
-        - traefik.docker.network=proxy
-        - traefik.port=8080
-        - traefik.enable=true
-        - com.df.notify=true
-        - com.df.servicePath=/{{'default' | env('SITE_NAME')}}
-        - com.df.reqPathSearchReplace=/{{'default' | env('SITE_NAME')}},
-        - com.df.port=8080
+        com.df.notify: 'true'
+        com.df.servicePath: "/{{'default' | env('SITE_NAME')}}"
+        com.df.reqPathSearchReplace: "/{{'default' | env('SITE_NAME')}},"
+        com.df.port: 8080
 
 
 
@@ -173,19 +169,12 @@ services:
       restart_policy:
         delay: 5s
       labels:
-        - traefik.nginx_http.frontend.rule=Host:nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
-        - traefik.nginx_https.frontend.rule=Host:nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
-        - traefik.docker.network=proxy
-        - traefik.nginx_http.frontend.entryPoints=http
-        - traefik.nginx_https.frontend.entryPoints=https
-        - traefik.nginx_http.port=80
-        - traefik.nginx_https.port=443
-        - traefik.enable=true
-        - com.df.notify=true
-        - com.df.reqMode=http
-        - com.df.serviceDomain=nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
-        - com.df.port=443
-        - com.df.srcPort=443
+        com.df.notify: 'true'
+        com.df.port: 443
+        com.df.srcPort: 443
+        com.df.reqMode: sni
+        com.df.pathType: "req_ssl_sni -i -m reg"
+        com.df.servicePath: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
 
 
 
@@ -398,8 +387,7 @@ services:
       - DASH_API_URL=https://api-{{'default' | env('SITE_NAME')}}.anyvision.local:5443
       - GATEWAY_SECURE_URL=https://apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local:9443
       - GATEWAY_URL=http://apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local:8080
-      #- REDIS_HOST=redis-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - REDIS_HOST=redis
+      - REDIS_HOST=redis-{{'default' | env('SITE_NAME')}}.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
       - ENABLE_CREATE_SSL=false
@@ -418,19 +406,13 @@ services:
       restart_policy:
         delay: 5s
       labels:
-        - traefik.frontend.rule=Host:apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
-        - traefik.docker.network=proxy
-        - traefik.frontend.entryPoints=https
-        - traefik.protocol=https
-        - traefik.frontend.passHostHeader=true
-        - traefik.frontend.passTLSCert=true
-        - traefik.port=9443
-        - traefik.enable=true
-        - com.df.notify=true
-        #- com.df.serviceDomain=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
-        - com.df.port=9443
-        - com.df.srcPort=9443
-        - com.df.reqMode=tcp
+        com.df.notify: 'true'
+        com.df.port: 9443
+        com.df.srcPort: 9443
+        com.df.reqMode: sni
+        com.df.pathType: "req_ssl_sni -i -m reg"
+        com.df.servicePath: "^(apigateway-{{'default' | env('SITE_NAME')}}\\.)"
+
 
 
   api:
