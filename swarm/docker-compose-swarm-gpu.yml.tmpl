@@ -43,28 +43,6 @@ secrets:
 services:
 
 
-#  registrator:
-#    image: gliderlabs/registrator
-#    command: ["consul://consul-bootstrap:8500"]
-#    networks:
-#      - proxy
-#      - prod
-#    volumes:
-#      - /var/run/docker.sock:/tmp/docker.sock
-#    logging:
-#      options:
-#        max-size: 1g
-#    deploy:
-#      mode: replicated
-#      replicas: 1
-#      placement:
-#        constraints:
-#          - node.labels.site=={{'default' | env('SITE_NAME')}}
-#      restart_policy:
-#        delay: 5s
-
-
-
   guacamole:
     image: gcr.io/anyvision-production/guacamole:0.9.14
     networks:
@@ -175,36 +153,6 @@ services:
         com.df.reqMode: sni
         com.df.pathType: "req_ssl_sni -i -m reg"
         com.df.servicePath: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
-
-
-
-  desktop:
-    image: gcr.io/anyvision-production/desktop
-    networks:
-      prod:
-        aliases:
-          - desktop-{{'default' | env('SITE_NAME')}}.anyvision.local
-    volumes:
-      - /storage/sftp_data:/sftp:ro
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    environment:
-      - DISPLAY=:0
-      - VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
-      restart_policy:
-        delay: 5s
 
 
 
@@ -476,6 +424,7 @@ services:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
+      - /dev/shm:/dev/shm:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -530,10 +479,10 @@ services:
       - prod
     volumes:
       - /storage/sftp_data:/sftp:rw
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /media:/home/user/media:ro
       - /storage/share:/home/user/share:rw
       - /dev/shm:/dev/shm:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     secrets:
@@ -551,6 +500,37 @@ services:
       - env/global.env
       - env/api-gateway.env
       - env/dashboard.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
+      restart_policy:
+        delay: 5s
+
+
+
+  desktop:
+    image: gcr.io/anyvision-production/desktop
+    networks:
+      prod:
+        aliases:
+          - desktop-{{'default' | env('SITE_NAME')}}.anyvision.local
+    volumes:
+      - /storage/sftp_data:/sftp:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev/shm:/dev/shm:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - DISPLAY=:0
+      - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
+    env_file:
+      - env/global.env
     logging:
       options:
         max-size: 1g

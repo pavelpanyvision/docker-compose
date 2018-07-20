@@ -55,7 +55,8 @@ services:
       replicas: 1
       placement:
         constraints: [node.role == manager]
-
+      restart_policy:
+        delay: 5s
 
 
   df-swarm-listener:
@@ -70,6 +71,8 @@ services:
     deploy:
       placement:
         constraints: [node.role == manager]
+      restart_policy:
+        delay: 5s
 
 
 
@@ -101,6 +104,8 @@ services:
       replicas: 1
       placement:
         constraints: [node.role == manager]
+      restart_policy:
+        delay: 5s
     logging:
       options:
         max-size: 1g
@@ -121,6 +126,8 @@ services:
       - agent_network
     deploy:
       mode: global
+      restart_policy:
+        delay: 5s
 
 
 
@@ -138,32 +145,49 @@ services:
       replicas: 1
       placement:
         constraints: [node.role == manager]
+      restart_policy:
+        delay: 5s
 
 
 
-#  consul:
-#    image: consul:1.2.1
-#    volumes:
-#      - consul:/consul
-#    ports:
-#      - "8500:8500"
+ consul:
+   image: consul:1.2.1
+   volumes:
+     - consul:/consul
+   ports:
+     - "8500:8500"
+   networks:
+     prod:
+       aliases:
+         - consul.cluster
+   environment:
+     - 'CONSUL_LOCAL_CONFIG={ "skip_leave_on_interrupt": true, "leave_on_terminate": true, "datacenter":"dc1", "data_dir":"/consul/data", "server":true }'
+     - CONSUL_BIND_INTERFACE=eth0
+     #- CONSUL_BIND_ADDRESS=0.0.0.0
+   command: agent -ui -data-dir /consul/data -server -client 0.0.0.0 -bootstrap-expect=1 -retry-join consul.cluster
+   deploy:
+     #endpoint_mode: dnsrr
+     mode: global
+     placement:
+       constraints: [node.role == manager]
+     restart_policy:
+       delay: 5s
+
+
+
+#  registrator:
+#    image: gliderlabs/registrator
+#    command: ["consul://consul.cluster:8500"]
 #    networks:
-#      prod:
-#        aliases:
-#          - consul.cluster
-#    environment:
-#      - 'CONSUL_LOCAL_CONFIG={ "skip_leave_on_interrupt": true, "leave_on_terminate": true, "datacenter":"dc1", "data_dir":"/consul/data", "server":true }'
-#      - CONSUL_BIND_INTERFACE=eth0
-#      #- CONSUL_BIND_ADDRESS=0.0.0.0
-#    command: agent -ui -data-dir /consul/data -server -client 0.0.0.0 -bootstrap-expect=1 -retry-join consul.cluster
+#      - prod
+#    volumes:
+#      - /var/run/docker.sock:/tmp/docker.sock
+#    logging:
+#      options:
+#        max-size: 1g
 #    deploy:
-##      endpoint_mode: dnsrr
 #      mode: global
 #      placement:
-#        constraints:
-#          - node.role == manager
+#        constraints: [node.role == worker]
 #      restart_policy:
-#        condition: on-failure
 #        delay: 5s
-#        max_attempts: 10
-#        window: 120s

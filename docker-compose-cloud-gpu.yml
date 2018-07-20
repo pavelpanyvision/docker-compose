@@ -81,29 +81,6 @@ services:
 
 
 
-  desktop:
-    image: gcr.io/anyvision-production/desktop
-    restart: always
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
-    networks:
-      - anyvision
-    volumes:
-      - /storage/sftp_data:/sftp:ro
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    environment:
-      - DISPLAY=:0
-      - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
-    env_file:
-      - env/global.env
-    ipc: host
-    logging:
-      options:
-        max-size: 1g
-
-
-
   cron:
     image: gcr.io/anyvision-production/supercronic:latest
     restart: always
@@ -300,6 +277,7 @@ services:
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /dev/shm:/dev/shm:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -334,13 +312,13 @@ services:
     restart: always
     networks:
       - anyvision
-    shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /media:/home/user/media:ro
       - /storage/share:/home/user/share:rw
+      - /dev/shm:/dev/shm:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -357,3 +335,27 @@ services:
       options:
         max-size: 1g
     ipc: host
+
+
+
+  desktop:
+    image: gcr.io/anyvision-production/desktop
+    restart: always
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      - anyvision
+    volumes:
+      - /storage/sftp_data:/sftp:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev/shm:/dev/shm:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - DISPLAY=:0
+      - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
+    env_file:
+      - env/global.env
+    ipc: host
+    logging:
+      options:
+        max-size: 1g
