@@ -4,6 +4,7 @@ version: '3.3'
 
 volumes:
   consul:
+  portainer_data:
 
 
 networks:
@@ -13,6 +14,8 @@ networks:
     external: true
 #  consul:
 #    external: true
+  agent_network:
+    driver: overlay
 
 
 secrets:
@@ -22,6 +25,8 @@ secrets:
     file: ./tls/apigateway.anyvision.local.key.pem
   anv_ca:
     file: ./tls/anyvisionCA.pem
+  anv_ca_key:
+    file: ./tls/anyvisionCA.key.pem
   anv_full:
     file: ./tls/apigateway.anyvision.local.full.pem
   anv_csr:
@@ -33,17 +38,18 @@ secrets:
 services:
 
 
-
-  proxy:
+  df-proxy:
     image: dockerflow/docker-flow-proxy
     ports:
       - "80:80"
       - "443:443"
       - "9443:9443"
     networks:
-      - proxy
+      proxy:
+        aliases:
+          - proxy
     environment:
-      - LISTENER_ADDRESS=swarm-listener
+      - LISTENER_ADDRESS=df-swarm-listener
       - MODE=swarm
     deploy:
       replicas: 1
@@ -52,84 +58,89 @@ services:
 
 
 
-  swarm-listener:
+  df-swarm-listener:
     image: dockerflow/docker-flow-swarm-listener
     networks:
       - proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - DF_NOTIFY_CREATE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/reconfigure
-      - DF_NOTIFY_REMOVE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/remove
+      - DF_NOTIFY_CREATE_SERVICE_URL=http://df-proxy:8080/v1/docker-flow-proxy/reconfigure
+      - DF_NOTIFY_REMOVE_SERVICE_URL=http://df-proxy:8080/v1/docker-flow-proxy/remove
     deploy:
       placement:
         constraints: [node.role == manager]
 
 
 
+  docker-registry:
+    image: registry:2
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - registry.anyvision.local
+    ports:
+     - "5000:5000"
+    volumes:
+      - /storage/dockerregistry:/var/lib/registry
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:5000
+      #- REGISTRY_HTTP_TLS_CERTIFICATE=/certs/anyvisionCA.pem
+      #- REGISTRY_HTTP_TLS_KEY=/certs/anyvisionCA.key.pem
+    secrets:
+      - source: anv_ca
+        target: /certs/anyvisionCA.pem
+        uid: "0"
+        mode: 400
+      - source: anv_ca_key
+        target: /certs/anyvisionCA.key.pem
+        uid: "0"
+        mode: 400
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    logging:
+      options:
+        max-size: 1g
 
 
-#  traefik:
-#    image: traefik
-#    networks:
-#      - proxy
-#    ports:
-#      - "80:80"
-#      - "8080:80"
-#      #- "27017:80"
-#      - "443:443"
-#      - "9443:443"
-#      #- "5443:443"
-#      #- "4005:443"
-#      #- "9067:443"
-#      #- "9068:443"
-#      #- "9069:443"
-#      - "8081:8080"
-#    command:
-#      - "--api"
-#      - "--entrypoints=Name:http Address::80"
-#      #- "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
-#      - "--entrypoints=Name:https Address::443 TLS:/run/secrets/cert.pem,/run/secrets/key.pem"
-#      #- "--defaultentrypoints=http,https"
-#      - "--defaultentrypoints=http"
-#      - "--InsecureSkipVerify"
-#      - "--docker"
-#      - "--docker.domain=anyvision.local"
-#      - "--docker.swarmMode=true"
-#      - "--docker.watch=true"
-#      - "--docker.exposedByDefault=false"
-#      #- "--docker.endpoint=unix://var/run/docker.sock"
-#      #- "--docker.tls.insecureSkipVerify"
-#      - "--logLevel=DEBUG"
-#    secrets:
-#      - source: anv_cert
-#        target: cert.pem
-#        uid: "0"
-#        mode: 400
-#      - source: anv_key
-#        target: key.pem
-#        uid: "0"
-#        mode: 400
-#      - source: anv_ca
-#        target: ca.pem
-#        uid: "0"
-#        mode: 400
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    deploy:
-#      mode: replicated
-#      replicas: 1
-#      placement:
-#        constraints:
-#          - node.role == manager
-#      restart_policy:
-#        condition: on-failure
-#        delay: 5s
-#        max_attempts: 10
-#        window: 120s
-#
-#
-#
+
+  portainer-agent:
+    image: portainer/agent:1.0.0
+    environment:
+      # REQUIRED: Should be equal to the service name prefixed by "tasks." when
+      # deployed inside an overlay network
+      AGENT_CLUSTER_ADDR: tasks.portainer-agent
+      # AGENT_PORT: 9001
+      # LOG_LEVEL: debug
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - agent_network
+    deploy:
+      mode: global
+
+
+
+  portainer:
+    image: portainer/portainer:1.18.1
+    command: -H "tcp://tasks.portainer-agent:9001" --tlsskipverify
+    ports:
+      - "9000:9000"
+    volumes:
+      - portainer_data:/data
+    networks:
+      - agent_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+
+
 #  consul:
 #    image: consul:1.2.1
 #    volumes:
@@ -151,43 +162,6 @@ services:
 #      placement:
 #        constraints:
 #          - node.role == manager
-#      restart_policy:
-#        condition: on-failure
-#        delay: 5s
-#        max_attempts: 10
-#        window: 120s
-
-
-
-#  api-master:
-#    image: gcr.io/anyvision-training/api-master:development
-#    networks:
-#      prod:
-#        aliases:
-#          - api-master.anyvision.local
-#      - proxy
-#    #dns: 172.14.0.1  ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
-#    volumes:
-#      - /storage:/var/www/html
-#      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-#      - /etc/localtime:/etc/localtime:ro
-#      - /etc/timezone:/etc/timezone:ro
-#    environment:
-#      - RUN_AS_USER=user
-#      - ENABLE_CHOWN=false
-#      #- TZ=Etc/UTC    ## DO NOT CHANGE
-#    env_file:
-#      - env/global.env
-#      - env/api-master.env
-#    logging:
-#      options:
-#        max-size: 1g
-#    deploy:
-#      mode: replicated
-#      replicas: 1
-#      # placement:
-#      #   constraints:
-#      #     - node.role == manager
 #      restart_policy:
 #        condition: on-failure
 #        delay: 5s
