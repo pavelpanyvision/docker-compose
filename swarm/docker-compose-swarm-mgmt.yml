@@ -39,7 +39,7 @@ services:
 
 
   df-proxy:
-    image: dockerflow/docker-flow-proxy
+    image: dockerflow/docker-flow-proxy:18.07.18-74
     ports:
       - "80:80"
       - "443:443"
@@ -60,7 +60,7 @@ services:
 
 
   df-swarm-listener:
-    image: dockerflow/docker-flow-swarm-listener
+    image: dockerflow/docker-flow-swarm-listener:18.07.03-28
     networks:
       - proxy
     volumes:
