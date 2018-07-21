@@ -39,7 +39,7 @@ services:
 
 
   df-proxy:
-    image: dockerflow/docker-flow-proxy:18.07.18-74
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/docker-flow-proxy:18.07.18-74
     ports:
       - "80:80"
       - "443:443"
@@ -60,7 +60,7 @@ services:
 
 
   df-swarm-listener:
-    image: dockerflow/docker-flow-swarm-listener:18.07.03-28
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/docker-flow-swarm-listener:18.07.03-28
     networks:
       - proxy
     volumes:
@@ -86,18 +86,18 @@ services:
     ports:
      - "5000:5000"
     volumes:
-      - /storage/dockerregistry:/var/lib/registry
+      - /ssd/registry:/var/lib/registry
     environment:
       - REGISTRY_HTTP_ADDR=0.0.0.0:5000
-      #- REGISTRY_HTTP_TLS_CERTIFICATE=/certs/anyvisionCA.pem
-      #- REGISTRY_HTTP_TLS_KEY=/certs/anyvisionCA.key.pem
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/cert.pem
+      - REGISTRY_HTTP_TLS_KEY=/certs/key.pem
     secrets:
-      - source: anv_ca
-        target: /certs/anyvisionCA.pem
+      - source: anv_cert
+        target: /certs/cert.pem
         uid: "0"
         mode: 400
-      - source: anv_ca_key
-        target: /certs/anyvisionCA.key.pem
+      - source: anv_key
+        target: /certs/key.pem
         uid: "0"
         mode: 400
     deploy:
@@ -113,7 +113,7 @@ services:
 
 
   portainer-agent:
-    image: portainer/agent:1.0.0
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/portainer-agent:1.0.0
     environment:
       # REQUIRED: Should be equal to the service name prefixed by "tasks." when
       # deployed inside an overlay network
@@ -132,7 +132,7 @@ services:
 
 
   portainer:
-    image: portainer/portainer:1.18.1
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/portainer:1.18.1
     command: -H "tcp://tasks.portainer-agent:9001" --tlsskipverify
     ports:
       - "9000:9000"
@@ -151,7 +151,7 @@ services:
 
 
  consul:
-   image: consul:1.2.1
+   image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/consul:1.2.1
    volumes:
      - consul:/consul
    ports:
@@ -176,7 +176,7 @@ services:
 
 
 #  registrator:
-#    image: gliderlabs/registrator
+#    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/registrator:v7
 #    command: ["consul://consul.cluster:8500"]
 #    networks:
 #      - prod

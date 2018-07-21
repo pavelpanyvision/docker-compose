@@ -44,7 +44,7 @@ services:
 
 
   guacamole:
-    image: gcr.io/anyvision-production/guacamole:0.9.14
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/guacamole:0.9.14
     networks:
       proxy:
       prod:
@@ -81,7 +81,7 @@ services:
 
 
   sftp:
-    image: atmoz/sftp
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/sftp:alpine
     networks:
       prod:
         aliases:
@@ -108,7 +108,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-production/nginx-rtmp:ssl
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/nginx-rtmp:ssl
     networks:
       proxy:
       prod:
@@ -157,7 +157,7 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-production/supercronic:latest
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/supercronic:latest
     networks:
       prod:
         aliases:
@@ -187,7 +187,7 @@ services:
 
 
   rabbitmq:
-    image: gcr.io/anyvision-production/rabbitmq:latest
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/rabbitmq:latest
     networks:
       prod:
         aliases:
@@ -213,7 +213,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-production/mongo:3.6-jessie
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/mongo:3.6-jessie
     networks:
       prod:
         aliases:
@@ -239,7 +239,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-production/redis:latest
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/redis:latest
     networks:
       prod:
         aliases:
@@ -263,7 +263,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/broadcaster:1.19.2
     hostname: broadcaster
     networks:
       proxy:
@@ -303,7 +303,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-gateway:1.19.2
     networks:
       proxy:
       prod:
@@ -364,7 +364,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api:1.19.2
     networks:
       proxy:
       prod:
@@ -412,7 +412,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-pyconcrete:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.2
     networks:
       prod:
         aliases:
@@ -474,7 +474,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-production/dashboard:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard:1.19.2
     networks:
       - prod
     volumes:
@@ -515,7 +515,7 @@ services:
 
 
   desktop:
-    image: gcr.io/anyvision-production/desktop
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/desktop:latest
     networks:
       prod:
         aliases:

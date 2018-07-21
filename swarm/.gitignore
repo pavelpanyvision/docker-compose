@@ -1,2 +1,3 @@
 tls/
 sites/
+docker-compose-swarm-mgmt.yml
