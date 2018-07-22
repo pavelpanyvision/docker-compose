@@ -1,2 +1,0 @@
-*/15 * * * * track_delete=$(date --iso-8601=seconds  -d "$TO_DATE_TRACK_DELETE day ago") && curl -G -X "DELETE" --data-urlencode "toDate=$track_delete" http://api:3000/detections
-#* * * * * /root/migration/mongo_migration_1.19.2.sh /root/migration/ignoreMigration.js

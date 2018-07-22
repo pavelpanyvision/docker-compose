@@ -4,16 +4,19 @@ services:
 
   dslr:
     restart: always
+    privileged: true
     networks:
       - anyvision
     image: gcr.io/anyvision-training/dslr
     volumes:
       - backend_data:/root/pipe_data
-      - /storage:/var/www/html
-      - /storage/cameraMount:/root/mount
+      - c:/anv/storage:/var/www/html
+      - c:/anv/storage/cameraMount:/root/mount
     env_file:
-      - dslr.env
-    privileged: true
+      - env/dslr.env
+      - env/backend.env
+      - env/global.env
+
 
 volumes:
   backend_data:
