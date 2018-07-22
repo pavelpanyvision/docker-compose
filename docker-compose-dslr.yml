@@ -13,6 +13,8 @@ services:
       - /storage:/var/www/html
       - /storage/cameraMount:/root/mount
       - /dev:/dev:rw
+    environment:
+      - pipe_cpu_mode=true
     env_file:
       - env/dslr.env
       - env/backend.env

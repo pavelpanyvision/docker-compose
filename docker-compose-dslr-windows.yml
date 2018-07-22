@@ -12,6 +12,8 @@ services:
       - backend_data:/root/pipe_data
       - c:/anv/storage:/var/www/html
       - c:/anv/storage/cameraMount:/root/mount
+    environment:
+      - pipe_cpu_mode=true
     env_file:
       - env/dslr.env
       - env/backend.env
