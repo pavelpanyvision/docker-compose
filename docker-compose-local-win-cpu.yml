@@ -49,7 +49,7 @@ services:
           - cron-${node_name:-localnode}.anyvision.local
     volumes:
       - c:/anv/storage:/var/www/html
-      - ./env/crontab:/etc/crontab
+      - ./env/crontab:/etc/crontabs/crontab
     environment:
       - TO_DATE_TRACK_DELETE=30
     logging:
