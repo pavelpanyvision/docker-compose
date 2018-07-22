@@ -18,7 +18,11 @@ docker login "https://gcr.io" --username "oauth2accesstoken" --password <token f
 ```
 
 ###
-install python
+install python 2.7
+windows: ```https://www.python.org/ftp/python/2.7/python-2.7.amd64.msi```
+linux: already built in
+
+install it by next next next
 
 ### download mtp drive
 ```
