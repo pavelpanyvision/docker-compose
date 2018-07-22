@@ -41,6 +41,10 @@ for linux: ```https://docs.docker.com/install/linux/docker-ce/ubuntu/```
 git clone -b dslr git@github.com:AnyVisionltd/docker-compose.git
 ```
 
+### download git DSLR files
+```
+git clone https://github.com/AnyVisionltd/IDF_DSLR 
+```
 
 ### credentials for docker login
 option 1: with token
@@ -50,4 +54,6 @@ got to ```http://jenkins.anyvision.co/job/gcloud_generate_new_token/``` in order
 ``` 
 docker login "https://gcr.io" --username "oauth2accesstoken" --password <token from jenkins>
 ```
+
+### docker pull & up -d
 
