@@ -41,7 +41,7 @@ for linux: ```https://docs.docker.com/install/linux/docker-ce/ubuntu/```
 git clone -b dslr git@github.com:AnyVisionltd/docker-compose.git
 ```
 
-### download git DSLR files
+### download git DSLR windows watcher files
 ```
 git clone https://github.com/AnyVisionltd/IDF_DSLR 
 ```
@@ -55,5 +55,25 @@ got to ```http://jenkins.anyvision.co/job/gcloud_generate_new_token/``` in order
 docker login "https://gcr.io" --username "oauth2accesstoken" --password <token from jenkins>
 ```
 
-### docker pull & up -d
+### set configuration
 
+First, verify env/backend.env is up to date from the main docker-compose github repo under development branch
+
+Second, edit env/dslr.env with the relevant API_IP , API_PORT and etc...
+
+Third, Edit the IDF_DSLR/windows_watcher/Settings.json with the relevant Directory path
+
+
+### docker pull & up -d
+```
+cd <path of the docker compose files>
+
+#linux:
+docker-compose -f docker-compose-dslr.yml pull
+docker-compose -f docker-compose-dslr.yml up -d
+
+
+#windows:
+docker-compose -f docker-compose-dslr-windows.yml pull
+docker-compose -f docker-compose-dslr-windows.yml up -d
+```

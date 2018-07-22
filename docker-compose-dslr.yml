@@ -12,6 +12,7 @@ services:
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
       - /storage/cameraMount:/root/mount
+      - /storage/logs:/var/www/html/logs
       - /dev:/dev:rw
     environment:
       - pipe_cpu_mode=true

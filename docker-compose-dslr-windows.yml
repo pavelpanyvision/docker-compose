@@ -11,6 +11,7 @@ services:
     volumes:
       - backend_data:/root/pipe_data
       - c:/anv/storage:/var/www/html
+      - c:/anv/storage/logs:/var/www/html/logs
       - c:/anv/storage/cameraMount:/root/mount
     environment:
       - pipe_cpu_mode=true
