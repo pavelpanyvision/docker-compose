@@ -1,24 +1,5 @@
+### install python 2.7
 
-### install docker ce
-for windows: ```https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe```
-
-for linux: ```https://docs.docker.com/install/linux/docker-ce/ubuntu/```
-
-### download git compose files 
-``` 
-git clone -b dslr git@github.com:AnyVisionltd/docker-compose.git
-```
-
-
-### credentials for docker login
-option 1: with token
-
-``` 
-docker login "https://gcr.io" --username "oauth2accesstoken" --password <token from jenkins>
-```
-
-###
-install python 2.7
 windows: ```https://www.python.org/ftp/python/2.7/python-2.7.amd64.msi```
 linux: already built in
 
@@ -48,3 +29,25 @@ Ie344vFLBgMBHVCm1M+9MWfjEUNSXE+osdngmf93pXNEijYInkhf1tjBjtC9d0uV
 6CwThPsRN/nlSBQmyWIz6UaZmvR7UOvRfKUkW2i6f50=
 -----END MTPDRIVE REGISTRATION KEY----- 
 ```
+
+
+### install docker ce
+for windows: ```https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe```
+
+for linux: ```https://docs.docker.com/install/linux/docker-ce/ubuntu/```
+
+### download git compose files 
+``` 
+git clone -b dslr git@github.com:AnyVisionltd/docker-compose.git
+```
+
+
+### credentials for docker login
+option 1: with token
+
+got to ```http://jenkins.anyvision.co/job/gcloud_generate_new_token/``` in order to generate new token
+
+``` 
+docker login "https://gcr.io" --username "oauth2accesstoken" --password <token from jenkins>
+```
+
