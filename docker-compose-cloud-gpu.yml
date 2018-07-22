@@ -11,18 +11,13 @@ volumes:
 
 networks:
   anyvision:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.14.0.0/16
 
 
 services:
 
 
   guacamole:
-    image: gcr.io/anyvision-training/guacamole:0.9.14
+    image: gcr.io/anyvision-production/guacamole:0.9.14
     restart: always
     networks:
       - anyvision
@@ -32,6 +27,8 @@ services:
       - ./guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    environment:
+      - GUACD_LOGLEVEL=info
     env_file:
       - env/global.env
     logging:
@@ -59,7 +56,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    image: gcr.io/anyvision-production/nginx-rtmp:ssl
     restart: always
     networks:
       anyvision:
@@ -74,31 +71,10 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  desktop:
-    image: gcr.io/anyvision-training/desktop
-    restart: always
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
-    networks:
-      - anyvision
-    volumes:
-      - /storage/sftp_data:/sftp:ro
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     environment:
-      - DISPLAY=:0
-      - VNC_OPTIONS=-auth /home/user/.Xauthority -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
+      - limit_rate_speed=0
     env_file:
       - env/global.env
-    ipc: host
     logging:
       options:
         max-size: 1g
@@ -106,7 +82,7 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:latest
+    image: gcr.io/anyvision-production/supercronic:latest
     restart: always
     networks:
       anyvision:
@@ -126,7 +102,7 @@ services:
 
 
   rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
+    image: gcr.io/anyvision-production/rabbitmq:latest
     restart: always
     networks:
       anyvision:
@@ -148,7 +124,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     restart: always
     networks:
       anyvision:
@@ -169,7 +145,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:latest
+    image: gcr.io/anyvision-production/redis:latest
     restart: always
     networks:
       anyvision:
@@ -188,7 +164,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:1.19.2
+    image: gcr.io/anyvision-production/broadcaster:1.19.2
     restart: always
     hostname: broadcaster
     networks:
@@ -216,7 +192,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:1.19.2
+    image: gcr.io/anyvision-production/api-gateway:1.19.2
     restart: always
     networks:
       anyvision:
@@ -251,7 +227,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:1.19.2
+    image: gcr.io/anyvision-production/api:1.19.2
     restart: always
     networks:
       anyvision:
@@ -281,7 +257,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.19.2
     restart: always
     networks:
       anyvision:
@@ -301,6 +277,7 @@ services:
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /dev/shm:/dev/shm:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -323,25 +300,25 @@ services:
     env_file:
       - env/backend.env
       - env/global.env
+    ipc: host
     logging:
       options:
         max-size: 1g
-    ipc: host
 
 
 
   dashboard:
-    image: gcr.io/anyvision-training/dashboard:1.19.2
+    image: gcr.io/anyvision-production/dashboard:1.19.2
     restart: always
     networks:
       - anyvision
-    shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /media:/home/user/media:ro
       - /storage/share:/home/user/share:rw
+      - /dev/shm:/dev/shm:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -354,7 +331,31 @@ services:
       - env/global.env
       - env/api-gateway.env
       - env/dashboard.env
+    ipc: host
     logging:
       options:
         max-size: 1g
+
+
+
+  desktop:
+    image: gcr.io/anyvision-production/desktop
+    restart: always
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      - anyvision
+    volumes:
+      - /storage/sftp_data:/sftp:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev/shm:/dev/shm:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - DISPLAY=:0
+      - VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
+    env_file:
+      - env/global.env
     ipc: host
+    logging:
+      options:
+        max-size: 1g

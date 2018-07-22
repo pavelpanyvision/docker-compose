@@ -1,4 +1,6 @@
+#filename: docker-compose-swarm-gpu.yml.tmpl
 version: '3.3'
+
 
 volumes:
   mongo_db_data:
@@ -8,7 +10,6 @@ volumes:
 
 ### create prod overlay network: docker network create -d overlay --attachable prod
 ### create proxy overlay network: docker network create -d overlay --attachable proxy
-
 
 networks:
   prod:
@@ -20,54 +21,35 @@ networks:
 configs:
   {{'default' | env('SITE_NAME')}}_guacamole_mapping:
     file: ./guacamole/user-mapping-cloud.xml
+  {{'default' | env('SITE_NAME')}}_cron_config:
+    file: ./env/crontab
 
 
-# secrets:
-#   anv_cert:
-#     file: ./tls/cert.pem
-#   anv_key:
-#     file: ./tls/key.pem
-#   anv_ca:
-#     file: ./tls/ca.pem
+secrets:
+  anv_cert:
+    file: ./tls/apigateway.anyvision.local.crt
+  anv_key:
+    file: ./tls/apigateway.anyvision.local.key.pem
+  anv_ca:
+    file: ./tls/anyvisionCA.pem
+  anv_full:
+    file: ./tls/apigateway.anyvision.local.full.pem
+  anv_csr:
+    file: ./tls/apigateway.anyvision.local.csr
+  passinfo:
+    file: ./tls/passinfo
 
 
 services:
 
 
-#  registrator:
-#    image: gliderlabs/registrator
-#    command: ["consul://consul-bootstrap:8500"]
-#    networks:
-#      - proxy
-#      - prod
-#    volumes:
-#      - /var/run/docker.sock:/tmp/docker.sock
-#    logging:
-#      options:
-#        max-size: 1g
-#    deploy:
-#      mode: replicated
-#      replicas: 1
-#      placement:
-#        constraints:
-#          - node.labels.site=={{'default' | env('SITE_NAME')}}
-#      restart_policy:
-#        condition: on-failure
-#        delay: 5s
-#        max_attempts: 10
-#        window: 120s
-
-
-
   guacamole:
-    image: gcr.io/anyvision-training/guacamole:0.9.14
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/guacamole:0.9.14
     networks:
       proxy:
       prod:
         aliases:
          - guacamole-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "8080:8080"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -75,19 +57,8 @@ services:
       - source: {{'default' | env('SITE_NAME')}}_guacamole_mapping
         target: /etc/guacamole/user-mapping.xml
         mode: 444
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
+    environment:
+      - GUACD_LOGLEVEL=info
     env_file:
       - env/global.env
     logging:
@@ -100,20 +71,17 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
       labels:
-        - traefik.frontend.rule=PathPrefixStrip:/{{'default' | env('SITE_NAME')}}/
-        - traefik.docker.network=proxy
-        - traefik.port=8080
-        - traefik.enable=true
+        com.df.notify: 'true'
+        com.df.servicePath: "/{{'default' | env('SITE_NAME')}}"
+        com.df.reqPathSearchReplace: "/{{'default' | env('SITE_NAME')}},"
+        com.df.port: 8080
 
 
 
   sftp:
-    image: atmoz/sftp
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/sftp:alpine
     networks:
       prod:
         aliases:
@@ -135,42 +103,34 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/nginx-rtmp:ssl
     networks:
       proxy:
       prod:
         aliases:
          - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "1935:1935"
-      #- "443:443"
-      #- "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
+    secrets:
+      - source: anv_cert
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
+        uid: "0"
+        mode: 400
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 400
+      - source: passinfo
+        target: /usr/local/share/ca-certificates/anyvision/passinfo
+        uid: "0"
+        mode: 400
     environment:
       - limit_rate_speed=0
     env_file:
@@ -185,57 +145,31 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
-
-
-
-  desktop:
-    image: gcr.io/anyvision-training/desktop
-    networks:
-      prod:
-        aliases:
-          - desktop-{{'default' | env('SITE_NAME')}}.anyvision.local
-    volumes:
-      - /storage/sftp_data:/sftp:ro
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    environment:
-      - DISPLAY=:0
-      - VNC_OPTIONS=-auth /home/user/.Xauthority -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0 -noshm
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 10
-        window: 120s
+      labels:
+        com.df.notify: 'true'
+        com.df.port: 443
+        com.df.srcPort: 443
+        com.df.reqMode: sni
+        com.df.pathType: "req_ssl_sni -i -m reg"
+        com.df.servicePath: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
 
 
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:latest
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/supercronic:latest
     networks:
       prod:
         aliases:
           - cron-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/var/www/html
-      - /storage/crontab:/etc/crontab
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    configs:
+      - source: {{'default' | env('SITE_NAME')}}_cron_config
+        target: /etc/crontab
+        mode: 444
     environment:
       - TO_DATE_TRACK_DELETE=30
     logging:
@@ -248,22 +182,16 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
   rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/rabbitmq:latest
     networks:
       prod:
         aliases:
           - rabbitmq-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "5761:5761"
-      #- "15761:15761"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
@@ -280,21 +208,16 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/mongo:3.6-jessie
     networks:
       prod:
         aliases:
           - mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "27017:27017"
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
@@ -311,15 +234,12 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:latest
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/redis:latest
     networks:
       prod:
         aliases:
@@ -338,15 +258,12 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/broadcaster:1.19.2
     hostname: broadcaster
     networks:
       proxy:
@@ -354,22 +271,13 @@ services:
         aliases:
           - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
+    secrets:
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
     depends_on:
       - api
     environment:
@@ -390,41 +298,35 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-gateway:1.19.2
     networks:
       proxy:
       prod:
         aliases:
           - apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "9443:9443"
     volumes:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
+    secrets:
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 444
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
+      - source: anv_full
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.full.pem
+        uid: "0"
+        mode: 444
     depends_on:
       - redis
     environment:
@@ -436,6 +338,7 @@ services:
       - REDIS_HOST=redis-{{'default' | env('SITE_NAME')}}.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
+      - ENABLE_CREATE_SSL=false
     env_file:
       - env/api-gateway.env
       - env/global.env
@@ -449,40 +352,41 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
+      labels:
+        com.df.notify: 'true'
+        com.df.port: 9443
+        com.df.srcPort: 9443
+        com.df.reqMode: sni
+        com.df.pathType: "req_ssl_sni -i -m reg"
+        com.df.servicePath: "^(apigateway-{{'default' | env('SITE_NAME')}}\\.)"
 
 
 
   api:
-    image: gcr.io/anyvision-training/api:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api:1.19.2
     networks:
       proxy:
       prod:
         aliases:
           - api-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "5443:5443"
     volumes:
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
+    secrets:
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 444
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
+      - source: anv_full
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.full.pem
+        uid: "0"
+        mode: 444
     environment:
       - API_IP=api-{{'default' | env('SITE_NAME')}}.anyvision.local
       - MONGO_DB_IP=mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
@@ -503,15 +407,12 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-pyconcrete:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.2
     networks:
       prod:
         aliases:
@@ -519,33 +420,27 @@ services:
           - reid-{{'default' | env('SITE_NAME')}}.anyvision.local
           - coll-{{'default' | env('SITE_NAME')}}.anyvision.local
           - arch-{{'default' | env('SITE_NAME')}}.anyvision.local
-    #ports:
-      #- "4005:4005"
-      #- "9067:9067"
-      #- "9068:9068"
-      #- "9069:9069"
-      #- "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /dev/shm:/dev/shm:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    #secrets:
-    #  - source: anv_cert
-    #    target: cert.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_key
-    #    target: key.pem
-    #    uid: "0"
-    #    mode: 400
-    #  - source: anv_ca
-    #    target: ca.pem
-    #    uid: "0"
-    #    mode: 400
+    secrets:
+      - source: anv_cert
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
+        uid: "0"
+        mode: 444
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 444
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
     environment:
       - DISPLAY=:0
       - external_ip=proc-{{'default' | env('SITE_NAME')}}.anyvision.local
@@ -575,58 +470,75 @@ services:
         constraints:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
-        condition: on-failure
         delay: 5s
-        max_attempts: 10
-        window: 120s
 
 
-#  dashboard:
-#    image: gcr.io/anyvision-training/dashboard:1.19.2
-#    networks:
-#      - prod
-#    volumes:
-#      - /storage/sftp_data:/sftp:rw
-#      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
-#      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-#      - /media:/home/user/media:ro
-#      - /storage/share:/home/user/share:rw
-#      - /etc/localtime:/etc/localtime:ro
-#      - /etc/timezone:/etc/timezone:ro
-#    #secrets:
-#    #  - source: anv_cert
-#    #    target: cert.pem
-#    #    uid: "0"
-#    #    mode: 400
-#    #  - source: anv_key
-#    #    target: key.pem
-#    #    uid: "0"
-#    #    mode: 400
-#    #  - source: anv_ca
-#    #    target: ca.pem
-#    #    uid: "0"
-#    #    mode: 400
-#    environment:
-#      - DISPLAY=:0
-#      - ssl=true
-#      - GATEWAY_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
-#      - RUN_AS_USER=user
-#      - ENABLE_CHOWN=false
-#    env_file:
-#      - env/global.env
-#      - env/api-gateway.env
-#      - env/dashboard.env
-#    logging:
-#      options:
-#        max-size: 1g
-#    deploy:
-#      mode: replicated
-#      replicas: 1
-#      placement:
-#        constraints:
-#          - node.labels.site=={{'default' | env('SITE_NAME')}}
-#      restart_policy:
-#        condition: on-failure
-#        delay: 5s
-#        max_attempts: 10
-#        window: 120s
+  dashboard:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard:1.19.2
+    networks:
+      - prod
+    volumes:
+      - /storage/sftp_data:/sftp:rw
+      - /media:/home/user/media:ro
+      - /storage/share:/home/user/share:rw
+      - /dev/shm:/dev/shm:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    secrets:
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
+    environment:
+      - DISPLAY=:0
+      - ssl=true
+      - GATEWAY_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+    env_file:
+      - env/global.env
+      - env/api-gateway.env
+      - env/dashboard.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
+      restart_policy:
+        delay: 5s
+
+
+
+  desktop:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/desktop:latest
+    networks:
+      prod:
+        aliases:
+          - desktop-{{'default' | env('SITE_NAME')}}.anyvision.local
+    volumes:
+      - /storage/sftp_data:/sftp:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev/shm:/dev/shm:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - DISPLAY=:0
+      - VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
+      restart_policy:
+        delay: 5s

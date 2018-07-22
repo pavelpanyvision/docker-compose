@@ -1,0 +1,193 @@
+#filename: docker-compose-swarm-mgmt.yml
+version: '3.3'
+
+
+volumes:
+  consul:
+  portainer_data:
+
+
+networks:
+  prod:
+    external: true
+  proxy:
+    external: true
+#  consul:
+#    external: true
+  agent_network:
+    driver: overlay
+
+
+secrets:
+  anv_cert:
+    file: ./tls/apigateway.anyvision.local.crt
+  anv_key:
+    file: ./tls/apigateway.anyvision.local.key.pem
+  anv_ca:
+    file: ./tls/anyvisionCA.pem
+  anv_ca_key:
+    file: ./tls/anyvisionCA.key.pem
+  anv_full:
+    file: ./tls/apigateway.anyvision.local.full.pem
+  anv_csr:
+    file: ./tls/apigateway.anyvision.local.csr
+  passinfo:
+    file: ./tls/passinfo
+
+
+services:
+
+
+  df-proxy:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/docker-flow-proxy:18.07.18-74
+    ports:
+      - "80:80"
+      - "443:443"
+      - "9443:9443"
+    networks:
+      proxy:
+        aliases:
+          - proxy
+    environment:
+      - LISTENER_ADDRESS=df-swarm-listener
+      - MODE=swarm
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        delay: 5s
+
+
+  df-swarm-listener:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/docker-flow-swarm-listener:18.07.03-28
+    networks:
+      - proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DF_NOTIFY_CREATE_SERVICE_URL=http://df-proxy:8080/v1/docker-flow-proxy/reconfigure
+      - DF_NOTIFY_REMOVE_SERVICE_URL=http://df-proxy:8080/v1/docker-flow-proxy/remove
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        delay: 5s
+
+
+
+  docker-registry:
+    image: registry:2
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - registry.anyvision.local
+    ports:
+     - "5000:5000"
+    volumes:
+      - /ssd/registry:/var/lib/registry
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:5000
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/cert.pem
+      - REGISTRY_HTTP_TLS_KEY=/certs/key.pem
+    secrets:
+      - source: anv_cert
+        target: /certs/cert.pem
+        uid: "0"
+        mode: 400
+      - source: anv_key
+        target: /certs/key.pem
+        uid: "0"
+        mode: 400
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        delay: 5s
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  portainer-agent:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/portainer-agent:1.0.0
+    environment:
+      # REQUIRED: Should be equal to the service name prefixed by "tasks." when
+      # deployed inside an overlay network
+      AGENT_CLUSTER_ADDR: tasks.portainer-agent
+      # AGENT_PORT: 9001
+      # LOG_LEVEL: debug
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - agent_network
+    deploy:
+      mode: global
+      restart_policy:
+        delay: 5s
+
+
+
+  portainer:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/portainer:1.18.1
+    command: -H "tcp://tasks.portainer-agent:9001" --tlsskipverify
+    ports:
+      - "9000:9000"
+    volumes:
+      - portainer_data:/data
+    networks:
+      - agent_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        delay: 5s
+
+
+
+ consul:
+   image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/consul:1.2.1
+   volumes:
+     - consul:/consul
+   ports:
+     - "8500:8500"
+   networks:
+     prod:
+       aliases:
+         - consul.cluster
+   environment:
+     - 'CONSUL_LOCAL_CONFIG={ "skip_leave_on_interrupt": true, "leave_on_terminate": true, "datacenter":"dc1", "data_dir":"/consul/data", "server":true }'
+     - CONSUL_BIND_INTERFACE=eth0
+     #- CONSUL_BIND_ADDRESS=0.0.0.0
+   command: agent -ui -data-dir /consul/data -server -client 0.0.0.0 -bootstrap-expect=1 -retry-join consul.cluster
+   deploy:
+     #endpoint_mode: dnsrr
+     mode: global
+     placement:
+       constraints: [node.role == manager]
+     restart_policy:
+       delay: 5s
+
+
+
+#  registrator:
+#    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/registrator:v7
+#    command: ["consul://consul.cluster:8500"]
+#    networks:
+#      - prod
+#    volumes:
+#      - /var/run/docker.sock:/tmp/docker.sock
+#    logging:
+#      options:
+#        max-size: 1g
+#    deploy:
+#      mode: global
+#      placement:
+#        constraints: [node.role == worker]
+#      restart_policy:
+#        delay: 5s
