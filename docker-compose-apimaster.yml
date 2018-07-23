@@ -105,7 +105,7 @@ services:
       anyvision:
         aliases:
           - api.anyvision.local
-    ports:
+   # ports:
       #- "3000:3000"
       #- "38389:38389"
     volumes:
