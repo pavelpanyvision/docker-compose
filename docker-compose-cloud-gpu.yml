@@ -209,7 +209,7 @@ services:
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - api_service_ip=api.anyvision.local
-      - BCAST_SOCKETIO_API_URL="https://apigateway.anyvision.local:5443"
+      - BCAST_SOCKETIO_API_URL=https://apigateway.anyvision.local:5443
       - RUN_AS_USER=user
       - ENABLE_CHOWN=true
     env_file:
