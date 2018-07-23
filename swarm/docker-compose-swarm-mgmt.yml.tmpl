@@ -84,9 +84,9 @@ services:
         aliases:
           - registry.anyvision.local
     ports:
-     - "5000:5000"
+      - "5000:5000"
     volumes:
-      - /ssd/registry:/var/lib/registry
+      - /ssd/docker-registry:/var/lib/registry
     environment:
       - REGISTRY_HTTP_ADDR=0.0.0.0:5000
       - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/cert.pem
@@ -103,7 +103,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.role == manager]
+        constraints: [node.labels.type==registry]
       restart_policy:
         delay: 5s
     logging:
