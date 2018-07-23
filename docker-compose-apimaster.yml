@@ -29,7 +29,7 @@ services:
         aliases:
           - dashboard-master-${node_name:-localnode}.anyvision.local
     ports:
-      - "443:443"
+    #  - "443:443"
       - "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
@@ -74,8 +74,8 @@ services:
       anyvision:
         aliases:
           - api-master.anyvision.local
-    ports:
-      - "27183:27183"
+   # ports:
+   #  - "27183:27183"
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -95,47 +95,7 @@ services:
     logging:
       options:
         max-size: 1g
-        
-     
-     
-  apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
-    restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
-    networks:
-      anyvision:
-        aliases:
-          - apigateway.anyvision.local
-    ports:
-      - "9443:9443"
-      - "38391:38391"
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
-    volumes:
-      - /storage:/var/www/html
-      - api_gateway_keys:/home/user/api-gateway/config/keys
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-      #- /home/anyvision/Projects/API-gateway:/home/user/api-gateway         ### mount your local project directory to the container
-    depends_on:
-      - redis
-    environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
-      - GATEWAY_HOST=apigateway.anyvision.local
-      - API_HOST=api.anyvision.local
-      - DASH_API_URL=https://api.anyvision.local:5443
-      - GATEWAY_SECURE_URL=https://apigateway.anyvision.local:9443
-      - GATEWAY_URL=http://apigateway.anyvision.local:8080
-      - REDIS_HOST=redis.anyvision.local
-      - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
-    env_file:
-      - env/api-gateway.env
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
+           
 
 
   api:
@@ -147,7 +107,7 @@ services:
           - api.anyvision.local
     ports:
       #- "3000:3000"
-      - "38389:38389"
+      #- "38389:38389"
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -168,28 +128,9 @@ services:
     logging:
       options:
         max-size: 1g
-           
-  
+          
         
-  redis:
-    image: gcr.io/anyvision-training/redis:latest
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - redis.anyvision.local
-    sysctls:
-      - net.core.somaxconn=511
-    volumes:
-      - redis_db_data:/data:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    logging:
-      options:
-        max-size: 1g
-
-
-
+  
   backend:
     image: gcr.io/anyvision-training/backend:development
     restart: always
@@ -202,12 +143,12 @@ services:
           - reid-${node_name:-localnode}.anyvision.local
           - coll-${node_name:-localnode}.anyvision.local
           - arch-${node_name:-localnode}.anyvision.local
-    ports:
-      - "4005:4005"
-      - "9067:9067"
-      - "9068:9068"
-      - "9069:9069"
-      - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
+   # ports:
+   #   - "4005:4005"
+   #   - "9067:9067"
+   #   - "9068:9068"
+   #   - "9069:9069"
+   #   - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
