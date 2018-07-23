@@ -263,7 +263,7 @@ services:
 
 
   broadcaster:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/broadcaster:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/broadcaster:1.19.3
     hostname: broadcaster
     networks:
       proxy:
@@ -303,7 +303,7 @@ services:
 
 
   apigateway:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-gateway:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-gateway:1.19.3
     networks:
       proxy:
       prod:
@@ -364,7 +364,7 @@ services:
 
 
   api:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api:1.19.3
     networks:
       proxy:
       prod:
@@ -412,7 +412,7 @@ services:
 
 
   backend:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.3
     networks:
       prod:
         aliases:
@@ -474,7 +474,7 @@ services:
 
 
   dashboard:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard:1.19.3
     networks:
       - prod
     volumes:
