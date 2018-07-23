@@ -15,7 +15,7 @@ services:
 
 
   dashboard-master:
-    image: gcr.io/anyvision-training/dashboard-master:development
+    image: gcr.io/anyvision-production/dashboard-master:1.19.3
     restart: always
     networks:
       anyvision:
@@ -40,7 +40,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     restart: always
     networks:
       anyvision:
@@ -61,7 +61,7 @@ services:
 
 
   api-master:
-    image: gcr.io/anyvision-training/api-master:development
+    image: gcr.io/anyvision-production/api-master:1.19.3
     restart: always
     networks:
       anyvision:
@@ -92,7 +92,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-production/api:1.19.3
     restart: always
     networks:
       anyvision:
@@ -125,7 +125,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:development
+    image: gcr.io/anyvision-production/backend:1.19.3
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
