@@ -2,6 +2,9 @@
 version: '3.3'
 
 
+volumes:
+  mongo_db_data:
+
 networks:
   anyvision:
     driver: bridge
