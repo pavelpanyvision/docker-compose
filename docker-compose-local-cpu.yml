@@ -179,7 +179,7 @@ services:
       - api
     environment:
       - api_service_ip=api.anyvision.local
-      - BCAST_SOCKETIO_API_URL="https://apigateway.anyvision.local:5443"
+      - BCAST_SOCKETIO_API_URL="https://api.anyvision.local:5443"
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
