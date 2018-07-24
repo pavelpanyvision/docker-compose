@@ -69,9 +69,9 @@ services:
     logging:
       options:
         max-size: 1g
-		
-		
-    
+
+
+
   api:
     image: gcr.io/anyvision-training/api:development
     restart: always
@@ -82,7 +82,6 @@ services:
     ports:
       - "5443:5443"
       - "38389:38389"
-      - "3000:3000"
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -103,9 +102,9 @@ services:
     logging:
       options:
         max-size: 1g
-		
-    
-		
+
+
+
   mongodb:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
     restart: always
@@ -124,9 +123,9 @@ services:
     logging:
       options:
         max-size: 1g
-		
-    
-		
+
+
+
   backend:
     image: gcr.io/anyvision-training/backend:development
     restart: always
