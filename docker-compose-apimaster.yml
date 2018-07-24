@@ -29,10 +29,8 @@ services:
         aliases:
           - dashboard-master-${node_name:-localnode}.anyvision.local
     ports:
-    #  - "443:443"
       - "80:80"
     volumes:
-      - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
