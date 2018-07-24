@@ -1,0 +1,179 @@
+#filename: docker-compose-all-api-master.yml
+version: '3.3'
+
+
+networks:
+  anyvision:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.14.0.0/16
+
+
+services:
+
+
+  dashboard-master:
+    image: gcr.io/anyvision-training/dashboard-master:development
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - dashboard-master-${node_name:-localnode}.anyvision.local
+    ports:
+    #  - "443:443"
+      - "80:80"
+    volumes:
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - limit_rate_speed=0
+      - master_api_ip=api-master.anyvision.local
+      - master_api_username=admin
+      - master_api_password=admin
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  api-master:
+    image: gcr.io/anyvision-training/api-master:development
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - api-master.anyvision.local
+    ports:
+      - "27183:27183"
+    volumes:
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - api_service_ip=api.anyvision.local
+      - api_service_port=3000
+      - MONGO_DB_IP=mongodb.anyvision.local
+      - MONGO_DB_PORT=27017
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+    env_file:
+      - env/global.env
+      - env/api-master.env
+      - env/api.env
+    logging:
+      options:
+        max-size: 1g
+		
+		
+    
+  api:
+    image: gcr.io/anyvision-training/api:development
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - api.anyvision.local
+    ports:
+      - "5443:5443"
+      - "38389:38389"
+      - "3000:3000"
+    volumes:
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
+    environment:
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
+      - API_IP=api.anyvision.local
+      - MONGO_DB_IP=mongodb.anyvision.local
+      - CA_HOST=apigateway.anyvision.local
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=true
+    env_file:
+      - env/global.env
+      - env/api.env
+    logging:
+      options:
+        max-size: 1g
+		
+    
+		
+  mongodb:
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - mongodb.anyvision.local
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_db_data:/data/db
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+		
+    
+		
+  backend:
+    image: gcr.io/anyvision-training/backend:development
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      anyvision:
+        aliases:
+          - proc-${node_name:-localnode}.anyvision.local
+          - reid-${node_name:-localnode}.anyvision.local
+          - coll-${node_name:-localnode}.anyvision.local
+          - arch-${node_name:-localnode}.anyvision.local
+    ports:
+      - "4005:4005"
+      - "9067:9067"
+      - "9068:9068"
+      - "9069:9069"
+      - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
+    volumes:
+      - /home/user/license:/home/user/license:ro
+      - backend_data:/root/pipe_data
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+    environment:
+      - DISPLAY=:0
+      - external_ip=proc-${node_name:-localnode}.anyvision.local
+      - storage_ip=nginx-${node_name:-localnode}.anyvision.local
+      - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
+      - redis_host=127.0.0.1
+      - api_service_ip=api.anyvision.local
+      - mongodb_host=mongodb.anyvision.local
+      ########################################################################## use the configuration below to configure localhost services
+      - reid_service_ip=reid-${node_name:-localnode}.anyvision.local
+      - collate_service_ip=coll-${node_name:-localnode}.anyvision.local
+      - track_archive_service_ip=arch-${node_name:-localnode}.anyvision.local
+      ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
+      #- reid_service_ip=reid-b.anyvision.local
+      #- collate_service_ip=coll-b.anyvision.local
+      #- track_archive_service_ip=arch-b.anyvision.local
+    env_file:
+      - env/backend.env
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    ipc: host
