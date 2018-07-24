@@ -248,6 +248,8 @@ services:
     ports:
       - "5443:5443"
       - "38389:38389"
+      - "3000:3000"
+
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
