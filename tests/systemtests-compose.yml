@@ -1,0 +1,34 @@
+version: '2.3'
+
+networks:
+  default:
+    external:
+      name: docker-compose_anyvision
+
+services:
+
+  backend-jmeter:
+    networks:
+      default:
+        aliases:
+          - backend-jmeter.anyvision.local
+    #command: sleep 1d
+    image: system_tests-jmeter:latest
+    restart: "no"
+    volumes:
+      - /storage:/var/www/html
+      - /storage/logs:/storage/logs
+      - /storage/pipe_store/test_data:/root/backend_trunk/tests/test_data
+      - /storage/results:/tmp/results
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+    environment:
+      - HOST=proc-${node_name:-localnode}.anyvision.local
+      - PORT=4005
+    ports:
+      - "6000:6000"
+    #extra_hosts:
+    # - "backend-jmeter.anyvision.local:192.168.20.202"
+    logging:
+      options:
+        max-size: 1g
+        
