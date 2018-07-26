@@ -307,6 +307,9 @@ services:
           - reid-${node_name:-localnode}.anyvision.local
           - coll-${node_name:-localnode}.anyvision.local
           - arch-${node_name:-localnode}.anyvision.local
+    extra_hosts:
+    #The IP here should point to nginx of the master API
+      - "nginx-master-${node_name:-localnode}.anyvision.local:1.1.1.1"
     ports:
       - "4005:4005"
       - "9067:9067"
