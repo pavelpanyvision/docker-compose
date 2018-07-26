@@ -76,6 +76,32 @@ services:
 
 
 
+  nginx-master:
+    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - nginx-master-${node_name:-localnode}.anyvision.local
+    ports:
+      - "1935:1935"
+      - "443:443"
+      - "80:80"
+    volumes:
+      - /storage:/opt/nginx/html:ro
+      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - limit_rate_speed=0
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
   api:
     image: gcr.io/anyvision-training/api:development
     restart: always
@@ -160,8 +186,8 @@ services:
     environment:
       - DISPLAY=:0
       - external_ip=proc-${node_name:-localnode}.anyvision.local
-      - storage_ip=nginx-${node_name:-localnode}.anyvision.local
-      - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
+      - storage_ip=nginx-master-${node_name:-localnode}.anyvision.local
+      - frame_store_storage_ip=nginx-master-${node_name:-localnode}.anyvision.local
       - redis_host=127.0.0.1
       - api_service_ip=api.anyvision.local
       - mongodb_host=mongodb.anyvision.local
