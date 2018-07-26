@@ -84,9 +84,7 @@ services:
         aliases:
           - nginx-master-${node_name:-localnode}.anyvision.local
     ports:
-      - "1935:1935"
       - "443:443"
-      - "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
