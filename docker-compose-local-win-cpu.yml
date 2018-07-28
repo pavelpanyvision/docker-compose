@@ -49,7 +49,7 @@ services:
           - cron-${node_name:-localnode}.anyvision.local
     volumes:
       - c:/anv/storage:/var/www/html
-      - ./env/crontab:/etc/crontab
+      - ./env/crontab:/etc/crontabs/crontab
     environment:
       - TO_DATE_TRACK_DELETE=30
     logging:
@@ -128,7 +128,7 @@ services:
       - api
     environment:
       - api_service_ip=api.anyvision.local
-      - BCAST_SOCKETIO_API_URL="https://apigateway.anyvision.local:5443"
+      - BCAST_SOCKETIO_API_URL=https://api.anyvision.local:5443
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
