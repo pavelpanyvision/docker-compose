@@ -3,9 +3,7 @@ version: '3.3'
 
 
 volumes:
-  mongo_db_data:
   redis_db_data:
-  backend_data:
   api_gateway_keys:
 
 ### create prod overlay network: docker network create -d overlay --attachable prod
@@ -168,7 +166,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
     configs:
       - source: {{'default' | env('SITE_NAME')}}_cron_config
-        target: /etc/crontab
+        target: /etc/crontabs/crontab
         mode: 444
     environment:
       - TO_DATE_TRACK_DELETE=30
@@ -219,7 +217,7 @@ services:
         aliases:
           - mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
-      - mongo_db_data:/data/db
+      - /ssd/mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     env_file:
@@ -263,7 +261,7 @@ services:
 
 
   broadcaster:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/broadcaster:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/broadcaster:1.19.3
     hostname: broadcaster
     networks:
       proxy:
@@ -303,7 +301,7 @@ services:
 
 
   apigateway:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-gateway:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-gateway:1.19.3
     networks:
       proxy:
       prod:
@@ -364,7 +362,7 @@ services:
 
 
   api:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api:1.19.3
     networks:
       proxy:
       prod:
@@ -412,7 +410,7 @@ services:
 
 
   backend:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.3
     networks:
       prod:
         aliases:
@@ -422,7 +420,7 @@ services:
           - arch-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /home/user/license:/home/user/license:ro
-      - backend_data:/root/pipe_data
+      - /ssd/pipe_data:/root/pipe_data
       - /storage:/var/www/html
       - /dev/shm:/dev/shm:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
@@ -474,7 +472,7 @@ services:
 
 
   dashboard:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard:1.19.2
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard:1.19.3
     networks:
       - prod
     volumes:
