@@ -3,9 +3,7 @@ version: '3.3'
 
 
 volumes:
-  mongo_db_data:
   redis_db_data:
-  backend_data:
   api_gateway_keys:
 
 ### create prod overlay network: docker network create -d overlay --attachable prod
@@ -168,7 +166,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
     configs:
       - source: {{'default' | env('SITE_NAME')}}_cron_config
-        target: /etc/crontab
+        target: /etc/crontabs/crontab
         mode: 444
     environment:
       - TO_DATE_TRACK_DELETE=30
@@ -219,7 +217,7 @@ services:
         aliases:
           - mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
-      - mongo_db_data:/data/db
+      - /ssd/mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     env_file:
@@ -282,7 +280,7 @@ services:
       - api
     environment:
       - api_service_ip=api-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - BCAST_SOCKETIO_API_URL="https://apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local:5443"
+      - BCAST_SOCKETIO_API_URL=https://api-{{'default' | env('SITE_NAME')}}.anyvision.local:5443
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -422,7 +420,7 @@ services:
           - arch-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /home/user/license:/home/user/license:ro
-      - backend_data:/root/pipe_data
+      - /ssd/pipe_data:/root/pipe_data
       - /storage:/var/www/html
       - /dev/shm:/dev/shm:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw

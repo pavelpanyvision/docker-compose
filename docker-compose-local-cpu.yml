@@ -38,7 +38,7 @@ services:
 
 
   sftp:
-    image: atmoz/sftp
+    image: gcr.io/anyvision-production/sftp:alpine
     restart: always
     networks:
       - anyvision
@@ -90,7 +90,7 @@ services:
           - cron-${node_name:-localnode}.anyvision.local
     volumes:
       - /storage:/var/www/html
-      - ./env/crontab:/etc/crontab
+      - ./env/crontab:/etc/crontabs/crontab
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -179,7 +179,7 @@ services:
       - api
     environment:
       - api_service_ip=api.anyvision.local
-      - BCAST_SOCKETIO_API_URL="https://api.anyvision.local:5443"
+      - BCAST_SOCKETIO_API_URL=https://api.anyvision.local:5443
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -217,6 +217,7 @@ services:
       - REDIS_HOST=redis.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
+      - ENABLE_CREATE_SSL=true
     env_file:
       - env/api-gateway.env
       - env/global.env

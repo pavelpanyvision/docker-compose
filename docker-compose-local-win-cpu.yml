@@ -164,6 +164,7 @@ services:
       - REDIS_HOST=redis.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
+      - ENABLE_CREATE_SSL=true
     env_file:
       - env/api-gateway.env
       - env/global.env
