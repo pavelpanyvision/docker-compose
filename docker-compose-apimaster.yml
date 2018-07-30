@@ -189,7 +189,7 @@ services:
       - redis_host=127.0.0.1
       - api_service_ip=api.anyvision.local
       - mongodb_host=mongodb.anyvision.local
-      - ENABLE_CRON_PIPE_IMG_TEMPORARY=false
+      #- ENABLE_CRON_PIPE_IMG_TEMPORARY=false
       ########################################################################## use the configuration below to configure localhost services
       - reid_service_ip=reid-${node_name:-localnode}.anyvision.local
       - collate_service_ip=coll-${node_name:-localnode}.anyvision.local
