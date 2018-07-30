@@ -70,5 +70,9 @@ done < "sites.txt"
 echo "Generating Docker Management stack file"
 /usr/local/bin/meta-compose -t docker-compose-swarm-mgmt.yml.tmpl -o docker-compose-swarm-mgmt.yml
 
+## Generate the api-master stack
+echo "Generating Docker API-Master stack file"
+/usr/local/bin/meta-compose -t docker-compose-apimaster.yml.tmpl -o docker-compose-apimaster.yml
+
 echo "Done!"
 exit 0
