@@ -1,0 +1,125 @@
+#!/usr/bin/env groovy
+import hudson.model.*
+
+if (! env.GIT_REPO_NAME ){
+    echo "This job is missing GIT_REPO_NAME"
+    currentBuild.result = 'FALURE'
+    error "This job is missing GIT_REPO_NAME"
+    return
+}
+// parameters:
+env.BUCKET_NAME = "airgap.anyvision.co"
+env.S3_FQDN = "airgap.anyvision.co"
+env.devops_repo = "https://github.com/AnyVisionltd/devops.git"
+env.dir_path = "devops/scripts/air_gapped_deployment"
+env.compose_path = "docker-compose"
+
+
+//if this job started on demand
+if (env.GIT_REPO_NAME){
+    echo "This job started on demand echo $GIT_REPO_NAME"
+    env.current_version_number = env.VERSION_NUMBER
+    echo "The version is: $env.VERSION_NUMBER"
+    generic_pipeline_method()
+}
+else { //if this job started by the jenkins pipeline master
+    echo "This job started by the jenkins pipeline master $GIT_REPO_NAME"
+}
+
+echo "job started with repository: $GIT_REPO_NAME"
+
+def generic_pipeline_method() {
+    timeout(time: 30, unit: 'MINUTES') {
+        node('master') {
+
+            try {
+
+                //clean up work space
+                step([$class: 'WsCleanup'])
+
+                //if the parapets came from upstream
+                if (!env.GIT_REPO_NAME && !env.GIT_OWNER) {
+                    def split = "${JOB_NAME}".split('/')
+                    env.GIT_REPO_NAME = split[1]
+                    env.GIT_OWNER = split[0]
+                }
+
+                //when branch name is not exist
+                if (!env.BRANCH_NAME) {
+                    echo "Branch name was not specified. will use master"
+                    env.BRANCH_NAME = 'master'
+                }
+
+                env.GIT_REPO_URL = "https://github.com/${env.GIT_REPO_NAME}.git"
+                echo "Detected Git Repo URL: ${env.GIT_REPO_URL}"
+
+                node('cicd') {
+
+                    stage('PULL') {
+
+                        checkout changelog: false, poll: false, scm: [
+                                $class      : 'GitSCM',
+                                branches    : [[name: '*/master']],
+                                extensions  : [[$class           : 'RelativeTargetDirectory',
+                                                relativeTargetDir: '.']],
+                                submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/devops.git"]]]
+
+                        sh("rm -rf docker-compose")
+                        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'av-jenkins-reader', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
+                            echo "git clone https://github.com/AnyVisionltd/docker-compose.git"
+                            sh("git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/AnyVisionltd/docker-compose.git")
+                        }
+                        echo "dir path is : ${env.dir_path}"
+                        sh("mkdir -p all_files && rm -rf all_files/*")
+                        echo "sleep 5 seconds"
+                        sleep 5
+                        sh("cd scripts/air_gapped_deployment && hostname && pwd && ls -la && ./pull_images_from_compose.sh ../../docker-compose ../../all_files")
+                        echo "sleep 5 seconds"
+                        sleep 5
+
+                    } // end of stage PULL
+
+                    stage('TAR') {
+
+                        echo "making a tar file"
+                        echo " current version is: ${current_version_number}"
+                        sh("tar cvf all_files.tar all_files")
+
+                    } //end of stage TAR
+
+                    stage('PUSH'){
+
+                        parallel push_registry: {
+
+                            echo ("pushing to registry")
+                            sh("docker load -i all_file.tar.gz")
+                            sh("docker tag ")
+                            sh("cd scripts/air_gapped_deployment && ./push_images_to_local_registry.sh ../../all_files.tar")
+
+                        }
+                        parallel push_s3: {
+
+                            echo ("pushing to s3")
+                            sh("aws s3 sync --acl public-read ${current_version_number} s3://${BUCKET_NAME}/${current_version_number}")
+
+                        }
+
+                    } // end of stage PUSH
+
+                } //end of node
+
+            } //end of try
+
+            catch (err) {
+
+                echo "Something went wrong , job ${JOB_NAME}"
+                throw err
+                currentBuild.result = 'FAILURE'
+
+            }// end of catch
+
+        } // end of node
+
+    } // end of timeout master
+}
+return this
