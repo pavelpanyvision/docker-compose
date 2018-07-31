@@ -1,1 +1,2 @@
 */30 * * * * track_delete=$(date --iso-8601=seconds  -d "$TO_DATE_TRACK_DELETE day ago") && curl -X "DELETE" http://api:3000/detections?toDate=$track_delete
+0 0 * * * find /var/www/html/pipe_store/pipe_img/ -not -path '/var/www/html/pipe_store/pipe_img/' -delete
