@@ -41,6 +41,10 @@ REGISTRY_HOST="$1"
 set +eu
 REGISTRY_PORT="$2"
 set -eu
+export REGISTRY_HOST="$REGISTRY_HOST"
+if [ -n "$REGISTRY_PORT" ]; then
+  export REGISTRY_PORT="$REGISTRY_PORT"
+fi
 
 rm -rf sites/
 mkdir -p sites/
@@ -51,10 +55,6 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     SITE_NAME="$site"
     echo "Generating Docker stack file for $SITE_NAME"
     export SITE_NAME="$SITE_NAME"
-    export REGISTRY_HOST="$REGISTRY_HOST"
-    if [ -n "$REGISTRY_PORT" ]; then
-      export REGISTRY_PORT="$REGISTRY_PORT"
-    fi
     mkdir -p sites/"$SITE_NAME"
     /usr/local/bin/meta-compose -t docker-compose-swarm-gpu.yml.tmpl -o sites/"$SITE_NAME"/docker-compose-"$SITE_NAME".yml
     cp -R ../env ../guacamole sites/"$SITE_NAME"/
@@ -72,6 +72,8 @@ echo "Generating Docker Management stack file"
 
 ## Generate the api-master stack
 echo "Generating Docker API-Master stack file"
+cp -R ../env .
+export SITE_NAME="api-master"
 /usr/local/bin/meta-compose -t docker-compose-apimaster.yml.tmpl -o docker-compose-apimaster.yml
 
 echo "Done!"
