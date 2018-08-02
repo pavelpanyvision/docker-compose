@@ -28,7 +28,7 @@ services:
 
 
   dashboard-master:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard-master:1.19.3
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard-master:1.0.0
     networks:
       proxy:
       prod:
@@ -79,7 +79,7 @@ services:
 
 
   api-master:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-master:1.19.3
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-master:1.0.0
     networks:
       prod:
         aliases:
@@ -251,7 +251,7 @@ services:
 
 
   backend:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.3
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.3.3
     networks:
       prod:
         aliases:
