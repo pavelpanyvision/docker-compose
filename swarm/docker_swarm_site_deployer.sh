@@ -21,7 +21,7 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     echo "Removing stack \"$SITE_NAME\""
     docker stack rm "$SITE_NAME"
     echo "Deploying stack \"$SITE_NAME\" using file sites/$SITE_NAME/docker-compose-$SITE_NAME.yml"
-    docker stack deploy -c sites/"$SITE_NAME"/docker-compose-"$SITE_NAME".yml "$SITE_NAME"
+    docker stack deploy --with-registry-auth -c sites/"$SITE_NAME"/docker-compose-"$SITE_NAME".yml "$SITE_NAME"
 done < "sites.txt"
 
 
