@@ -7,6 +7,7 @@ networks:
     external: true
   proxy:
     external: true
+  {{'default' | env('SITE_NAME')}}:
 
 
 secrets:
@@ -31,7 +32,7 @@ services:
     image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard-master:1.0.1
     networks:
       proxy:
-      prod:
+      {{'default' | env('SITE_NAME')}}:
         aliases:
           - dashboard-master.anyvision.local
     volumes:
@@ -78,6 +79,9 @@ services:
   api-master:
     image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-master:1.0.0
     networks:
+      {{'default' | env('SITE_NAME')}}:
+        aliases:
+          - api-master.anyvision.local
       prod:
         aliases:
           - api-master.anyvision.local
@@ -130,6 +134,9 @@ services:
     image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/nginx-rtmp:ssl
     networks:
       proxy:
+      {{'default' | env('SITE_NAME')}}:
+        aliases:
+         - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
       prod:
         aliases:
          - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
@@ -178,6 +185,9 @@ services:
   api:
     image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api:1.19.3
     networks:
+      {{'default' | env('SITE_NAME')}}:
+        aliases:
+          - api-{{'default' | env('SITE_NAME')}}.anyvision.local
       prod:
         aliases:
           - api-{{'default' | env('SITE_NAME')}}.anyvision.local
@@ -225,7 +235,7 @@ services:
   mongodb:
     image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/mongo:3.6-jessie
     networks:
-      prod:
+      {{'default' | env('SITE_NAME')}}:
         aliases:
           - mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
@@ -251,7 +261,7 @@ services:
   backend:
     image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.3.3
     networks:
-      prod:
+      {{'default' | env('SITE_NAME')}}:
         aliases:
           - proc-{{'default' | env('SITE_NAME')}}.anyvision.local
           - reid-{{'default' | env('SITE_NAME')}}.anyvision.local

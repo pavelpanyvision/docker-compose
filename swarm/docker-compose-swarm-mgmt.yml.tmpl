@@ -18,6 +18,7 @@ networks:
     driver: overlay
 
 
+
 secrets:
   anv_cert:
     file: ./tls/apigateway.anyvision.local.crt
@@ -69,6 +70,7 @@ services:
       - DF_NOTIFY_CREATE_SERVICE_URL=http://df-proxy:8080/v1/docker-flow-proxy/reconfigure
       - DF_NOTIFY_REMOVE_SERVICE_URL=http://df-proxy:8080/v1/docker-flow-proxy/remove
     deploy:
+      replicas: 1
       placement:
         constraints: [node.role == manager]
       restart_policy:
@@ -103,7 +105,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.labels.type==registry]
+        constraints: [node.labels.type == registry]
       restart_policy:
         delay: 5s
     logging:
