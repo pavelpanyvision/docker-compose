@@ -1,0 +1,1 @@
+*/30 * * * * curl -i "http://df-proxy:8080/v1/docker-flow-proxy/reload?recreate=false&fromListener=true"

@@ -24,6 +24,12 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     docker stack deploy --with-registry-auth -c sites/"$SITE_NAME"/docker-compose-"$SITE_NAME".yml "$SITE_NAME"
 done < "sites.txt"
 
+echo "Deploy Management stack"
+docker stack deploy --with-registry-auth -c management/"$SITE_NAME"/docker-compose-"$SITE_NAME".yml "$SITE_NAME"
+
+echo "Deploy Api Master stuck"
+SITE_NAME="api-master"
+docker stack deploy --with-registry-auth -c sites/"$SITE_NAME"/docker-compose-apimaster.yml "$SITE_NAME"
 
 echo "Done!"
 exit 0

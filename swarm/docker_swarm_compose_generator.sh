@@ -68,14 +68,18 @@ done < "sites.txt"
 
 ## Generate the management stack
 echo "Generating Docker Management stack file"
-cp -R ../crontab .
-/usr/local/bin/meta-compose -t docker-compose-swarm-mgmt.yml.tmpl -o docker-compose-swarm-mgmt.yml
+mkdir -p management
+cp -R ../crontab ./management
+cp -R ./tls ./management
+/usr/local/bin/meta-compose -t docker-compose-swarm-mgmt.yml.tmpl -o management/docker-compose-swarm-mgmt.yml
 
 ## Generate the api-master stack
 echo "Generating Docker API-Master stack file"
-cp -R ../env .
+mkdir -p sites/api-master
+cp -R ../env ./api-master
+cp -R ./tls ./api-master
 export SITE_NAME="api-master"
-/usr/local/bin/meta-compose -t docker-compose-apimaster.yml.tmpl -o docker-compose-apimaster.yml
+/usr/local/bin/meta-compose -t docker-compose-apimaster.yml.tmpl -o sites/"$SITE_NAME"/docker-compose-apimaster.yml
 
 echo "Done!"
 exit 0
