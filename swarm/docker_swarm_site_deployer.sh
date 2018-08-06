@@ -20,12 +20,13 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     SITE_NAME="$site"
     echo "Removing stack \"$SITE_NAME\""
     docker stack rm "$SITE_NAME"
+    sleep 15
     echo "Deploying stack \"$SITE_NAME\" using file sites/$SITE_NAME/docker-compose-$SITE_NAME.yml"
     docker stack deploy --with-registry-auth -c sites/"$SITE_NAME"/docker-compose-"$SITE_NAME".yml "$SITE_NAME"
 done < "sites.txt"
 
 echo "Deploy Management stack"
-docker stack deploy --with-registry-auth -c management/"$SITE_NAME"/docker-compose-"$SITE_NAME".yml "$SITE_NAME"
+docker stack deploy --with-registry-auth -c management/docker-compose-swarm-mgmt.yml management
 
 echo "Deploy API Master stack"
 SITE_NAME="api-master"
