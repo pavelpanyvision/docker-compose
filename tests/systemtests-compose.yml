@@ -13,7 +13,7 @@ services:
         aliases:
           - backend-jmeter.anyvision.local
     #command: sleep 1d
-    image: system_tests-jmeter:latest
+    image: gcr.io/anyvision-training/backend-jmeter:latest
     restart: "no"
     volumes:
       - /storage:/var/www/html
