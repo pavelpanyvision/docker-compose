@@ -49,7 +49,7 @@ services:
           - cron-${node_name:-localnode}.anyvision.local
     volumes:
       - c:/anv/storage:/var/www/html
-      - ./env/crontab:/etc/crontabs/crontab
+      - ./crontab/site_crontab:/etc/crontab
     environment:
       - TO_DATE_TRACK_DELETE=30
     logging:
@@ -266,7 +266,7 @@ services:
       - DISPLAY=10.0.75.1:0.0
       - ssl=true
       - GATEWAY_HOST=apigateway.anyvision.local
-      - RUN_AS_USER=user
+      - RUN_AS_USER=root
       - ENABLE_CHOWN=false
       - isPersonEnabled=false
     env_file:

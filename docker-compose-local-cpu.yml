@@ -90,7 +90,7 @@ services:
           - cron-${node_name:-localnode}.anyvision.local
     volumes:
       - /storage:/var/www/html
-      - ./env/crontab:/etc/crontab
+      - ./crontab/site_crontab:/etc/crontab
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -348,7 +348,7 @@ services:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - ssl=true
       - GATEWAY_HOST=apigateway.anyvision.local
-      - RUN_AS_USER=user
+      - RUN_AS_USER=root
       - ENABLE_CHOWN=true
       - isPersonEnabled=false
     env_file:
