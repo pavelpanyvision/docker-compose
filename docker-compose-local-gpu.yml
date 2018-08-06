@@ -327,7 +327,7 @@ services:
       - DISPLAY=${DISPLAY:-:1}
       - ssl=true
       - GATEWAY_HOST=apigateway.anyvision.local
-      - RUN_AS_USER=user
+      - RUN_AS_USER=root
       - ENABLE_CHOWN=false
     env_file:
       - env/global.env
