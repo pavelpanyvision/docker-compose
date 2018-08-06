@@ -76,8 +76,8 @@ cp -R ./tls ./management
 ## Generate the api-master stack
 echo "Generating Docker API-Master stack file"
 mkdir -p sites/api-master
-cp -R ../env ./api-master
-cp -R ./tls ./api-master
+cp -R ../env ./sites/api-master
+cp -R ./tls ./sites/api-master
 export SITE_NAME="api-master"
 /usr/local/bin/meta-compose -t docker-compose-apimaster.yml.tmpl -o sites/"$SITE_NAME"/docker-compose-apimaster.yml
 
