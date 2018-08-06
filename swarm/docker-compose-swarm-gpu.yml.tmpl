@@ -503,7 +503,7 @@ services:
       - DISPLAY=:0
       - ssl=true
       - GATEWAY_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - RUN_AS_USER=user
+      - RUN_AS_USER=root
       - ENABLE_CHOWN=false
     env_file:
       - env/global.env

@@ -90,7 +90,7 @@ services:
           - cron-${node_name:-localnode}.anyvision.local
     volumes:
       - /storage:/var/www/html
-      - ./env/crontab:/etc/crontabs/crontab
+      - ./crontab/site_crontab:/etc/crontabs/crontab
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -215,7 +215,7 @@ services:
       - GATEWAY_SECURE_URL=https://apigateway.anyvision.local:9443
       - GATEWAY_URL=http://apigateway.anyvision.local:8080
       - REDIS_HOST=redis.anyvision.local
-      - RUN_AS_USER=user
+      - RUN_AS_USER=root
       - ENABLE_CHOWN=false
       - ENABLE_CREATE_SSL=true
     env_file:
