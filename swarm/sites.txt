@@ -7,3 +7,4 @@ bellagio
 mirage
 grand
 montecarlo
+harbor
