@@ -115,7 +115,7 @@ services:
 
 
   portainer-agent:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/portainer-agent:1.0.0
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/portainer-agent:1.1.2
     environment:
       # REQUIRED: Should be equal to the service name prefixed by "tasks." when
       # deployed inside an overlay network
@@ -134,7 +134,7 @@ services:
 
 
   portainer:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/portainer:1.18.1
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/portainer:1.19.1
     command: -H "tcp://tasks.portainer-agent:9001" --tlsskipverify
     ports:
       - "9000:9000"
