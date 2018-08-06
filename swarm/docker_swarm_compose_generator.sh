@@ -57,7 +57,7 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     export SITE_NAME="$SITE_NAME"
     mkdir -p sites/"$SITE_NAME"
     /usr/local/bin/meta-compose -t docker-compose-swarm-gpu.yml.tmpl -o sites/"$SITE_NAME"/docker-compose-"$SITE_NAME".yml
-    cp -R ../env ../guacamole sites/"$SITE_NAME"/
+    cp -R ../env ../crontab ../guacamole sites/"$SITE_NAME"/
     if [ -d "$certdir" ]; then
       cp -R "$certdir" sites/"$SITE_NAME"/
     fi
@@ -68,6 +68,7 @@ done < "sites.txt"
 
 ## Generate the management stack
 echo "Generating Docker Management stack file"
+cp -R ../crontab .
 /usr/local/bin/meta-compose -t docker-compose-swarm-mgmt.yml.tmpl -o docker-compose-swarm-mgmt.yml
 
 ## Generate the api-master stack
