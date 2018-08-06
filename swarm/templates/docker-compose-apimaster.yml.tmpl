@@ -72,8 +72,9 @@ services:
       labels:
         com.df.notify: 'true'
         com.df.port: 80
-        com.df.serviceDomain: 'dashboard-master.anyvision.local'
-
+        #com.df.serviceDomain: 'dashboard-master.anyvision.local'
+        com.df.servicePath: "/master"
+        com.df.reqPathSearchReplace: "/master,"
 
 
   api-master:
@@ -127,6 +128,12 @@ services:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         delay: 5s
+#      labels:
+#        com.df.notify: 'true'
+#        com.df.port: 80
+#        #com.df.serviceDomain: 'api-master.anyvision.local'
+#        com.df.servicePath: "/api-master"
+#        com.df.reqPathSearchReplace: "/api-master,"
 
 
 

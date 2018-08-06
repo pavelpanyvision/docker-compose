@@ -56,7 +56,7 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     echo "Generating Docker stack file for $SITE_NAME"
     export SITE_NAME="$SITE_NAME"
     mkdir -p sites/"$SITE_NAME"
-    /usr/local/bin/meta-compose -t docker-compose-swarm-gpu.yml.tmpl -o sites/"$SITE_NAME"/docker-compose-"$SITE_NAME".yml
+    /usr/local/bin/meta-compose -t templates/docker-compose-swarm-gpu.yml.tmpl -o sites/"$SITE_NAME"/docker-compose-"$SITE_NAME".yml
     cp -R ../env ../crontab ../guacamole sites/"$SITE_NAME"/
     if [ -d "$certdir" ]; then
       cp -R "$certdir" sites/"$SITE_NAME"/
@@ -71,15 +71,16 @@ echo "Generating Docker Management stack file"
 mkdir -p management
 cp -R ../crontab ./management
 cp -R ./tls ./management
-/usr/local/bin/meta-compose -t docker-compose-swarm-mgmt.yml.tmpl -o management/docker-compose-swarm-mgmt.yml
+/usr/local/bin/meta-compose -t templates/docker-compose-swarm-mgmt.yml.tmpl -o management/docker-compose-swarm-mgmt.yml
 
 ## Generate the api-master stack
 echo "Generating Docker API-Master stack file"
 mkdir -p sites/api-master
-cp -R ../env ./api-master
-cp -R ./tls ./api-master
+cp -R ../env ./sites/api-master
+cp -R ./tls ./sites/api-master
 export SITE_NAME="api-master"
-/usr/local/bin/meta-compose -t docker-compose-apimaster.yml.tmpl -o sites/"$SITE_NAME"/docker-compose-apimaster.yml
+/usr/local/bin/meta-compose -t templates/docker-compose-apimaster.yml.tmpl -o sites/"$SITE_NAME"/docker-compose-apimaster.yml
 
 echo "Done!"
 exit 0
+
