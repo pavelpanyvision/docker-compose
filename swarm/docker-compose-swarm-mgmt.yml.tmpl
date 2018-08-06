@@ -57,7 +57,7 @@ services:
       - LISTENER_ADDRESS=df-swarm-listener
       - MODE=swarm
     deploy:
-      replicas: 1
+      mode: global
       placement:
         constraints: [node.role == manager]
       restart_policy:
