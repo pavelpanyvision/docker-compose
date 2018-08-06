@@ -18,6 +18,10 @@ networks:
     driver: overlay
 
 
+configs:
+  management_cron_config:
+    file: ./crontab/management_crontab
+
 
 secrets:
   anv_cert:
@@ -60,6 +64,7 @@ services:
         delay: 5s
 
 
+
   df-swarm-listener:
     image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/docker-flow-swarm-listener:18.07.03-28
     networks:
@@ -70,6 +75,31 @@ services:
       - DF_NOTIFY_CREATE_SERVICE_URL=http://df-proxy:8080/v1/docker-flow-proxy/reconfigure
       - DF_NOTIFY_REMOVE_SERVICE_URL=http://df-proxy:8080/v1/docker-flow-proxy/remove
     deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        delay: 5s
+
+
+
+  cron:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/supercronic:latest
+    networks:
+      - prod
+      - proxy
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    configs:
+      - source: management_cron_config
+        target: /etc/crontabs/crontab
+        mode: 444
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
       replicas: 1
       placement:
         constraints: [node.role == manager]
