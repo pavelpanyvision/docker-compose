@@ -3,7 +3,7 @@ version: '2.3'
 networks:
   default:
     external:
-      name: docker-compose_anyvision
+      name: anyvision_anyvision
 
 services:
 
