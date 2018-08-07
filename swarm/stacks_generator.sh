@@ -61,7 +61,7 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     echo "Generating Docker stack file for $SITE_NAME"
     export SITE_NAME="$SITE_NAME"
     mkdir -p "$BASEDIR"/stacks/"$SITE_NAME"
-    /usr/local/bin/meta-compose -t templates/node-gpu-stack.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
+    /usr/local/bin/meta-compose -t templates/node-gpu-stack-a.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
     cp -R "$BASEDIR"/../{env,crontab,guacamole} --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
     ln -s "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
     rm "$BASEDIR"/stacks/"$SITE_NAME"/guacamole/user-mapping-local.xml
@@ -71,7 +71,7 @@ done < "$BASEDIR"/sites.txt
 
 ## Generate the management stack
 echo "Generating Docker Management stack file"
-mkdir -p "$BASEDIR"/stacks/management
+mkdir -p "$BASEDIR"/stacks/b
 cp -R "$BASEDIR"/../crontab --target-directory="$BASEDIR"/stacks/management/
 ln -s "$BASEDIR"/tls "$BASEDIR"/stacks/management/tls
 /usr/local/bin/meta-compose -t templates/management-stack.yml.tmpl -o "$BASEDIR"/stacks/management/docker-stack-management.yml
