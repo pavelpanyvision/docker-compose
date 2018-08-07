@@ -41,6 +41,7 @@ secrets:
 
 services:
 
+
   guacamole:
     image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/guacamole:0.9.14
     networks:
@@ -149,16 +150,11 @@ services:
         delay: 5s
       labels:
         com.df.notify: 'true'
-        com.df.port.1: 443
-        com.df.srcPort.1: 443
-        com.df.reqMode.1: sni
-        com.df.pathType.1: "req_ssl_sni -i -m reg"
-        com.df.servicePath.1: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
-        com.df.port.2: 80
-        com.df.srcPort.2: 80
-        com.df.reqMode.2: http
-        com.df.pathType.2: "path_reg"
-        com.df.servicePath.2: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
+        com.df.port: 443
+        com.df.srcPort: 443
+        com.df.reqMode: sni
+        com.df.pathType: "req_ssl_sni -i -m reg"
+        com.df.servicePath: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
 
 
 
@@ -192,32 +188,32 @@ services:
 
 
 
-  rabbitmq:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/rabbitmq:latest
-    networks:
-      {{'default' | env('SITE_NAME')}}:
-        aliases:
-          - rabbitmq-{{'default' | env('SITE_NAME')}}.anyvision.local
-      prod:
-        aliases:
-          - rabbitmq-{{'default' | env('SITE_NAME')}}.anyvision.local
-    volumes:
-      - /storage/rabbitmq:/var/lib/rabbitmq
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
-      restart_policy:
-        delay: 5s
+#  rabbitmq:
+#    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/rabbitmq:latest
+#    networks:
+#      {{'default' | env('SITE_NAME')}}:
+#        aliases:
+#          - rabbitmq-{{'default' | env('SITE_NAME')}}.anyvision.local
+#      prod:
+#        aliases:
+#          - rabbitmq-{{'default' | env('SITE_NAME')}}.anyvision.local
+#    volumes:
+#      - /storage/rabbitmq:/var/lib/rabbitmq
+#      - /etc/localtime:/etc/localtime:ro
+#      - /etc/timezone:/etc/timezone:ro
+#    env_file:
+#      - env/global.env
+#    logging:
+#      options:
+#        max-size: 1g
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#      placement:
+#        constraints:
+#          - node.labels.site=={{'default' | env('SITE_NAME')}}
+#      restart_policy:
+#        delay: 5s
 
 
 
@@ -271,45 +267,45 @@ services:
 
 
 
-  broadcaster:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/broadcaster:1.19.3
-    hostname: broadcaster
-    networks:
-      {{'default' | env('SITE_NAME')}}:
-        aliases:
-          - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
-      prod:
-        aliases:
-          - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    secrets:
-      - source: anv_ca
-        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
-        uid: "0"
-        mode: 444
-    depends_on:
-      - api
-    environment:
-      - api_service_ip=api-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - BCAST_SOCKETIO_API_URL=https://api-{{'default' | env('SITE_NAME')}}.anyvision.local:5443
-      - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-    env_file:
-      - env/global.env
-      - env/broadcaster.env
-    logging:
-      options:
-        max-size: 1g
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
-      restart_policy:
-        delay: 5s
+#  broadcaster:
+#    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/broadcaster:1.19.3
+#    hostname: broadcaster
+#    networks:
+#      {{'default' | env('SITE_NAME')}}:
+#        aliases:
+#          - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
+#      prod:
+#        aliases:
+#          - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
+#    volumes:
+#      - /etc/localtime:/etc/localtime:ro
+#      - /etc/timezone:/etc/timezone:ro
+#    secrets:
+#      - source: anv_ca
+#        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+#        uid: "0"
+#        mode: 444
+#    depends_on:
+#      - api
+#    environment:
+#      - api_service_ip=api-{{'default' | env('SITE_NAME')}}.anyvision.local
+#      - BCAST_SOCKETIO_API_URL=https://api-{{'default' | env('SITE_NAME')}}.anyvision.local:5443
+#      - RUN_AS_USER=user
+#      - ENABLE_CHOWN=false
+#    env_file:
+#      - env/global.env
+#      - env/broadcaster.env
+#    logging:
+#      options:
+#        max-size: 1g
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#      placement:
+#        constraints:
+#          - node.labels.site=={{'default' | env('SITE_NAME')}}
+#      restart_policy:
+#        delay: 5s
 
 
 
@@ -462,14 +458,15 @@ services:
       - redis_host=127.0.0.1
       - api_service_ip=api-{{'default' | env('SITE_NAME')}}.anyvision.local
       - mongodb_host=mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
-      ########################################################################## use the configuration below to configure localhost services
-      - reid_service_ip=reid-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - collate_service_ip=coll-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - track_archive_service_ip=arch-{{'default' | env('SITE_NAME')}}.anyvision.local
       ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
-      #- reid_service_ip=reid-b.anyvision.local
-      #- collate_service_ip=coll-b.anyvision.local
-      #- track_archive_service_ip=arch-b.anyvision.local
+      - reid_service_ip=reid-b.anyvision.local
+      - collate_service_ip=coll-b.anyvision.local
+      - track_archive_service_ip=arch-b.anyvision.local
+      ########################################################################## Services override for b sites
+      - ENABLE_FRAMESTORE_CLEANER=false
+      - ENABLE_PROCESS_SERVICE=false
+      - ENABLE_XPRA_SERVICE=false
+      - ENABLE_CRON_PIPE_IMG_TEMPORARY=false
     env_file:
       - env/backend.env
       - env/global.env
