@@ -1,0 +1,327 @@
+#filename: docker-compose-apimaster.yml.tmpl
+version: '3.3'
+
+
+networks:
+  prod:
+    external: true
+  proxy:
+    external: true
+  {{'default' | env('SITE_NAME')}}:
+
+
+secrets:
+  anv_cert:
+    file: ./tls/apigateway.anyvision.local.crt
+  anv_key:
+    file: ./tls/apigateway.anyvision.local.key.pem
+  anv_ca:
+    file: ./tls/anyvisionCA.pem
+  anv_full:
+    file: ./tls/apigateway.anyvision.local.full.pem
+  anv_csr:
+    file: ./tls/apigateway.anyvision.local.csr
+  passinfo:
+    file: ./tls/passinfo
+
+
+services:
+
+
+  dashboard-master:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard-master:1.0.1
+    networks:
+      proxy:
+      {{'default' | env('SITE_NAME')}}:
+        aliases:
+          - dashboard-master.anyvision.local
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    secrets:
+      - source: anv_cert
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
+        uid: "0"
+        mode: 400
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 400
+      - source: passinfo
+        target: /usr/local/share/ca-certificates/anyvision/passinfo
+        uid: "0"
+        mode: 400
+    environment:
+      - limit_rate_speed=0
+      - master_api_ip=api-master.anyvision.local
+      - master_api_username=admin
+      - master_api_password=admin
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
+      restart_policy:
+        delay: 5s
+      labels:
+        com.df.notify: 'true'
+        com.df.port: 80
+        com.df.serviceDomain: 'dashboard-master.anyvision.local'
+        #com.df.servicePath: "/master"
+        #com.df.reqPathSearchReplace: "/master,"
+
+
+  api-master:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-master:1.0.0
+    networks:
+      {{'default' | env('SITE_NAME')}}:
+        aliases:
+          - api-master.anyvision.local
+      prod:
+        aliases:
+          - api-master.anyvision.local
+    ports:
+      - "27183:27183"
+    volumes:
+      - /storage:/var/www/html
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - api_service_ip=api-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - api_service_port=3000
+      - MONGO_DB_IP=mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - MONGO_DB_PORT=27017
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+      - ENABLE_DOCKERIZE=false
+    secrets:
+      - source: anv_cert
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
+        uid: "0"
+        mode: 400
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 400
+      - source: passinfo
+        target: /usr/local/share/ca-certificates/anyvision/passinfo
+        uid: "0"
+        mode: 400
+    env_file:
+      - env/global.env
+      - env/api-master.env
+      - env/api.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
+      restart_policy:
+        delay: 5s
+#      labels:
+#        com.df.notify: 'true'
+#        com.df.port: 80
+#        #com.df.serviceDomain: 'api-master.anyvision.local'
+#        com.df.servicePath: "/api-master"
+#        com.df.reqPathSearchReplace: "/api-master,"
+
+
+
+  nginx:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/nginx-rtmp:ssl
+    networks:
+      proxy:
+      {{'default' | env('SITE_NAME')}}:
+        aliases:
+         - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+      prod:
+        aliases:
+         - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+    volumes:
+      - /storage:/opt/nginx/html:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    secrets:
+      - source: anv_cert
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
+        uid: "0"
+        mode: 400
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 400
+      - source: passinfo
+        target: /usr/local/share/ca-certificates/anyvision/passinfo
+        uid: "0"
+        mode: 400
+    environment:
+      - limit_rate_speed=0
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
+      restart_policy:
+        delay: 5s
+      labels:
+        com.df.notify: 'true'
+        com.df.port: 443
+        com.df.srcPort: 443
+        com.df.reqMode: sni
+        com.df.pathType: "req_ssl_sni -i -m reg"
+        com.df.servicePath: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
+
+
+
+  api:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api:1.19.3
+    networks:
+      {{'default' | env('SITE_NAME')}}:
+        aliases:
+          - api-{{'default' | env('SITE_NAME')}}.anyvision.local
+      prod:
+        aliases:
+          - api-{{'default' | env('SITE_NAME')}}.anyvision.local
+    volumes:
+      - /storage:/var/www/html
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    secrets:
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 444
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
+      - source: anv_full
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.full.pem
+        uid: "0"
+        mode: 444
+    environment:
+      - API_IP=api-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - MONGO_DB_IP=mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - CA_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - MASS_IMPORT_IP=reid-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+    env_file:
+      - env/global.env
+      - env/api.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
+      restart_policy:
+        delay: 5s
+
+
+
+  mongodb:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/mongo:3.6-jessie
+    networks:
+      {{'default' | env('SITE_NAME')}}:
+        aliases:
+          - mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
+    volumes:
+      - /ssd/mongo_db_data:/data/db
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
+      restart_policy:
+        delay: 5s
+
+
+
+  backend:
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.3.3
+    networks:
+      {{'default' | env('SITE_NAME')}}:
+        aliases:
+          - proc-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - reid-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - coll-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - arch-{{'default' | env('SITE_NAME')}}.anyvision.local
+    volumes:
+      - /home/user/license:/home/user/license:ro
+      - /ssd/pipe_data:/root/pipe_data
+      - /storage:/var/www/html
+      - /dev/shm:/dev/shm:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    secrets:
+      - source: anv_cert
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
+        uid: "0"
+        mode: 444
+      - source: anv_key
+        target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
+        uid: "0"
+        mode: 444
+      - source: anv_ca
+        target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
+        uid: "0"
+        mode: 444
+    environment:
+      - DISPLAY=:0
+      - external_ip=proc-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - storage_ip=nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - frame_store_storage_ip=nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - redis_host=127.0.0.1
+      - api_service_ip=api-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - mongodb_host=mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
+      ########################################################################## use the configuration below to configure localhost services
+      - reid_service_ip=reid-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - collate_service_ip=coll-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - track_archive_service_ip=arch-{{'default' | env('SITE_NAME')}}.anyvision.local
+      ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
+      #- reid_service_ip=reid-b.anyvision.local
+      #- collate_service_ip=coll-b.anyvision.local
+      #- track_archive_service_ip=arch-b.anyvision.local
+    env_file:
+      - env/backend.env
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.site=={{'default' | env('SITE_NAME')}}
+      restart_policy:
+        delay: 5s
