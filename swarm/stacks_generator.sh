@@ -46,8 +46,13 @@ if [ -n "$REGISTRY_PORT" ]; then
   export REGISTRY_PORT="$REGISTRY_PORT"
 fi
 
-rm -rf stacks/
-mkdir -p stacks/
+# Absolute path to this script
+SCRIPT=$(readlink -f "$0")
+# Absolute path to the script directory
+BASEDIR=$(dirname "$SCRIPT")
+
+rm -rf "$BASEDIR"/stacks/
+mkdir -p "$BASEDIR"/stacks/
 
 
 ## Generate unique stack for each site
@@ -55,31 +60,29 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     SITE_NAME="$site"
     echo "Generating Docker stack file for $SITE_NAME"
     export SITE_NAME="$SITE_NAME"
-    mkdir -p stacks/"$SITE_NAME"
-    /usr/local/bin/meta-compose -t templates/node-gpu-stack.yml.tmpl -o stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
-    cp -R ../env ../crontab ../guacamole stacks/"$SITE_NAME"/
-    if [ -d "$certdir" ]; then
-      cp -R "$certdir" stacks/"$SITE_NAME"/
-    fi
-    rm stacks/"$SITE_NAME"/guacamole/user-mapping-local.xml
-    sed -i 's/>desktop</>desktop-'"$SITE_NAME"'\.anyvision\.local</g' stacks/"$SITE_NAME"/guacamole/user-mapping-cloud.xml
-    sed -i 's/>sftp</>sftp-'"$SITE_NAME"'\.anyvision\.local</g' stacks/"$SITE_NAME"/guacamole/user-mapping-cloud.xml
-done < "sites.txt"
+    mkdir -p "$BASEDIR"/stacks/"$SITE_NAME"
+    /usr/local/bin/meta-compose -t templates/node-gpu-stack.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
+    cp -R "$BASEDIR"/../env "$BASEDIR"/../crontab "$BASEDIR"/../guacamole --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
+    ln -s "$BASEDIR"/tls stacks/"$SITE_NAME"/tls
+    rm "$BASEDIR"/stacks/"$SITE_NAME"/guacamole/user-mapping-local.xml
+    sed -i 's/>desktop</>desktop-'"$SITE_NAME"'\.anyvision\.local</g' "$BASEDIR"/stacks/"$SITE_NAME"/guacamole/user-mapping-cloud.xml
+    sed -i 's/>sftp</>sftp-'"$SITE_NAME"'\.anyvision\.local</g' "$BASEDIR"/stacks/"$SITE_NAME"/guacamole/user-mapping-cloud.xml
+done < "$BASEDIR"/sites.txt
 
 ## Generate the management stack
 echo "Generating Docker Management stack file"
-mkdir -p stacks/management
-cp -R ../crontab stacks/management/
-cp -R ./tls stacks/management/
-/usr/local/bin/meta-compose -t templates/management-stack.yml.tmpl -o stacks/management/docker-stack-management.yml
+mkdir -p "$BASEDIR"/stacks/management
+cp -R "$BASEDIR"/../crontab --target-directory="$BASEDIR"/stacks/management/
+ln -s "$BASEDIR"/tls "$BASEDIR"/stacks/management/tls
+/usr/local/bin/meta-compose -t templates/management-stack.yml.tmpl -o "$BASEDIR"/stacks/management/docker-stack-management.yml
 
 ## Generate the api-master stack
 echo "Generating Docker API-Master stack file"
-mkdir -p stacks/api-master
-cp -R ../env stacks/api-master/
-cp -R ./tls stacks/api-master/
+mkdir -p "$BASEDIR"/stacks/api-master
+cp -R "$BASEDIR"/../env --target-directory="$BASEDIR"/stacks/api-master/
+ln -s "$BASEDIR"/tls "$BASEDIR"/stacks/api-master/tls
 export SITE_NAME="api-master"
-/usr/local/bin/meta-compose -t templates/api-master-stack.yml.tmpl -o stacks/"$SITE_NAME"/docker-stack-api-master.yml
+/usr/local/bin/meta-compose -t templates/api-master-stack.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-api-master.yml
 
 echo "Done!"
 exit 0
