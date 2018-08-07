@@ -14,6 +14,6 @@ If you need to generate new **TLS Certificates**, run the script ``./certificate
 
 If you already have existing certificates, copy them to **tls/** (at docker-compose/swarm/tls) directory.
 
-> Note: If you generated new certificates or made changes to the **tls** directory files, you must run ``./stack_generator.sh [SOURCE_REGISTRY]`` again and re-deploy the generated stacks files for the changes to take effect.
+> Note: If you generated new certificates or made changes to the **tls** directory files, you must re-deploy the stacks for the changes to take effect.
 
 To automatically deploy all stacks under **stacks/** directory, use ``./stacks_deployer.sh`` script.

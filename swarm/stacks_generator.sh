@@ -62,7 +62,7 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     export SITE_NAME="$SITE_NAME"
     mkdir -p "$BASEDIR"/stacks/"$SITE_NAME"
     /usr/local/bin/meta-compose -t templates/node-gpu-stack.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
-    cp -R "$BASEDIR"/../env "$BASEDIR"/../crontab "$BASEDIR"/../guacamole --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
+    cp -R "$BASEDIR"/../{env,crontab,guacamole} --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
     ln -s "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
     rm "$BASEDIR"/stacks/"$SITE_NAME"/guacamole/user-mapping-local.xml
     sed -i 's/>desktop</>desktop-'"$SITE_NAME"'\.anyvision\.local</g' "$BASEDIR"/stacks/"$SITE_NAME"/guacamole/user-mapping-cloud.xml
