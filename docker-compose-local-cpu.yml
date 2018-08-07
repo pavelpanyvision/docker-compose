@@ -25,9 +25,8 @@ services:
       - "8080:8080"
     volumes:
       - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     environment:
+      - TZ=${TZ:-UTC}
       - GUACD_LOGLEVEL=info
     env_file:
       - env/global.env
@@ -44,9 +43,9 @@ services:
       - anyvision
     volumes:
       - /storage/sftp_data:/home/user
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     command: user:pass:2000:2000:files
+    environment:
+      - TZ=${TZ:-UTC}
     env_file:
       - env/global.env
     logging:
@@ -69,9 +68,8 @@ services:
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     environment:
+      - TZ=${TZ:-UTC}
       - limit_rate_speed=0
     env_file:
       - env/global.env
@@ -91,9 +89,8 @@ services:
     volumes:
       - /storage:/var/www/html
       - ./crontab/site_crontab:/etc/crontabs/crontab
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     environment:
+      - TZ=${TZ:-UTC}
       - TO_DATE_TRACK_DELETE=30
     logging:
       options:
@@ -113,8 +110,8 @@ services:
       #- "15761:15761"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - TZ=${TZ:-UTC}
     env_file:
       - env/global.env
     logging:
@@ -134,8 +131,8 @@ services:
       #- "27017:27017"
     volumes:
       - mongo_db_data:/data/db
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - TZ=${TZ:-UTC}
     env_file:
       - env/global.env
     logging:
@@ -155,8 +152,8 @@ services:
       - net.core.somaxconn=511
     volumes:
       - redis_db_data:/data:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - TZ=${TZ:-UTC}
     logging:
       options:
         max-size: 1g
@@ -173,11 +170,10 @@ services:
           - broadcaster.anyvision.local
     volumes:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     depends_on:
       - api
     environment:
+      - TZ=${TZ:-UTC}
       - api_service_ip=api.anyvision.local
       - BCAST_SOCKETIO_API_URL=https://api.anyvision.local:5443
       - RUN_AS_USER=user
@@ -204,11 +200,10 @@ services:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     depends_on:
       - redis
     environment:
+      - TZ=${TZ:-UTC}
       - GATEWAY_HOST=apigateway.anyvision.local
       - API_HOST=api.anyvision.local
       - DASH_API_URL=https://api.anyvision.local:5443
@@ -239,9 +234,8 @@ services:
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     environment:
+      - TZ=${TZ:-UTC}
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
       - CA_HOST=apigateway.anyvision.local
@@ -281,9 +275,8 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /dev:/dev       ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     environment:
+      - TZ=${TZ:-UTC}
       - pipe_cpu_mode=true
       - DISPLAY=${DISPLAY:-:1}
       - external_ip=proc-${node_name:-localnode}.anyvision.local
@@ -322,9 +315,8 @@ services:
       - /storage/share:/home/user/share:rw
       - /dev/shm:/dev/shm:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     environment:
+      - TZ=${TZ:-UTC}
       - DISPLAY=${DISPLAY:-:1}
       - ssl=true
       - GATEWAY_HOST=apigateway.anyvision.local
