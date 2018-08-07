@@ -46,8 +46,8 @@ if [ -n "$REGISTRY_PORT" ]; then
   export REGISTRY_PORT="$REGISTRY_PORT"
 fi
 
-rm -rf sites/
-mkdir -p sites/
+rm -rf stacks/
+mkdir -p stacks/
 
 
 ## Generate unique stack for each site
@@ -55,31 +55,31 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     SITE_NAME="$site"
     echo "Generating Docker stack file for $SITE_NAME"
     export SITE_NAME="$SITE_NAME"
-    mkdir -p sites/"$SITE_NAME"
-    /usr/local/bin/meta-compose -t templates/node-gpu-stack.yml.tmpl -o sites/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
-    cp -R ../env ../crontab ../guacamole sites/"$SITE_NAME"/
+    mkdir -p stacks/"$SITE_NAME"
+    /usr/local/bin/meta-compose -t templates/node-gpu-stack.yml.tmpl -o stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
+    cp -R ../env ../crontab ../guacamole stacks/"$SITE_NAME"/
     if [ -d "$certdir" ]; then
-      cp -R "$certdir" sites/"$SITE_NAME"/
+      cp -R "$certdir" stacks/"$SITE_NAME"/
     fi
-    rm sites/"$SITE_NAME"/guacamole/user-mapping-local.xml
-    sed -i 's/>desktop</>desktop-'"$SITE_NAME"'\.anyvision\.local</g' sites/"$SITE_NAME"/guacamole/user-mapping-cloud.xml
-    sed -i 's/>sftp</>sftp-'"$SITE_NAME"'\.anyvision\.local</g' sites/"$SITE_NAME"/guacamole/user-mapping-cloud.xml
+    rm stacks/"$SITE_NAME"/guacamole/user-mapping-local.xml
+    sed -i 's/>desktop</>desktop-'"$SITE_NAME"'\.anyvision\.local</g' stacks/"$SITE_NAME"/guacamole/user-mapping-cloud.xml
+    sed -i 's/>sftp</>sftp-'"$SITE_NAME"'\.anyvision\.local</g' stacks/"$SITE_NAME"/guacamole/user-mapping-cloud.xml
 done < "sites.txt"
 
 ## Generate the management stack
 echo "Generating Docker Management stack file"
-mkdir -p management
-cp -R ../crontab ./management
-cp -R ./tls ./management
-/usr/local/bin/meta-compose -t templates/management-stack.yml.tmpl -o management/docker-stack-management.yml
+mkdir -p stacks/management
+cp -R ../crontab stacks/management/
+cp -R ./tls stacks/management/
+/usr/local/bin/meta-compose -t templates/management-stack.yml.tmpl -o stacks/management/docker-stack-management.yml
 
 ## Generate the api-master stack
 echo "Generating Docker API-Master stack file"
-mkdir -p sites/api-master
-cp -R ../env ./sites/api-master
-cp -R ./tls ./sites/api-master
+mkdir -p stacks/api-master
+cp -R ../env stacks/api-master/
+cp -R ./tls stacks/api-master/
 export SITE_NAME="api-master"
-/usr/local/bin/meta-compose -t templates/api-master-stack.yml.tmpl -o sites/"$SITE_NAME"/docker-stack-api-master.yml
+/usr/local/bin/meta-compose -t templates/api-master-stack.yml.tmpl -o stacks/"$SITE_NAME"/docker-stack-api-master.yml
 
 echo "Done!"
 exit 0

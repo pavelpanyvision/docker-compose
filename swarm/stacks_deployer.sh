@@ -21,21 +21,20 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     echo "Removing stack \"$SITE_NAME\""
     docker stack rm "$SITE_NAME"
     sleep 15
-    echo "Deploying stack \"$SITE_NAME\" using file sites/$SITE_NAME/docker-stack-$SITE_NAME.yml"
-    docker stack deploy --with-registry-auth -c sites/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml "$SITE_NAME"
+    echo "Deploying stack \"$SITE_NAME\" using file stacks/$SITE_NAME/docker-stack-$SITE_NAME.yml"
+    docker stack deploy --with-registry-auth -c stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml "$SITE_NAME"
 done < "sites.txt"
 
 echo "Deploying API Master stack"
-SITE_NAME="api-master"
-docker stack rm "$SITE_NAME"
+docker stack rm api-master
 sleep 15
-docker stack deploy --with-registry-auth -c sites/"$SITE_NAME"/docker-stack-api-master.yml "$SITE_NAME"
+docker stack deploy --with-registry-auth -c stacks/api-master/docker-stack-api-master.yml api-master
 
 
 echo "Deploying Management stack"
 docker stack rm management
 sleep 15
-docker stack deploy --with-registry-auth -c management/docker-stack-management.yml management
+docker stack deploy --with-registry-auth -c stacks/management/docker-stack-management.yml management
 
 
 echo "Done!"
