@@ -58,8 +58,8 @@ services:
       - MODE=swarm
     deploy:
       mode: global
-      placement:
-        constraints: [node.role == manager]
+#      placement:
+#        constraints: [node.role == manager]
       restart_policy:
         delay: 5s
 
