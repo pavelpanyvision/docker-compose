@@ -152,12 +152,12 @@ services:
         com.df.port.1: 443
         com.df.srcPort.1: 443
         com.df.reqMode.1: sni
-        com.df.pathType.1: "req_ssl_sni -i -m reg"
+        com.df.pathType.1: "req.ssl_sni -i -m reg"
         com.df.servicePath.1: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
         com.df.port.2: 80
         com.df.srcPort.2: 80
         com.df.reqMode.2: http
-        com.df.pathType.2: "path_reg"
+        com.df.pathType.2: "req.hdr(host) -i -m reg"
         com.df.servicePath.2: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
 
 
@@ -369,7 +369,7 @@ services:
         com.df.port: 9443
         com.df.srcPort: 9443
         com.df.reqMode: sni
-        com.df.pathType: "req_ssl_sni -i -m reg"
+        com.df.pathType: "req.ssl_sni -i -m reg"
         com.df.servicePath: "^(apigateway-{{'default' | env('SITE_NAME')}}\\.)"
 
 
