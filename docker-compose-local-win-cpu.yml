@@ -25,8 +25,8 @@ services:
           - nginx-${node_name:-localnode}.anyvision.local
     ports:
       - "1935:1935"
-      #- "443:443"
-      #- "80:80"
+      - "443:443"
+      - "80:80"
     volumes:
       - c:/anv/storage:/opt/nginx/html:ro
       - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision

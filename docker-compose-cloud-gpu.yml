@@ -63,8 +63,8 @@ services:
           - nginx-${node_name:-localnode}.anyvision.local
     ports:
       - "1935:1935"
-      #- "443:443"
-      #- "80:80"
+      - "443:443"
+      - "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -254,6 +254,7 @@ services:
   backend:
     image: gcr.io/anyvision-production/backend-pyconcrete:1.19.3
     restart: always
+    privileged: true
     networks:
       anyvision:
         aliases:
@@ -304,6 +305,7 @@ services:
   dashboard:
     image: gcr.io/anyvision-production/dashboard:1.19.3
     restart: always
+    privileged: true
     networks:
       - anyvision
     volumes:
