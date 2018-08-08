@@ -157,7 +157,7 @@ services:
         com.df.port.2: 80
         com.df.srcPort.2: 80
         com.df.reqMode.2: http
-        com.df.pathType.2: "req.hdr(host) -i -m reg"
+        com.df.pathType.2: "req.hdr_reg(host) -i"
         com.df.servicePath.2: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
 
 

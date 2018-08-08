@@ -1,5 +1,4 @@
 #!/bin/bash
-set -eu
 
 
 # Requires https://github.com/webcrofting/meta-compose:
@@ -9,25 +8,23 @@ set -eu
 # pip install --no-index --find-links="./meta-compose" meta-compose
 
 
-certdir="tls"
+# Source the optparse.bash file ---------------------------------------------------
+source optparse.bash
+# Define options
+optparse.define short=s long=sites desc="Generate stacks from sites.txt" variable=generate_sites value=true default=true
+optparse.define short=b long=ab desc="Generate A/B stacks from sites.txt" variable=generate_ab value=true default=false
+optparse.define short=m long=management desc="Generate management stack" variable=generate_management value=true default=true
+optparse.define short=a long=apimaster desc="Generate api-master stack" variable=generate_apimaster value=true default=true
+optparse.define short=r long=registry desc="Registry URI, for example: \"gcr.io/anyvision-training\" [required]" variable=registry
+optparse.define short=p long=port desc="Registry Port, for example: \":5000\" [optional]" variable=port default=""
+# Source the output file ----------------------------------------------------------
+source $( optparse.build )
 
-
-display_usage() {
-  echo -e "\nUsage:\n$0 REGISTRY_HOST [:PORT] --argument1 --argument2 --argument3 --argumentX\n"
-  echo -e "Example:\n$0 registry.anyvision.local :5000 --sites --managemnt --api-master\n"
-  echo -e "Example:\n$0 gcr.io/anyvision-training --sites --managemnt --api-master\n"
-  echo -e "Example:\n$0 gcr.io/anyvision-production --sites --managemnt --ab \n"
-}
 
 docker_warning() {
-  echo "This script must be run with Docker capable privileges!"
+  echo "Error: This script must be run with Docker capable privileges."
 }
 
-# Check params
-if [ $# -lt 4 ]; then
-  display_usage
-  exit 1
-fi
 
 # Check Docker command executable exit code
 docker images > /dev/null 2>&1; rc=$?;
@@ -36,44 +33,20 @@ if [[ $rc != 0 ]]; then
   exit 1
 fi
 
-# get extra arguments
-generate_sites='false'
-generate_managament='false'
-generate_apimaster='false'
-generate_ab='false'
 
-for i in $*; do
-    if [ "${i}" == '--sites' ] ; then
-        echo "detected --sites"
-        generate_sites='true'
-    elif  [ "${i}" == '--managemnt' ] ; then
-        echo "detected --managemnt"
-        generate_managament='true'
-    elif  [ "${i}" == '--api-master' ] ; then
-        echo "detected --api-master"
-        generate_apimaster='true'
-    elif  [ "${i}" == '--ab' ] ; then
-        echo "detected --ab"
-        generate_ab='true'
-    fi
-done
+if [ -z "$registry" ]; then
+  echo "Error: Registry URI must be provided."
+  exit 1
+fi
 
 certdir="tls"
-REGISTRY_HOST="$1"
-set +eu
 
-if [[ "$2" =~ [0-9] ]]; then
-    REGISTRY_PORT="$2"
-else
-    echo "no port specified"
-    REGISTRY_PORT=""
+export REGISTRY_HOST="$registry"
+if [ -n "$port" ]; then
+  export REGISTRY_PORT="$port"
 fi
 
 set -eu
-export REGISTRY_HOST="$REGISTRY_HOST"
-if [ -n "$REGISTRY_PORT" ]; then
-  export REGISTRY_PORT="$REGISTRY_PORT"
-fi
 
 # Absolute path to this script
 SCRIPT=$(readlink -f "$0")
@@ -90,7 +63,7 @@ while IFS='' read -r site || [[ -n "$site" ]]; do
     echo "Generating Docker stack file for $SITE_NAME"
     export SITE_NAME="$SITE_NAME"
     mkdir -p "$BASEDIR"/stacks/"$SITE_NAME"
-    if [ $generate_sites == 'true' ] && [ $generate_ab == 'false' ] ; then
+    if [ "$generate_sites" = "true" ] && [ "$generate_ab" = "false" ] ; then
         /usr/local/bin/meta-compose -t templates/node-gpu-stack.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
     else
         /usr/local/bin/meta-compose -t templates/node-gpu-stack-a.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
@@ -105,7 +78,7 @@ done < "$BASEDIR"/sites.txt
 
 
 ## Generate the management stack
-if [ $generate_managament == 'true' ] ; then
+if [ "$generate_management" = "true" ] ; then
     echo "Generating Docker Management stack file"
     mkdir -p "$BASEDIR"/stacks/management
     cp -R "$BASEDIR"/../crontab --target-directory="$BASEDIR"/stacks/management/
@@ -114,7 +87,7 @@ if [ $generate_managament == 'true' ] ; then
 fi
 
 ## Generate the api-master stack
-if [ $generate_apimaster == 'true' ] ; then
+if [ "$generate_apimaster" = "true" ] ; then
     echo "Generating Docker API-Master stack file"
     mkdir -p "$BASEDIR"/stacks/api-master
     cp -R "$BASEDIR"/../env --target-directory="$BASEDIR"/stacks/api-master/
@@ -124,8 +97,8 @@ if [ $generate_apimaster == 'true' ] ; then
 fi
 
 ## Generate the ab stack
-if [ $generate_ab == 'true' ] ; then
-    echo "Generating Docker b stack file"
+if [ "$generate_ab" = "true" ] ; then
+    echo "Generating Docker \"B\" stack file"
     export SITE_NAME="b"
     mkdir -p "$BASEDIR"/stacks/"$SITE_NAME"
     cp -R "$BASEDIR"/../env --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
