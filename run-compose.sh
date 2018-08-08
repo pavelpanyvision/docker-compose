@@ -8,4 +8,4 @@ BASEDIR=$(dirname "$SCRIPT")
 
 export TZ=`readlink /etc/localtime | awk -F / '{print $5"/"$6}'`
 
-docker-compose -f "$BASEDIR"/"$1" -p "$2" ${*:3}
+docker-compose "$@"
