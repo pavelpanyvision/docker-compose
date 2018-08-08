@@ -63,7 +63,9 @@ services:
 #        constraints: [node.role == manager]
       restart_policy:
         delay: 5s
-
+    logging:
+      options:
+        max-size: 1g
 
 
   df-swarm-listener:
@@ -81,7 +83,9 @@ services:
         constraints: [node.labels.leader == true]
       restart_policy:
         delay: 5s
-
+    logging:
+      options:
+        max-size: 1g
 
 
   cron:
@@ -160,7 +164,9 @@ services:
       mode: global
       restart_policy:
         delay: 5s
-
+    logging:
+      options:
+        max-size: 1g
 
 
   portainer:
@@ -181,7 +187,9 @@ services:
         constraints: [node.role == manager]
       restart_policy:
         delay: 5s
-
+    logging:
+      options:
+        max-size: 1g
 
 
 #  consul:
