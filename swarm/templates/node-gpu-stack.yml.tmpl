@@ -152,13 +152,13 @@ services:
         com.df.port.1: 443
         com.df.srcPort.1: 443
         com.df.reqMode.1: sni
-        com.df.pathType.1: "req.ssl_sni -i -m reg"
-        com.df.servicePath.1: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
+        com.df.pathType.1: req.ssl_sni -i -m reg
+        com.df.servicePath.1: ^(nginx-{{'default' | env('SITE_NAME')}}\\.)
         com.df.port.2: 80
         com.df.srcPort.2: 80
         com.df.reqMode.2: http
-        com.df.pathType.2: "req.hdr_reg(host) -i"
-        com.df.servicePath.2: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
+        com.df.serviceDomain.2: nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+
 
 
 
@@ -428,6 +428,12 @@ services:
     image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.3
     networks:
       {{'default' | env('SITE_NAME')}}:
+        aliases:
+          - proc-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - reid-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - coll-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - arch-{{'default' | env('SITE_NAME')}}.anyvision.local
+      prod:
         aliases:
           - proc-{{'default' | env('SITE_NAME')}}.anyvision.local
           - reid-{{'default' | env('SITE_NAME')}}.anyvision.local
