@@ -112,9 +112,9 @@ services:
       {{'default' | env('SITE_NAME')}}:
         aliases:
          - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
-      prod:
-        aliases:
-         - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+      #prod:
+      #  aliases:
+      #   - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/opt/nginx/html:ro
       - /etc/localtime:/etc/localtime:ro
@@ -279,9 +279,9 @@ services:
       {{'default' | env('SITE_NAME')}}:
         aliases:
           - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
-      prod:
-        aliases:
-          - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
+      #prod:
+      #  aliases:
+      #    - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
