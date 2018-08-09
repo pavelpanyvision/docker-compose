@@ -163,6 +163,7 @@ services:
   broadcaster:
     image: gcr.io/anyvision-production/broadcaster:1.19.3
     restart: always
+#    network_mode: "host"
     hostname: broadcaster
     networks:
       anyvision:
@@ -176,6 +177,8 @@ services:
       - TZ=${TZ:-UTC}
       - api_service_ip=api.anyvision.local
       - BCAST_SOCKETIO_API_URL=https://api.anyvision.local:5443
+      - api_service_port=5443
+#      - ENABLE_DOCKERIZE=false
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
