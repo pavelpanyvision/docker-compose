@@ -317,6 +317,7 @@ services:
       #- /dev/shm:/dev/shm:rw
       - /dev:/dev:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /run/user/1000/pulse:/tmp/pulse
     environment:
       - TZ=${TZ:-UTC}
       - DISPLAY=${DISPLAY:-:1}
