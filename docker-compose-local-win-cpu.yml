@@ -226,6 +226,8 @@ services:
       - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
     environment:
       - pipe_cpu_mode=true
+      - NVIDIA_VISIBLE_DEVICES=
+      - NVIDIA_DRIVER_CAPABILITIES=      
       - DISPLAY=10.0.75.1:0.0
       - external_ip=proc-${node_name:-localnode}.anyvision.local
       - storage_ip=nginx-${node_name:-localnode}.anyvision.local
