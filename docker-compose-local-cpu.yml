@@ -301,6 +301,8 @@ services:
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - pipe_cpu_mode=true
+      - NVIDIA_VISIBLE_DEVICES=
+      - NVIDIA_DRIVER_CAPABILITIES=
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - external_ip=proc-${node_name:-localnode}.anyvision.local
       - storage_ip=nginx-${node_name:-localnode}.anyvision.local
