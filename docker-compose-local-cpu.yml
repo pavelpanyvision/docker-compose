@@ -278,6 +278,8 @@ services:
     environment:
       - TZ=${TZ:-UTC}
       - pipe_cpu_mode=true
+      - NVIDIA_VISIBLE_DEVICES=
+      - NVIDIA_DRIVER_CAPABILITIES=
       - DISPLAY=${DISPLAY:-:1}
       - external_ip=proc-${node_name:-localnode}.anyvision.local
       - storage_ip=nginx-${node_name:-localnode}.anyvision.local
