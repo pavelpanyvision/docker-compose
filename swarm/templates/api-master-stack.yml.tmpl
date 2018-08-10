@@ -72,9 +72,8 @@ services:
       labels:
         com.df.notify: 'true'
         com.df.port: 80
+        com.df.srcPort: 80
         com.df.serviceDomain: 'dashboard-master.anyvision.local'
-        #com.df.servicePath: "/master"
-        #com.df.reqPathSearchReplace: "/master,"
 
 
   api-master:
@@ -86,8 +85,8 @@ services:
       prod:
         aliases:
           - api-master.anyvision.local
-    ports:
-      - "27183:27183"
+#    ports:
+#      - "27183:27183"
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
@@ -128,12 +127,11 @@ services:
           - node.labels.site=={{'default' | env('SITE_NAME')}}
       restart_policy:
         delay: 5s
-#      labels:
-#        com.df.notify: 'true'
-#        com.df.port: 80
-#        #com.df.serviceDomain: 'api-master.anyvision.local'
-#        com.df.servicePath: "/api-master"
-#        com.df.reqPathSearchReplace: "/api-master,"
+      labels:
+        com.df.notify: 'true'
+        com.df.port: 27183
+        com.df.srcPort: 80
+        com.df.serviceDomain: 'api-master.anyvision.local'
 
 
 
@@ -181,16 +179,16 @@ services:
         delay: 5s
       labels:
         com.df.notify: 'true'
-        com.df.port.1: 443
-        com.df.srcPort.1: 443
-        com.df.reqMode.1: sni
-        com.df.pathType.1: "req.ssl_sni -i -m reg"
-        com.df.servicePath.1: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
-        com.df.port.2: 80
-        com.df.srcPort.2: 80
-        com.df.reqMode.2: http
-        com.df.pathType.2: "req.hdr_reg(host) -i"
-        com.df.servicePath.2: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
+        com.df.port: 443
+        com.df.srcPort: 443
+        com.df.reqMode: sni
+        com.df.pathType: "req.ssl_sni -i -m reg"
+        com.df.servicePath: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
+#        com.df.port.2: 80
+#        com.df.srcPort.2: 80
+#        com.df.reqMode.2: http
+#        com.df.pathType.2: "req.hdr_beg(host) -i"
+#        com.df.servicePath.2: "nginx-{{'default' | env('SITE_NAME')}}."
 
 
 
