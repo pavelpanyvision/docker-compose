@@ -29,7 +29,8 @@ services:
 
 
   dashboard-master:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard-master:1.0.1
+    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard-master:on-demand-1.0.1-env-config
+#    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard-master:1.0.1
     networks:
       proxy:
       {{'default' | env('SITE_NAME')}}:
@@ -53,6 +54,7 @@ services:
         mode: 400
     environment:
       - limit_rate_speed=0
+      - master_api_port=27183
       - master_api_ip=api-master.anyvision.local
 #      - master_api_ip=35.195.83.247/master
       - master_api_username=admin
