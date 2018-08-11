@@ -112,9 +112,6 @@ services:
       {{'default' | env('SITE_NAME')}}:
         aliases:
          - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
-      #prod:
-      #  aliases:
-      #   - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/opt/nginx/html:ro
       - /etc/localtime:/etc/localtime:ro
@@ -279,9 +276,6 @@ services:
       {{'default' | env('SITE_NAME')}}:
         aliases:
           - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
-      #prod:
-      #  aliases:
-      #    - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -475,9 +469,9 @@ services:
       - collate_service_ip=coll-{{'default' | env('SITE_NAME')}}.anyvision.local
       - track_archive_service_ip=arch-{{'default' | env('SITE_NAME')}}.anyvision.local
       ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
-      #- reid_service_ip=reid-b.anyvision.local
-      #- collate_service_ip=coll-b.anyvision.local
-      #- track_archive_service_ip=arch-b.anyvision.local
+#      - reid_service_ip=reid-b.anyvision.local
+#      - collate_service_ip=coll-b.anyvision.local
+#      - track_archive_service_ip=arch-b.anyvision.local
     env_file:
       - env/backend.env
       - env/global.env

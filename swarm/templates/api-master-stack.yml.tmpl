@@ -54,6 +54,7 @@ services:
     environment:
       - limit_rate_speed=0
       - master_api_ip=api-master.anyvision.local
+#      - master_api_ip=35.195.83.247/master
       - master_api_username=admin
       - master_api_password=admin
     env_file:
@@ -72,7 +73,11 @@ services:
       labels:
         com.df.notify: 'true'
         com.df.port: 80
+        com.df.srcPort: 80
         com.df.serviceDomain: 'dashboard-master.anyvision.local'
+#        com.df.servicePath: "/dashboard"
+#        com.df.reqPathSearchReplace: "/dashboard,"
+
 
 
   api-master:
@@ -85,8 +90,8 @@ services:
       prod:
         aliases:
           - api-master.anyvision.local
-#    ports:
-#      - "27183:27183"
+    ports:
+      - "27183:27183"
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
@@ -130,7 +135,10 @@ services:
       labels:
         com.df.notify: 'true'
         com.df.port: 27183
+        com.df.srcPort: 80
         com.df.serviceDomain: 'api-master.anyvision.local'
+#        com.df.servicePath: "/master"
+#        com.df.reqPathSearchReplace: "/master,"
 
 
 
