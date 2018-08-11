@@ -72,13 +72,13 @@ services:
       labels:
         com.df.notify: 'true'
         com.df.port: 80
-        com.df.srcPort: 80
         com.df.serviceDomain: 'dashboard-master.anyvision.local'
 
 
   api-master:
     image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-master:1.0.0
     networks:
+      proxy:
       {{'default' | env('SITE_NAME')}}:
         aliases:
           - api-master.anyvision.local
@@ -130,7 +130,6 @@ services:
       labels:
         com.df.notify: 'true'
         com.df.port: 27183
-        com.df.srcPort: 80
         com.df.serviceDomain: 'api-master.anyvision.local'
 
 
