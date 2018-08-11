@@ -17,7 +17,6 @@ optparse.define short=m long=management desc="Generate management stack" variabl
 optparse.define short=i long=apimaster desc="Generate api-master stack" variable=generate_apimaster value=true default=false
 optparse.define short=a long=all desc="Generate all stacks" variable=generate_all value=true default=false
 optparse.define short=r long=registry desc="Registry URI, for example: \"gcr.io/anyvision-production\" or \"registry.anyvision.local:5000\" [required]" variable=registry
-#optparse.define short=p long=port desc="Registry Port, for example: \":5000\" [optional]" variable=port default=""
 # Source the output file ----------------------------------------------------------
 source $( optparse.build )
 
@@ -48,9 +47,6 @@ fi
 certdir="tls"
 
 export REGISTRY_HOST="$registry"
-if [ -n "$port" ]; then
-  export REGISTRY_PORT="$port"
-fi
 
 set -eu
 
@@ -117,4 +113,3 @@ fi
 
 echo "Done!"
 exit 0
-
