@@ -16,7 +16,7 @@ optparse.define short=b long=ab desc="Generate A/B stacks from sites.txt" variab
 optparse.define short=m long=management desc="Generate management stack" variable=generate_management value=true default=false
 optparse.define short=i long=apimaster desc="Generate api-master stack" variable=generate_apimaster value=true default=false
 optparse.define short=a long=all desc="Generate all stacks" variable=generate_all value=true default=false
-optparse.define short=r long=registry desc="Registry URI, for example: \"gcr.io/anyvision-production\" or \"registry.anyvision.local:5000\" [required]" variable=registry
+optparse.define short=r long=registry desc="Registry URI, for example: \"gcr.io/anyvision-production\" or \"registry.anyvision.local:5000\"" variable=registry
 # Source the output file ----------------------------------------------------------
 source $( optparse.build )
 
@@ -39,14 +39,11 @@ if [[ $rc != 0 ]]; then
   exit 1
 fi
 
-if [ -z "$registry" ]; then
-  echo "Error: Registry URI must be provided."
-  exit 1
+if [ -n "$registry" ]; then
+  export REGISTRY_HOST="$registry"
 fi
 
 certdir="tls"
-
-export REGISTRY_HOST="$registry"
 
 set -eu
 
