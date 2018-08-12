@@ -80,7 +80,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.labels.leader == true]
+        constraints: [node.role == manager]
       restart_policy:
         delay: 5s
     logging:
