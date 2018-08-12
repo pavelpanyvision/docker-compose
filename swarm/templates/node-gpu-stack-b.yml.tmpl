@@ -14,13 +14,13 @@ networks:
     external: true
   proxy:
     external: true
-  {{'default' | env('SITE_NAME')}}:
+  {{'default'|env('SITE_NAME')}}:
 
 
 configs:
-  {{'default' | env('SITE_NAME')}}_guacamole_mapping:
+  {{'default'|env('SITE_NAME')}}_guacamole_mapping:
     file: ./guacamole/user-mapping-cloud.xml
-  {{'default' | env('SITE_NAME')}}_cron_config:
+  {{'default'|env('SITE_NAME')}}_cron_config:
     file: ./crontab/site_crontab
 
 
@@ -41,19 +41,18 @@ secrets:
 
 services:
 
-
   guacamole:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/guacamole:0.9.14
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/guacamole:0.9.14
     networks:
       proxy:
-      {{'default' | env('SITE_NAME')}}:
+      {{'default'|env('SITE_NAME')}}:
         aliases:
-         - guacamole-{{'default' | env('SITE_NAME')}}.anyvision.local
+         - guacamole-{{'default'|env('SITE_NAME')}}.anyvision.local
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     configs:
-      - source: {{'default' | env('SITE_NAME')}}_guacamole_mapping
+      - source: {{'default'|env('SITE_NAME')}}_guacamole_mapping
         target: /etc/guacamole/user-mapping.xml
         mode: 444
     environment:
@@ -68,23 +67,23 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
+          - node.labels.site=={{'default'|env('SITE_NAME')}}
       restart_policy:
         delay: 5s
       labels:
         com.df.notify: 'true'
-        com.df.servicePath: "/{{'default' | env('SITE_NAME')}}"
-        com.df.reqPathSearchReplace: "/{{'default' | env('SITE_NAME')}},"
+        com.df.servicePath: "/{{'default'|env('SITE_NAME')}}"
+        com.df.reqPathSearchReplace: "/{{'default'|env('SITE_NAME')}},"
         com.df.port: 8080
 
 
 
   sftp:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/sftp:alpine
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/sftp:alpine
     networks:
-      {{'default' | env('SITE_NAME')}}:
+      {{'default'|env('SITE_NAME')}}:
         aliases:
-          - sftp-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - sftp-{{'default'|env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage/sftp_data:/home/user
       - /etc/localtime:/etc/localtime:ro
@@ -100,22 +99,19 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
+          - node.labels.site=={{'default'|env('SITE_NAME')}}
       restart_policy:
         delay: 5s
 
 
 
   nginx:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/nginx-rtmp:ssl
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/nginx-rtmp:ssl
     networks:
       proxy:
-      {{'default' | env('SITE_NAME')}}:
+      {{'default'|env('SITE_NAME')}}:
         aliases:
-         - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
-      prod:
-        aliases:
-         - nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+         - nginx-{{'default'|env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/opt/nginx/html:ro
       - /etc/localtime:/etc/localtime:ro
@@ -145,36 +141,37 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
+          - node.labels.site=={{'default'|env('SITE_NAME')}}
       restart_policy:
         delay: 5s
       labels:
         com.df.notify: 'true'
-        com.df.port.1: 443
-        com.df.srcPort.1: 443
-        com.df.reqMode.1: sni
-        com.df.pathType.1: "req.ssl_sni -i -m reg"
-        com.df.servicePath.1: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
-        com.df.port.2: 80
-        com.df.srcPort.2: 80
-        com.df.reqMode.2: http
-        com.df.pathType.2: "req.hdr_reg(host) -i"
-        com.df.servicePath.2: "^(nginx-{{'default' | env('SITE_NAME')}}\\.)"
+        com.df.port: 443
+        com.df.srcPort: 443
+        com.df.reqMode: sni
+        com.df.pathType: "req.ssl_sni -i -m reg"
+        com.df.servicePath: "^(nginx-{{'default'|env('SITE_NAME')}}\\.)"
+#        com.df.port.2: 80
+#        com.df.srcPort.2: 80
+#        com.df.reqMode.2: http
+#        com.df.pathType.2: "req.hdr_beg(host) -i"
+#        com.df.servicePath.2: "nginx-{{'default'|env('SITE_NAME')}}."
+
 
 
 
   cron:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/supercronic:latest
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/supercronic:latest
     networks:
-      {{'default' | env('SITE_NAME')}}:
+      {{'default'|env('SITE_NAME')}}:
         aliases:
-          - cron-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - cron-{{'default'|env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     configs:
-      - source: {{'default' | env('SITE_NAME')}}_cron_config
+      - source: {{'default'|env('SITE_NAME')}}_cron_config
         target: /etc/crontabs/crontab
         mode: 444
     environment:
@@ -187,21 +184,21 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
+          - node.labels.site=={{'default'|env('SITE_NAME')}}
       restart_policy:
         delay: 5s
 
 
 
 #  rabbitmq:
-#    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/rabbitmq:latest
+#    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/rabbitmq:latest
 #    networks:
-#      {{'default' | env('SITE_NAME')}}:
+#      {{'default'|env('SITE_NAME')}}:
 #        aliases:
-#          - rabbitmq-{{'default' | env('SITE_NAME')}}.anyvision.local
+#          - rabbitmq-{{'default'|env('SITE_NAME')}}.anyvision.local
 #      prod:
 #        aliases:
-#          - rabbitmq-{{'default' | env('SITE_NAME')}}.anyvision.local
+#          - rabbitmq-{{'default'|env('SITE_NAME')}}.anyvision.local
 #    volumes:
 #      - /storage/rabbitmq:/var/lib/rabbitmq
 #      - /etc/localtime:/etc/localtime:ro
@@ -216,18 +213,18 @@ services:
 #      replicas: 1
 #      placement:
 #        constraints:
-#          - node.labels.site=={{'default' | env('SITE_NAME')}}
+#          - node.labels.site=={{'default'|env('SITE_NAME')}}
 #      restart_policy:
 #        delay: 5s
 
 
 
   mongodb:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/mongo:3.6-jessie
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/mongo:3.6-jessie
     networks:
-      {{'default' | env('SITE_NAME')}}:
+      {{'default'|env('SITE_NAME')}}:
         aliases:
-          - mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - mongodb-{{'default'|env('SITE_NAME')}}.anyvision.local
     volumes:
       - /ssd/mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
@@ -242,18 +239,18 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
+          - node.labels.site=={{'default'|env('SITE_NAME')}}
       restart_policy:
         delay: 5s
 
 
 
   redis:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/redis:latest
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/redis:latest
     networks:
-      {{'default' | env('SITE_NAME')}}:
+      {{'default'|env('SITE_NAME')}}:
         aliases:
-          - redis-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - redis-{{'default'|env('SITE_NAME')}}.anyvision.local
     volumes:
       - redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
@@ -266,22 +263,19 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
+          - node.labels.site=={{'default'|env('SITE_NAME')}}
       restart_policy:
         delay: 5s
 
 
 
 #  broadcaster:
-#    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/broadcaster:1.19.3
+#    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/broadcaster:1.19.3
 #    hostname: broadcaster
 #    networks:
-#      {{'default' | env('SITE_NAME')}}:
+#      {{'default'|env('SITE_NAME')}}:
 #        aliases:
-#          - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
-#      prod:
-#        aliases:
-#          - broadcaster-{{'default' | env('SITE_NAME')}}.anyvision.local
+#          - broadcaster-{{'default'|env('SITE_NAME')}}.anyvision.local
 #    volumes:
 #      - /etc/localtime:/etc/localtime:ro
 #      - /etc/timezone:/etc/timezone:ro
@@ -293,8 +287,9 @@ services:
 #    depends_on:
 #      - api
 #    environment:
-#      - api_service_ip=api-{{'default' | env('SITE_NAME')}}.anyvision.local
-#      - BCAST_SOCKETIO_API_URL=https://api-{{'default' | env('SITE_NAME')}}.anyvision.local:5443
+#      - api_service_ip=api-{{'default'|env('SITE_NAME')}}.anyvision.local
+#      - BCAST_SOCKETIO_API_URL=https://api-{{'default'|env('SITE_NAME')}}.anyvision.local:5443
+#      - api_service_port=5443
 #      - RUN_AS_USER=user
 #      - ENABLE_CHOWN=false
 #    env_file:
@@ -308,19 +303,19 @@ services:
 #      replicas: 1
 #      placement:
 #        constraints:
-#          - node.labels.site=={{'default' | env('SITE_NAME')}}
+#          - node.labels.site=={{'default'|env('SITE_NAME')}}
 #      restart_policy:
 #        delay: 5s
 
 
 
   apigateway:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api-gateway:1.19.3
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/api-gateway:1.19.3
     networks:
       proxy:
-      {{'default' | env('SITE_NAME')}}:
+      {{'default'|env('SITE_NAME')}}:
         aliases:
-          - apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
@@ -342,12 +337,12 @@ services:
     depends_on:
       - redis
     environment:
-      - GATEWAY_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - API_HOST=api-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - DASH_API_URL=https://api-{{'default' | env('SITE_NAME')}}.anyvision.local:5443
-      - GATEWAY_SECURE_URL=https://apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local:9443
-      - GATEWAY_URL=http://apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local:8080
-      - REDIS_HOST=redis-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - GATEWAY_HOST=apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - API_HOST=api-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - DASH_API_URL=https://api-{{'default'|env('SITE_NAME')}}.anyvision.local:5443
+      - GATEWAY_SECURE_URL=https://apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local:9443
+      - GATEWAY_URL=http://apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local:8080
+      - REDIS_HOST=redis-{{'default'|env('SITE_NAME')}}.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
       - ENABLE_CREATE_SSL=false
@@ -362,7 +357,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
+          - node.labels.site=={{'default'|env('SITE_NAME')}}
       restart_policy:
         delay: 5s
       labels:
@@ -371,19 +366,19 @@ services:
         com.df.srcPort: 9443
         com.df.reqMode: sni
         com.df.pathType: "req.ssl_sni -i -m reg"
-        com.df.servicePath: "^(apigateway-{{'default' | env('SITE_NAME')}}\\.)"
+        com.df.servicePath: "^(apigateway-{{'default'|env('SITE_NAME')}}\\.)"
 
 
 
   api:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/api:1.19.3
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/api:1.19.3
     networks:
-      {{'default' | env('SITE_NAME')}}:
+      {{'default'|env('SITE_NAME')}}:
         aliases:
-          - api-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - api-{{'default'|env('SITE_NAME')}}.anyvision.local
       prod:
         aliases:
-          - api-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - api-{{'default'|env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
@@ -402,10 +397,10 @@ services:
         uid: "0"
         mode: 444
     environment:
-      - API_IP=api-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - MONGO_DB_IP=mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - CA_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - MASS_IMPORT_IP=reid-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - API_IP=api-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - MONGO_DB_IP=mongodb-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - CA_HOST=apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - MASS_IMPORT_IP=reid-{{'default'|env('SITE_NAME')}}.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -419,21 +414,27 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
+          - node.labels.site=={{'default'|env('SITE_NAME')}}
       restart_policy:
         delay: 5s
 
 
 
   backend:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/backend-pyconcrete:1.19.3
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/backend-pyconcrete:1.19.3
     networks:
-      {{'default' | env('SITE_NAME')}}:
+      {{'default'|env('SITE_NAME')}}:
         aliases:
-          - proc-{{'default' | env('SITE_NAME')}}.anyvision.local
-          - reid-{{'default' | env('SITE_NAME')}}.anyvision.local
-          - coll-{{'default' | env('SITE_NAME')}}.anyvision.local
-          - arch-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - proc-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - reid-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - coll-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - arch-{{'default'|env('SITE_NAME')}}.anyvision.local
+      prod:
+        aliases:
+          - proc-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - reid-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - coll-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - arch-{{'default'|env('SITE_NAME')}}.anyvision.local
     volumes:
       - /home/user/license:/home/user/license:ro
       - /ssd/pipe_data:/root/pipe_data
@@ -457,12 +458,12 @@ services:
         mode: 444
     environment:
       - DISPLAY=:0
-      - external_ip=proc-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - storage_ip=nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - frame_store_storage_ip=nginx-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - external_ip=proc-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - storage_ip=nginx-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - frame_store_storage_ip=nginx-{{'default'|env('SITE_NAME')}}.anyvision.local
       - redis_host=127.0.0.1
-      - api_service_ip=api-{{'default' | env('SITE_NAME')}}.anyvision.local
-      - mongodb_host=mongodb-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - api_service_ip=api-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - mongodb_host=mongodb-{{'default'|env('SITE_NAME')}}.anyvision.local
       ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
       - reid_service_ip=reid-b.anyvision.local
       - collate_service_ip=coll-b.anyvision.local
@@ -483,15 +484,15 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
+          - node.labels.site=={{'default'|env('SITE_NAME')}}
       restart_policy:
         delay: 5s
 
 
   dashboard:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/dashboard:1.19.3
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/dashboard:1.19.3
     networks:
-      - {{'default' | env('SITE_NAME')}}
+      - {{'default'|env('SITE_NAME')}}
     volumes:
       - /storage/sftp_data:/sftp:rw
       - /media:/home/user/media:ro
@@ -508,7 +509,7 @@ services:
     environment:
       - DISPLAY=:0
       - ssl=true
-      - GATEWAY_HOST=apigateway-{{'default' | env('SITE_NAME')}}.anyvision.local
+      - GATEWAY_HOST=apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local
       - RUN_AS_USER=root
       - ENABLE_CHOWN=false
     env_file:
@@ -523,18 +524,18 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
+          - node.labels.site=={{'default'|env('SITE_NAME')}}
       restart_policy:
         delay: 5s
 
 
 
   desktop:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/desktop:latest
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/desktop:latest
     networks:
-      {{'default' | env('SITE_NAME')}}:
+      {{'default'|env('SITE_NAME')}}:
         aliases:
-          - desktop-{{'default' | env('SITE_NAME')}}.anyvision.local
+          - desktop-{{'default'|env('SITE_NAME')}}.anyvision.local
     volumes:
       - /storage/sftp_data:/sftp:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
@@ -554,6 +555,6 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.site=={{'default' | env('SITE_NAME')}}
+          - node.labels.site=={{'default'|env('SITE_NAME')}}
       restart_policy:
         delay: 5s

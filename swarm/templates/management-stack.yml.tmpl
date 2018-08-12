@@ -44,7 +44,7 @@ services:
 
 
   df-proxy:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/docker-flow-proxy:18.07.18-74
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/docker-flow-proxy:18.07.18-74
     ports:
       - "80:80"
       - "443:443"
@@ -58,7 +58,8 @@ services:
       - MODE=swarm
       - DEBUG=true
     deploy:
-      replicas: 1
+#      replicas: 1
+      mode: global
       placement:
         constraints: [node.role == manager]
       restart_policy:
@@ -69,7 +70,7 @@ services:
 
 
   df-swarm-listener:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/docker-flow-swarm-listener:18.07.03-28
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/docker-flow-swarm-listener:18.07.03-28
     networks:
       - proxy
     volumes:
@@ -89,7 +90,7 @@ services:
 
 
   cron:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/supercronic:latest
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/supercronic:latest
     networks:
       - prod
       - proxy
@@ -149,7 +150,7 @@ services:
 
 
   portainer-agent:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/portainer-agent:1.1.2
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/portainer-agent:1.1.2
     environment:
       # REQUIRED: Should be equal to the service name prefixed by "tasks." when
       # deployed inside an overlay network
@@ -170,7 +171,7 @@ services:
 
 
   portainer:
-    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/portainer:1.19.1
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/portainer:1.19.1
     command: -H "tcp://tasks.portainer-agent:9001" --tlsskipverify
     ports:
       - "9000:9000"
@@ -193,7 +194,7 @@ services:
 
 
 #  consul:
-#    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/consul:1.2.1
+#    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/consul:1.2.1
 #    volumes:
 #      - consul:/consul
 #    ports:
@@ -218,7 +219,7 @@ services:
 
 
 #  registrator:
-#    image: {{'default' | env('REGISTRY_HOST')}}{{'' | env('REGISTRY_PORT')}}/registrator:v7
+#    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/registrator:v7
 #    command: ["consul://consul.cluster:8500"]
 #    networks:
 #      - prod

@@ -161,8 +161,9 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:1.19.3
+    image: gcr.io/anyvision-production/broadcaster:1.19.3.2
     restart: always
+#    network_mode: "host"
     hostname: broadcaster
     networks:
       anyvision:
@@ -176,6 +177,8 @@ services:
       - TZ=${TZ:-UTC}
       - api_service_ip=api.anyvision.local
       - BCAST_SOCKETIO_API_URL=https://api.anyvision.local:5443
+      - api_service_port=5443
+#      - ENABLE_DOCKERIZE=false
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -188,7 +191,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:1.19.3
+    image: gcr.io/anyvision-production/api-gateway:1.19.3.2
     restart: always
     networks:
       anyvision:
@@ -223,7 +226,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.19.3
+    image: gcr.io/anyvision-production/api:1.19.3.2
     restart: always
     networks:
       anyvision:
@@ -252,9 +255,9 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-pyconcrete:1.19.3
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.19.3.6
     restart: always
-    privileged: true
+    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
         aliases:
@@ -273,7 +276,7 @@ services:
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /dev/shm:/dev/shm:rw
+      - /dev:/dev:rw       ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     environment:
       - TZ=${TZ:-UTC}
@@ -303,7 +306,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-production/dashboard:1.19.3
+    image: gcr.io/anyvision-production/dashboard:1.19.3.2
     restart: always
     privileged: true
     networks:
@@ -313,7 +316,8 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
       - /media:/home/user/media:ro
       - /storage/share:/home/user/share:rw
-      - /dev/shm:/dev/shm:rw
+      #- /dev/shm:/dev/shm:rw
+      - /dev:/dev:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     environment:
       - TZ=${TZ:-UTC}

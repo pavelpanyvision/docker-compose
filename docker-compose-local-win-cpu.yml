@@ -115,8 +115,9 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:1.19.3
+    image: gcr.io/anyvision-production/broadcaster:1.19.3.2
     restart: always
+#    network_mode: "host"
     hostname: broadcaster
     networks:
       anyvision:
@@ -129,6 +130,8 @@ services:
     environment:
       - api_service_ip=api.anyvision.local
       - BCAST_SOCKETIO_API_URL=https://api.anyvision.local:5443
+      - api_service_port=5443
+#      - ENABLE_DOCKERIZE=false
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -141,7 +144,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:1.19.3
+    image: gcr.io/anyvision-production/api-gateway:1.19.3.2
     restart: always
     networks:
       anyvision:
@@ -175,7 +178,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.19.3
+    image: gcr.io/anyvision-production/api:1.19.3.2
     restart: always
     networks:
       anyvision:
@@ -203,7 +206,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-cpu-pyconcrete:1.19.3
+    image: gcr.io/anyvision-production/backend-cpu-pyconcrete:1.19.3.6
     restart: always
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
@@ -254,7 +257,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-production/dashboard:1.19.3
+    image: gcr.io/anyvision-production/dashboard:1.19.3.2
     restart: always
     networks:
       - anyvision
