@@ -44,7 +44,7 @@ RUN  chmod u+x /root/backend_trunk/execute.sh
 COPY functional/check_env_setup.py /root/backend_trunk/tests/functional/check_env_setup.py
 COPY functional/dash_api_mock_server.py /root/backend_trunk/tests/functional/dash_api_mock_server.py
 COPY functional/check_tests_results.py /root/backend_trunk/tests/functional/check_tests_results.py
-COPY jmeter/tests/play_video_using_https_3.jmx  /root/backend_trunk/tests/jmeter/tests/play_video_using_https_3.jmx
+COPY jmeter/tests/play_video_update_subject_image.jmx  /root/backend_trunk/tests/jmeter/tests/play_video_update_subject_image.jmx
 WORKDIR	/root/backend_trunk
 
 CMD ["./execute.sh"]
