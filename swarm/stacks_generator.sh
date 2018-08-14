@@ -54,7 +54,7 @@ BASEDIR=$(dirname "$SCRIPT")
 
 
 ## Generate unique stack for each site
-if [ "$generate_sites" = "true" ] || [ "$generate_all" = "true" ]; then
+if [ "$generate_sites" = "true" ] || [ "$generate_ab" = "true" ] || [ "$generate_all" = "true" ]; then
   while IFS='' read -r site || [[ -n "$site" ]]; do
     SITE_NAME="$site"
     export SITE_NAME="$SITE_NAME"
