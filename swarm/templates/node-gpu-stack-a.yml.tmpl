@@ -130,7 +130,7 @@ services:
 
 
   backend:
-    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/backend-pyconcrete:1.19.3
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/backend-pyconcrete:1.19.4.rc1
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:

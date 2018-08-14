@@ -161,7 +161,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:1.19.3.2
+    image: gcr.io/anyvision-production/broadcaster:1.19.4-rc.1
     restart: always
 #    network_mode: "host"
     hostname: broadcaster
@@ -191,7 +191,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:1.19.3.2
+    image: gcr.io/anyvision-production/api-gateway:1.19.4-rc.1
     restart: always
     networks:
       anyvision:
@@ -226,7 +226,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.19.3.2
+    image: gcr.io/anyvision-production/api:1.19.4-rc.1
     restart: always
     networks:
       anyvision:
@@ -255,7 +255,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-pyconcrete:1.19.3.6
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.19.4.rc1
     restart: always
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
@@ -306,7 +306,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-production/dashboard:1.19.3.2
+    image: gcr.io/anyvision-production/dashboard:1.19.4-rc.1
     restart: always
     privileged: true
     networks:
