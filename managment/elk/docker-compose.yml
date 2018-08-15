@@ -58,7 +58,10 @@ services:
     container_name: filebeat
     volumes:
       - $PWD/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - /storage/logs:/usr/share/filebeat/logs:ro
+      - /storage/pipe-logs/:/usr/share/filebeat/logs/:ro
+      - /storage/api-logs/:/usr/share/filebeat/logs/:ro
+      - /storage/gateway-logs/:/usr/share/filebeat/logs/:ro
+      #- /storage/logs:/usr/share/filebeat/logs:ro
     networks:
       - logging
     depends_on:
