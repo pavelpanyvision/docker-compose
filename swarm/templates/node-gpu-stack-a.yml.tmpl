@@ -49,7 +49,7 @@ services:
       proxy:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-         - nginx-{{'default'|env('SITE_NAME')}}.anyvision.local
+         - nginx-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /storage:/opt/nginx/html:ro
       - /etc/localtime:/etc/localtime:ro
@@ -103,7 +103,7 @@ services:
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-          - cron-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - cron-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
@@ -134,16 +134,16 @@ services:
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-          - proc-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - reid-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - coll-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - arch-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - proc-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - reid-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - coll-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - arch-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       prod:
         aliases:
-          - proc-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - reid-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - coll-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - arch-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - proc-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - reid-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - coll-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - arch-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /home/user/license:/home/user/license:ro
       - /ssd/pipe_data:/root/pipe_data
@@ -167,16 +167,16 @@ services:
         mode: 444
     environment:
       - DISPLAY=:0
-      - external_ip=proc-{{'default'|env('SITE_NAME')}}.anyvision.local
-      - storage_ip=nginx-{{'default'|env('SITE_NAME')}}.anyvision.local
-      - frame_store_storage_ip=nginx-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - external_ip=proc-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - storage_ip=nginx-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - frame_store_storage_ip=nginx-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       - redis_host=127.0.0.1
-      - api_service_ip=api-{{'default'|env('SITE_NAME')}}.anyvision.local
-      - mongodb_host=mongodb-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - api_service_ip=api-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - mongodb_host=mongodb-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       ##########################################################################
-      - reid_service_ip=reid-b.anyvision.local
-      - collate_service_ip=coll-b.anyvision.local
-      - track_archive_service_ip=arch-b.anyvision.local
+      - reid_service_ip=reid-b.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - collate_service_ip=coll-b.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - track_archive_service_ip=arch-b.{{'anyvision.local'|env('DOMAIN_NAME')}}
       ########################################################################## Services override for A sites
       - ENABLE_DOCKERIZE=false
       - ENABLE_REID_SERVICE=false

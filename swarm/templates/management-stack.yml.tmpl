@@ -119,7 +119,7 @@ services:
     networks:
       prod:
         aliases:
-          - registry.anyvision.local
+          - registry.{{'anyvision.local'|env('DOMAIN_NAME')}}
     ports:
       - "5000:5000"
     volumes:
