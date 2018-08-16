@@ -168,11 +168,11 @@ services:
     environment:
       - DISPLAY=:0
       - external_ip=proc-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
-      - storage_ip=nginx-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - storage_ip=nginx-b.{{'anyvision.local'|env('DOMAIN_NAME')}}
       - frame_store_storage_ip=nginx-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       - redis_host=127.0.0.1
-      - api_service_ip=api-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
-      - mongodb_host=mongodb-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - api_service_ip=api-b.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - mongodb_host=mongodb-b.{{'anyvision.local'|env('DOMAIN_NAME')}}
       ##########################################################################
       - reid_service_ip=reid-b.{{'anyvision.local'|env('DOMAIN_NAME')}}
       - collate_service_ip=coll-b.{{'anyvision.local'|env('DOMAIN_NAME')}}
