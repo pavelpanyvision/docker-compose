@@ -21,7 +21,10 @@ networks:
 configs:
   management_cron_config:
     file: ./crontab/management_crontab
-
+  management_coredns_config:
+    file: ./coredns/Corefile
+  management_coredns_zonefile:
+    file: ./coredns/db.zonefile
 
 secrets:
   anv_cert:
@@ -39,8 +42,31 @@ secrets:
   passinfo:
     file: ./tls/passinfo
 
-
 services:
+
+#  coredns:
+#    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/coredns:1.2.0
+#    command: -conf /conf/Corefile
+#    ports:
+#      - "53:53/udp"
+#      - "53:53/tcp"
+#      - "9153:9153/tcp"
+#    configs:
+#      - source: management_coredns_config
+#        target: /conf/Corefile
+#        mode: 444
+#      - source: management_coredns_zonefile
+#        target: /conf/db.zonefile
+#        mode: 444
+#    deploy:
+#      mode: global
+#      placement:
+#        constraints: [node.role == manager]
+#      restart_policy:
+#        delay: 5s
+#    logging:
+#      options:
+#        max-size: 1g
 
 
   df-proxy:
@@ -119,7 +145,7 @@ services:
     networks:
       prod:
         aliases:
-          - registry.anyvision.local
+          - registry.{{'anyvision.local'|env('DOMAIN_NAME')}}
     ports:
       - "5000:5000"
     volumes:
