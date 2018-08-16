@@ -47,7 +47,7 @@ services:
       proxy:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-         - guacamole-{{'default'|env('SITE_NAME')}}.anyvision.local
+         - guacamole-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -83,7 +83,7 @@ services:
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-          - sftp-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - sftp-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /storage/sftp_data:/home/user
       - /etc/localtime:/etc/localtime:ro
@@ -111,7 +111,7 @@ services:
       proxy:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-         - nginx-{{'default'|env('SITE_NAME')}}.anyvision.local
+         - nginx-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /storage:/opt/nginx/html:ro
       - /etc/localtime:/etc/localtime:ro
@@ -165,7 +165,7 @@ services:
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-          - cron-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - cron-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
@@ -195,10 +195,10 @@ services:
 #    networks:
 #      {{'default'|env('SITE_NAME')}}:
 #        aliases:
-#          - rabbitmq-{{'default'|env('SITE_NAME')}}.anyvision.local
+#          - rabbitmq-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
 #      prod:
 #        aliases:
-#          - rabbitmq-{{'default'|env('SITE_NAME')}}.anyvision.local
+#          - rabbitmq-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
 #    volumes:
 #      - /storage/rabbitmq:/var/lib/rabbitmq
 #      - /etc/localtime:/etc/localtime:ro
@@ -224,7 +224,7 @@ services:
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-          - mongodb-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - mongodb-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /ssd/mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
@@ -250,7 +250,7 @@ services:
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-          - redis-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - redis-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
@@ -275,7 +275,7 @@ services:
 #    networks:
 #      {{'default'|env('SITE_NAME')}}:
 #        aliases:
-#          - broadcaster-{{'default'|env('SITE_NAME')}}.anyvision.local
+#          - broadcaster-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
 #    volumes:
 #      - /etc/localtime:/etc/localtime:ro
 #      - /etc/timezone:/etc/timezone:ro
@@ -287,8 +287,8 @@ services:
 #    depends_on:
 #      - api
 #    environment:
-#      - api_service_ip=api-{{'default'|env('SITE_NAME')}}.anyvision.local
-#      - BCAST_SOCKETIO_API_URL=https://api-{{'default'|env('SITE_NAME')}}.anyvision.local:5443
+#      - api_service_ip=api-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+#      - BCAST_SOCKETIO_API_URL=https://api-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}:5443
 #      - api_service_port=5443
 #      - RUN_AS_USER=user
 #      - ENABLE_CHOWN=false
@@ -315,7 +315,7 @@ services:
       proxy:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-          - apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - apigateway-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
@@ -337,12 +337,12 @@ services:
     depends_on:
       - redis
     environment:
-      - GATEWAY_HOST=apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local
-      - API_HOST=api-{{'default'|env('SITE_NAME')}}.anyvision.local
-      - DASH_API_URL=https://api-{{'default'|env('SITE_NAME')}}.anyvision.local:5443
-      - GATEWAY_SECURE_URL=https://apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local:9443
-      - GATEWAY_URL=http://apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local:8080
-      - REDIS_HOST=redis-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - GATEWAY_HOST=apigateway-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - API_HOST=api-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - DASH_API_URL=https://api-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}:5443
+      - GATEWAY_SECURE_URL=https://apigateway-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}:9443
+      - GATEWAY_URL=http://apigateway-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}:8080
+      - REDIS_HOST=redis-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
       - ENABLE_CREATE_SSL=false
@@ -375,10 +375,10 @@ services:
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-          - api-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - api-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       prod:
         aliases:
-          - api-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - api-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
@@ -397,10 +397,10 @@ services:
         uid: "0"
         mode: 444
     environment:
-      - API_IP=api-{{'default'|env('SITE_NAME')}}.anyvision.local
-      - MONGO_DB_IP=mongodb-{{'default'|env('SITE_NAME')}}.anyvision.local
-      - CA_HOST=apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local
-      - MASS_IMPORT_IP=reid-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - API_IP=api-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - MONGO_DB_IP=mongodb-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - CA_HOST=apigateway-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - MASS_IMPORT_IP=reid-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -425,16 +425,16 @@ services:
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-          - proc-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - reid-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - coll-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - arch-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - proc-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - reid-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - coll-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - arch-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       prod:
         aliases:
-          - proc-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - reid-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - coll-{{'default'|env('SITE_NAME')}}.anyvision.local
-          - arch-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - proc-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - reid-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - coll-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+          - arch-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /home/user/license:/home/user/license:ro
       - /ssd/pipe_data:/root/pipe_data
@@ -458,16 +458,16 @@ services:
         mode: 444
     environment:
       - DISPLAY=:0
-      - external_ip=proc-b.anyvision.local
-      - storage_ip=nginx-b.anyvision.local
-      - frame_store_storage_ip=nginx-b.anyvision.local
+      - external_ip=proc-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - storage_ip=nginx-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - frame_store_storage_ip=nginx-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       - redis_host=127.0.0.1
-      - api_service_ip=api-b.anyvision.local
-      - mongodb_host=mongodb-b.anyvision.local
+      - api_service_ip=api-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - mongodb_host=mongodb-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
-      - reid_service_ip=reid-b.anyvision.local
-      - collate_service_ip=coll-b.anyvision.local
-      - track_archive_service_ip=arch-b.anyvision.local
+      - reid_service_ip=reid-b.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - collate_service_ip=coll-b.{{'anyvision.local'|env('DOMAIN_NAME')}}
+      - track_archive_service_ip=arch-b.{{'anyvision.local'|env('DOMAIN_NAME')}}
       ########################################################################## Services override for b sites
       - ENABLE_FRAMESTORE_CLEANER=false
       - ENABLE_PROCESS_SERVICE=false
@@ -509,7 +509,7 @@ services:
     environment:
       - DISPLAY=:0
       - ssl=true
-      - GATEWAY_HOST=apigateway-{{'default'|env('SITE_NAME')}}.anyvision.local
+      - GATEWAY_HOST=apigateway-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       - RUN_AS_USER=root
       - ENABLE_CHOWN=false
     env_file:
@@ -535,7 +535,7 @@ services:
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
-          - desktop-{{'default'|env('SITE_NAME')}}.anyvision.local
+          - desktop-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /storage/sftp_data:/sftp:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
