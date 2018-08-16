@@ -255,7 +255,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-cpu-pyconcrete:1.19.4.rc.2
+    image: gcr.io/anyvision-production/backend-cpu-pyconcrete:1.19.4.rc2
     restart: always
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:

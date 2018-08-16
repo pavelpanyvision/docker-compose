@@ -103,7 +103,8 @@ if [ "$generate_ab" = "true" ]; then
     export SITE_NAME="b"
     rm -rf "$BASEDIR"/stacks/"$SITE_NAME"
     mkdir -p "$BASEDIR"/stacks/"$SITE_NAME"
-    cp -R "$BASEDIR"/../env --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
+    #cp -R "$BASEDIR"/../env --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
+    cp -R "$BASEDIR"/../{env,crontab,guacamole} --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
     ln -s "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
     /usr/local/bin/meta-compose -t templates/node-gpu-stack-b.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
 fi
