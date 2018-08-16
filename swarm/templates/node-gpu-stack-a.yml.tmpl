@@ -1,4 +1,4 @@
-#filename: docker-compose-swarm-gpu.yml.tmpl
+#filename: node-gpu-stack-a.yml.tmpl
 version: '3.3'
 
 
@@ -130,7 +130,7 @@ services:
 
 
   backend:
-    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/backend-pyconcrete:1.19.4.rc1
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/backend-pyconcrete:1.19.4.rc.2
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
