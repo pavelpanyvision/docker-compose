@@ -17,9 +17,9 @@ optparse.define short=m long=management desc="Generate management stack" variabl
 optparse.define short=i long=apimaster desc="Generate api-master stack" variable=generate_apimaster value=true default=false
 optparse.define short=a long=all desc="Generate all stacks" variable=generate_all value=true default=false
 optparse.define short=r long=registry desc="Registry URI, for example: \"gcr.io/anyvision-production\" or \"registry.anyvision.local:5000\"" variable=registry
+optparse.define short=d long=domain desc="Domain Name, for example: \"anyvision.local\" or \"tls.ai\"" variable=domain
 # Source the output file ----------------------------------------------------------
 source $( optparse.build )
-
 
 docker_warning() {
   echo "Error: This script must be run with Docker capable privileges."
@@ -41,6 +41,10 @@ fi
 
 if [ -n "$registry" ]; then
   export REGISTRY_HOST="$registry"
+fi
+
+if [ -n "$domain" ]; then
+  export DOMAIN_NAME="$domain"
 fi
 
 certdir="tls"
