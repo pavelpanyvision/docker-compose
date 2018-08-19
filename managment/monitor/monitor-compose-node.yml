@@ -9,6 +9,8 @@ networks:
 #        - subnet: 172.15.0.0/16
 #          gateway: 172.15.0.1
 
+volumes:
+  nvidia_dcgm_exporter_date:
 
 services:
 
@@ -20,12 +22,14 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+      - nvidia_dcgm_exporter_date:/etc/node-exporter:ro
       #- /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
     command:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-      #- '--collector.systemd'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|docker|tmpfs)($$|/)'
+      - '--collector.filesystem.ignored-fs-types=^/(aufs|cgroup|devpts|mqueue|nsfs|sysfs|proc|tmpfs|loop|shm|none|overlay)($$|/)'
+      - '--collector.textfile.directory=/etc/node-exporter'
     restart: always
     ports:
       - 9100:9100
@@ -79,6 +83,24 @@ services:
       options:
         max-size: 1g
 
+  nvidia-dcgm-exporter:
+    image: nvidia/dcgm-exporter
+    restart: always
+    privileged: true
+    networks:
+    - monitor-net
+    volumes:
+      - nvidia_dcgm_exporter_date:/run/prometheus
+    labels:
+      org.label-schema.group: "monitoring"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '1gb'
+    logging:
+      options:
+        max-size: 1g
 #  nvidia-smi-exporter:
 #    image: petrgrishin/nvidia-smi-exporter
 #    restart: always

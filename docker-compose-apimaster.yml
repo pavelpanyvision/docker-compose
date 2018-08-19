@@ -105,14 +105,14 @@ services:
           - api.anyvision.local
     ports:
       - "5443:5443"
-      - "38389:38389"
+      #- "38389:38389"
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
       - TZ=${TZ:-UTC}
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
+      #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
       - CA_HOST=apigateway.anyvision.local

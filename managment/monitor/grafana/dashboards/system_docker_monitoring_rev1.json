@@ -215,7 +215,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "count(rate(container_last_seen{name=~\".+\",instance=~\"$server:.*\"}[$interval]))",
+          "expr": "count(rate(container_tasks_state{name=~\".+\",instance=~\"$server:.*\",state=\"running\"}[$interval]))",
           "format": "time_series",
           "intervalFactor": 2,
           "refId": "A",
@@ -335,7 +335,7 @@
       "decimals": 1,
       "editable": true,
       "error": false,
-      "format": "percentunit",
+      "format": "percent",
       "gauge": {
         "maxValue": 1,
         "minValue": 0,
@@ -386,10 +386,11 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "nvidia",
+          "expr": "sum(rate(dcgm_gpu_utilization{instance=~\"$server:.*\"}[$interval])) * 100",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
+          "legendFormat": "",
           "refId": "A",
           "step": 1800
         }
