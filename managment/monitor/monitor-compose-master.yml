@@ -72,11 +72,15 @@ services:
   grafana:
     image: grafana/grafana:5.2.2
     volumes:
+      #- grafana_data:/var/lib/grafana:rw
+      #- ./grafana/datasources:/etc/grafana/datasources:rw
+      #- ./grafana/dashboards:/var/lib/grafana/dashboards:rw
+      #- ./grafana/files/:/etc/grafana/files:rw
       - grafana_data:/var/lib/grafana:rw
-      - ./grafana/datasources:/etc/grafana/datasources:rw
-      - ./grafana/dashboards:/etc/grafana/dashboards:rw
-      - ./grafana/files/:/etc/grafana/files:rw
-    entrypoint: /etc/grafana/files/setup.sh
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:rw
+      - ./grafana/provisioning:/etc/grafana/provisioning:rw
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:rw
+    #entrypoint: /etc/grafana/files/setup.sh
     environment:
       - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
