@@ -17,3 +17,14 @@ If you already have existing certificates, copy them to **tls/** (at docker-comp
 > Note: If you generated new certificates or made changes to the **tls** directory files, you must re-deploy the stacks for the changes to take effect.
 
 To automatically deploy all stacks under **stacks/** directory, use ``./stacks_deployer.sh`` script.
+
+## Examples:
+
+### Run Generator:
+```
+./stacks_generator.sh --sites --management --apimaster --registry gcr.io/anyvision-production
+```
+### Run Deployer:
+```
+./stacks_deployer.sh --sites --management --apimaster --remove
+```

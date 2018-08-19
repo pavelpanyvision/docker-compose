@@ -40,14 +40,14 @@ scrape_configs:
         replacement:   '${1}:9101'
 
 
-  - job_name: 'nvidiasmiexporter'
-    file_sd_configs:
-      - files:
-        - targets.yml
-    relabel_configs:
-      - source_labels: ['__address__']
-        target_label:  '__address__'
-        replacement:   '${1}:9102'
+#  - job_name: 'nvidiasmiexporter'
+#    file_sd_configs:
+#      - files:
+#        - targets.yml
+#    relabel_configs:
+#      - source_labels: ['__address__']
+#        target_label:  '__address__'
+#        replacement:   '${1}:9102'
 
 #  - job_name: 'blackbox'
 #    metrics_path: /probe

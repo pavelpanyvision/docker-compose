@@ -33,8 +33,11 @@ services:
       - monitor-net
     labels:
       org.label-schema.group: "monitoring"
-    cpu_percent: 10
-    mem_limit: 1gb
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '1gb'
     logging:
       options:
         max-size: 1g
@@ -67,8 +70,11 @@ services:
 #    devices:
 #     - /dev/nvidiactl:/dev/nvidiactl
 #     - /dev/nvidia0:/dev/nvidia0
-    cpu_percent: 10
-    mem_limit: 1gb
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '1gb'
     logging:
       options:
         max-size: 1g
@@ -101,8 +107,11 @@ services:
       - '--config.file=/config/blackbox.yml'
     labels:
       org.label-schema.group: "monitoring"
-    cpu_percent: 10
-    mem_limit: 1gb
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '1gb'
     logging:
       options:
         max-size: 1g
