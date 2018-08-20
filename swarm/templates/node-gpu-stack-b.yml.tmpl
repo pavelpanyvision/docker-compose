@@ -65,6 +65,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -97,6 +98,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -139,6 +141,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -182,6 +185,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -211,6 +215,7 @@ services:
 #    deploy:
 #      mode: replicated
 #      replicas: 1
+#     endpoint_mode: dnsrr
 #      placement:
 #        constraints:
 #          - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -237,6 +242,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -261,6 +267,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -301,6 +308,7 @@ services:
 #    deploy:
 #      mode: replicated
 #      replicas: 1
+#     endpoint_mode: dnsrr
 #      placement:
 #        constraints:
 #          - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -355,6 +363,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -412,6 +421,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -482,6 +492,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -522,6 +533,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.labels.site=={{'default'|env('SITE_NAME')}}
@@ -553,6 +565,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.labels.site=={{'default'|env('SITE_NAME')}}
