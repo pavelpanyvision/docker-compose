@@ -1,6 +1,6 @@
 global:
-  scrape_interval:     40s
-  evaluation_interval: 40s
+  scrape_interval:     60s
+  evaluation_interval: 60s
   scrape_timeout: 30s
 
   # Attach these labels to any time series or alerts when communicating with
@@ -11,6 +11,14 @@ global:
 # Load and evaluate rules in this file every 'evaluation_interval' seconds.
 rule_files:
   - "alert.rules"
+
+alerting:
+  alertmanagers:
+  - scheme: http
+    static_configs:
+    - targets:
+      - 'alertmanager:9093'
+
 
 # A scrape configuration containing exactly one endpoint to scrape.
 scrape_configs:
@@ -23,7 +31,7 @@ scrape_configs:
   - job_name: 'nodeexporter'
     file_sd_configs:
       - files:
-        - targets.yml
+        - all_nodes.yml
     relabel_configs:
       - source_labels: ['__address__']
         target_label:  '__address__'
@@ -33,71 +41,82 @@ scrape_configs:
   - job_name: 'cadvisor'
     file_sd_configs:
       - files:
-        - targets.yml
+        - all_nodes.yml
     relabel_configs:
       - source_labels: ['__address__']
         target_label:  '__address__'
         replacement:   '${1}:9101'
 
 
-#  - job_name: 'nvidiasmiexporter'
-#    file_sd_configs:
-#      - files:
-#        - targets.yml
-#    relabel_configs:
-#      - source_labels: ['__address__']
-#        target_label:  '__address__'
-#        replacement:   '${1}:9102'
-
-#  - job_name: 'blackbox'
-#    metrics_path: /probe
-#    params:
-#      module: [http_2xx]  # Look for a HTTP 200 response.
-#    file_sd_configs:
-#      - files:
-#        - targets.yml
-##      static_configs:
-##        - targets:
-##          - http://prometheus.io
-#    relabel_configs:
-#      - source_labels: ['__address__']
-#        target_label:  '__param_target'
-#        replacement:   'http://${1}:3000'
-##        - source_labels: [__address__]
-##          target_label: __param_target
-#      - source_labels: [__param_target]
-#        target_label: instance
-#      - target_label: __address__
-#        replacement: ${1}:9115  # The blackbox exporter's real hostname:port.
-
-
-  - job_name: 'blackbox'
+  - job_name: 'blackbox-api-3000'
     metrics_path: /probe
     params:
       module: [http_2xx]  # Look for a HTTP 200 response.
     file_sd_configs:
       - files:
-        - targets.yml
-#    static_configs:
-#      - targets:
-#          - 192.168.59.147
+        - workers.yml
     relabel_configs:
-      - source_labels: ['__address__']
+      - source_labels: ['__address__'] # Ensure new port , pass as URL parameter
+        regex: (.*)(:.*)?
         target_label:  '__param_target'
         replacement:   'http://${1}:3000'
-      - source_labels: [__param_target]
+      - source_labels: [__param_target] # Make instance label the target
         regex: (.*)
         target_label: instance
         replacement: ${1}
-      - source_labels: ['__address__']
-        regex: (.*)
-        target_label: __address__
-        replacement: ${1}:9115
+    - target_label: __address__ # Actually talk to the blackbox exporter though
+      replacement: 127.0.0.1:9115  # The blackbox exporter's real hostname:port.
+
+  - job_name: 'blackbox-apigw-9443'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]  # Look for a HTTP 200 response.
+    file_sd_configs:
+    - files:
+      - workers.yml
+    relabel_configs:
+    - source_labels: ['__address__'] # Ensure new port , pass as URL parameter
+      regex: (.*)(:.*)?
+      target_label:  '__param_target'
+      replacement:   'https://${1}:9443'
+    - source_labels: [__param_target] # Make instance label the target
+      regex: (.*)
+      target_label: instance
+      replacement: ${1}
+    - target_label: __address__ # Actually talk to the blackbox exporter though
+      replacement: 127.0.0.1:9115  # The blackbox exporter's real hostname:port.
 
 
-alerting:
-  alertmanagers:
-  - scheme: http
-    static_configs:
-    - targets:
-      - 'alertmanager:9093'
+#Black box in each node
+#  - job_name: 'blackbox'
+#    metrics_path: /probe
+#    params:
+#      module: [http_2xx]  # Look for a HTTP 200 response.
+#    file_sd_configs:
+#    - files:
+#      - all_nodes.yml
+#        static_configs:
+#          - targets:
+#              - 192.168.59.147
+#        relabel_configs:
+#          - source_labels: ['__address__']
+#            target_label:  '__param_target'
+#            replacement:   'http://${1}:3000'
+#          - source_labels: [__param_target]
+#            regex: (.*)
+#            target_label: instance
+#            replacement: ${1}
+#          - source_labels: ['__address__']
+#            regex: (.*)
+#            target_label: __address__
+#            replacement: ${1}:9115
+
+#  - job_name: 'nvidiasmiexporter'
+#    file_sd_configs:
+#      - files:
+#        - all_nodes.yml
+#    relabel_configs:
+#      - source_labels: ['__address__']
+#        target_label:  '__address__'
+#        replacement:   '${1}:9102'
+

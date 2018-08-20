@@ -15,7 +15,8 @@ modules:
       - expect: "^+OK"
       tls: true
       tls_config:
-        insecure_skip_verify: false
+        insecure_skip_verify: true
+        #ca_file: "/certs/my_cert.crt"
   ssh_banner:
     prober: tcp
     tcp:
