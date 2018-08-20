@@ -1,0 +1,5 @@
+- targets:
+  - https://apigateway.anyvision.local:9443
+  - https://api.anyvision.local:5443
+  - https://proc-localnode.anyvision.local:4005
+  - https://nginx-localnode.anyvision.local:443

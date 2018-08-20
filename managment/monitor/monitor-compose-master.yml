@@ -2,12 +2,10 @@ version: '3.3'
 
 networks:
   monitor-net:
-#    driver: bridge
-#    ipam:
-#      driver: default
-#      config:
-#        - subnet: 172.15.0.0/16
-#          gateway: 172.15.0.1
+  anyvision:
+    external:
+      name: docker-compose_anyvision
+
 
 volumes:
     prometheus_data:
@@ -102,13 +100,15 @@ services:
     image: prom/blackbox-exporter:v0.12.0
     restart: always
     ports:
-    - "9115:9115"
+      - "9115:9115"
     networks:
-    - monitor-net
+      - monitor-net
+      - anyvision
     volumes:
-    - ./blackbox-exporter:/config
+      - ./blackbox-exporter:/config
     command:
-    - '--config.file=/config/blackbox.yml'
+      - '--config.file=/config/blackbox.yml'
+      - '--log.level=debug'
     labels:
       org.label-schema.group: "monitoring"
     deploy:

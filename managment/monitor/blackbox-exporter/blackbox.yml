@@ -1,35 +1,44 @@
 modules:
   http_2xx:
     prober: http
+    timeout: 15s
     http:
-  http_post_2xx:
-    prober: http
-    http:
-      method: POST
-  tcp_connect:
-    prober: tcp
-  pop3s_banner:
-    prober: tcp
-    tcp:
-      query_response:
-      - expect: "^+OK"
-      tls: true
+      method: GET
+      valid_status_codes: [200, 201, 202, 302, 404]
+      preferred_ip_protocol: "ip4"
       tls_config:
         insecure_skip_verify: true
-        #ca_file: "/certs/my_cert.crt"
-  ssh_banner:
-    prober: tcp
-    tcp:
-      query_response:
-      - expect: "^SSH-2.0-"
-  irc_banner:
-    prober: tcp
-    tcp:
-      query_response:
-      - send: "NICK prober"
-      - send: "USER prober prober prober :prober"
-      - expect: "PING :([^ ]+)"
-        send: "PONG ${1}"
-      - expect: "^:[^ ]+ 001"
-  icmp:
-    prober: icmp
+        #ca_file: /path/to/cert/certCA.pem
+        #cert_file: /path/to/cert/clientCert.pem
+        #key_file: /path/to/cert/clientKey.key
+#  http_post_2xx:
+#    prober: http
+#    http:
+#      method: POST
+#  tcp_connect:
+#    prober: tcp
+#  pop3s_banner:
+#    prober: tcp
+#    tcp:
+#      query_response:
+#      - expect: "^+OK"
+#      tls: true
+#      tls_config:
+#        insecure_skip_verify: true
+#        #ca_file: "/certs/my_cert.crt"
+#  ssh_banner:
+#    prober: tcp
+#    tcp:
+#      query_response:
+#      - expect: "^SSH-2.0-"
+#  irc_banner:
+#    prober: tcp
+#    tcp:
+#      query_response:
+#      - send: "NICK prober"
+#      - send: "USER prober prober prober :prober"
+#      - expect: "PING :([^ ]+)"
+#        send: "PONG ${1}"
+#      - expect: "^:[^ ]+ 001"
+#  icmp:
+#    prober: icmp

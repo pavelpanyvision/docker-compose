@@ -18,6 +18,7 @@ optparse.define short=i long=apimaster desc="Generate api-master stack" variable
 optparse.define short=a long=all desc="Generate all stacks" variable=generate_all value=true default=false
 optparse.define short=r long=registry desc="Registry URI, for example: \"gcr.io/anyvision-production\" or \"registry.anyvision.local:5000\"" variable=registry
 optparse.define short=d long=domain desc="Domain Name, for example: \"anyvision.local\" or \"tls.ai\"" variable=domain
+optparse.define short=o long=overwrite desc="Force overwrite stack files" variable=force_overwrite value=true default=false
 # Source the output file ----------------------------------------------------------
 source $( optparse.build )
 
@@ -62,7 +63,9 @@ if [ "$generate_sites" = "true" ] || [ "$generate_ab" = "true" ] || [ "$generate
   while IFS='' read -r site || [[ -n "$site" ]]; do
     SITE_NAME="$site"
     export SITE_NAME="$SITE_NAME"
-    rm -rf "$BASEDIR"/stacks/"$SITE_NAME"
+    if [ "$force_overwrite" = "true" ] ; then
+        rm -rf "$BASEDIR"/stacks/"$SITE_NAME"
+    fi
     mkdir -p "$BASEDIR"/stacks/"$SITE_NAME"
     if [ "$generate_ab" = "false" ] ; then
       echo "Generating Docker stack file for \"$SITE_NAME\""
@@ -71,8 +74,8 @@ if [ "$generate_sites" = "true" ] || [ "$generate_ab" = "true" ] || [ "$generate
       echo "Generating Docker stack file for \"$SITE_NAME\" as 'A' site"
       /usr/local/bin/meta-compose -t templates/node-gpu-stack-a.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
     fi
-    cp -R "$BASEDIR"/../{env,crontab,guacamole} --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
-    ln -s "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
+    cp -R -n "$BASEDIR"/../{env,crontab,guacamole} --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
+    ln -sf "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
     rm "$BASEDIR"/stacks/"$SITE_NAME"/guacamole/user-mapping-local.xml
     sed -i 's/>desktop</>desktop-'"$SITE_NAME"'\.anyvision\.local</g' "$BASEDIR"/stacks/"$SITE_NAME"/guacamole/user-mapping-cloud.xml
     sed -i 's/>sftp</>sftp-'"$SITE_NAME"'\.anyvision\.local</g' "$BASEDIR"/stacks/"$SITE_NAME"/guacamole/user-mapping-cloud.xml
@@ -83,20 +86,24 @@ fi
 ## Generate the management stack
 if [ "$generate_management" = "true" ] || [ "$generate_all" = "true" ]; then
     echo "Generating Docker Management stack file"
-    rm -rf "$BASEDIR"/stacks/management
+    if [ "$force_overwrite" = "true" ] ; then
+        rm -rf "$BASEDIR"/stacks/management
+    fi
     mkdir -p "$BASEDIR"/stacks/management
-    cp -R "$BASEDIR"/../crontab --target-directory="$BASEDIR"/stacks/management/
-    ln -s "$BASEDIR"/tls "$BASEDIR"/stacks/management/tls
+    cp -R -n "$BASEDIR"/../crontab --target-directory="$BASEDIR"/stacks/management/
+    ln -sf "$BASEDIR"/tls "$BASEDIR"/stacks/management/tls
     /usr/local/bin/meta-compose -t templates/management-stack.yml.tmpl -o "$BASEDIR"/stacks/management/docker-stack-management.yml
 fi
 
 ## Generate the api-master stack
 if [ "$generate_apimaster" = "true" ] || [ "$generate_all" = "true" ]; then
     echo "Generating Docker API-Master stack file"
-    rm -rf "$BASEDIR"/stacks/api-master
+    if [ "$force_overwrite" = "true" ] ; then
+        rm -rf "$BASEDIR"/stacks/api-master
+    fi
     mkdir -p "$BASEDIR"/stacks/api-master
-    cp -R "$BASEDIR"/../env --target-directory="$BASEDIR"/stacks/api-master/
-    ln -s "$BASEDIR"/tls "$BASEDIR"/stacks/api-master/tls
+    cp -R -n "$BASEDIR"/../env --target-directory="$BASEDIR"/stacks/api-master/
+    ln -sf "$BASEDIR"/tls "$BASEDIR"/stacks/api-master/tls
     export SITE_NAME="api-master"
     /usr/local/bin/meta-compose -t templates/api-master-stack.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-api-master.yml
 fi
@@ -105,11 +112,13 @@ fi
 if [ "$generate_ab" = "true" ]; then
     echo "Generating Docker \"B\" stack file"
     export SITE_NAME="b"
-    rm -rf "$BASEDIR"/stacks/"$SITE_NAME"
+    if [ "$force_overwrite" = "true" ] ; then
+        rm -rf "$BASEDIR"/stacks/"$SITE_NAME"
+    fi
     mkdir -p "$BASEDIR"/stacks/"$SITE_NAME"
     #cp -R "$BASEDIR"/../env --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
-    cp -R "$BASEDIR"/../{env,crontab,guacamole} --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
-    ln -s "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
+    cp -R -n "$BASEDIR"/../{env,crontab,guacamole} --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
+    ln -sf "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
     /usr/local/bin/meta-compose -t templates/node-gpu-stack-b.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
 fi
 

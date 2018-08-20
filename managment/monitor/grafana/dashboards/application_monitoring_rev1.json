@@ -6,7 +6,7 @@
       "description": "",
       "type": "datasource",
       "pluginId": "prometheus",
-      "pluginName": "prometheus"
+      "pluginName": "Prometheus"
     }
   ],
   "__requires": [
@@ -14,12 +14,12 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "5.1.3"
+      "version": "5.2.2"
     },
     {
       "type": "datasource",
       "id": "prometheus",
-      "name": "prometheus",
+      "name": "Prometheus",
       "version": "5.0.0"
     },
     {
@@ -46,6 +46,7 @@
   "gnetId": 894,
   "graphTooltip": 1,
   "id": null,
+  "iteration": 1534772501713,
   "links": [],
   "panels": [
     {
@@ -57,7 +58,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "prometheus",
+      "datasource": "${DS_PROMETHEUS}",
       "decimals": 1,
       "editable": true,
       "error": false,
@@ -114,7 +115,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "probe_success{instance=\"http://192.168.59.147:3000\"}",
+          "expr": "probe_success{instance=~\".*api.*\", instance!~\".*apigateway.*\"}",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
@@ -150,18 +151,18 @@
     },
     {
       "cacheTimeout": null,
-      "colorBackground": false,
+      "colorBackground": true,
       "colorValue": false,
       "colors": [
         "rgba(245, 54, 54, 0.9)",
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "prometheus",
-      "decimals": 2,
+      "datasource": "${DS_PROMETHEUS}",
+      "decimals": 1,
       "editable": true,
       "error": false,
-      "format": "bytes",
+      "format": "none",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -176,7 +177,7 @@
         "y": 0
       },
       "hideTimeOverride": true,
-      "id": 5,
+      "id": 2,
       "interval": null,
       "isNew": true,
       "links": [],
@@ -195,7 +196,7 @@
       "nullPointMode": "connected",
       "nullText": null,
       "postfix": "",
-      "postfixFontSize": "50%",
+      "postfixFontSize": "80%",
       "prefix": "",
       "prefixFontSize": "50%",
       "rangeMaps": [
@@ -206,7 +207,7 @@
         }
       ],
       "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "fillColor": "#1f78c1",
         "full": false,
         "lineColor": "rgb(31, 120, 193)",
         "show": false
@@ -214,7 +215,8 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(container_memory_usage_bytes{container_label_org_label_schema_group=\"monitoring\"})",
+          "expr": "probe_success{instance=~\".*apigateway.*\"}",
+          "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
           "legendFormat": "",
@@ -222,10 +224,10 @@
           "step": 10
         }
       ],
-      "thresholds": "",
+      "thresholds": "0,1",
       "timeFrom": "10s",
       "timeShift": null,
-      "title": "Memory Usage",
+      "title": "API Gateway Status",
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -233,20 +235,31 @@
           "op": "=",
           "text": "N/A",
           "value": "null"
+        },
+        {
+          "op": "=",
+          "text": "UP",
+          "value": "1"
+        },
+        {
+          "op": "=",
+          "text": "DOWN",
+          "value": "0"
         }
       ],
       "valueName": "avg"
     },
     {
       "cacheTimeout": null,
-      "colorBackground": false,
+      "colorBackground": true,
       "colorValue": false,
       "colors": [
         "rgba(245, 54, 54, 0.9)",
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "prometheus",
+      "datasource": "${DS_PROMETHEUS}",
+      "decimals": 1,
       "editable": true,
       "error": false,
       "format": "none",
@@ -283,7 +296,7 @@
       "nullPointMode": "connected",
       "nullText": null,
       "postfix": "",
-      "postfixFontSize": "50%",
+      "postfixFontSize": "80%",
       "prefix": "",
       "prefixFontSize": "50%",
       "rangeMaps": [
@@ -294,7 +307,7 @@
         }
       ],
       "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "fillColor": "#1f78c1",
         "full": false,
         "lineColor": "rgb(31, 120, 193)",
         "show": false
@@ -302,17 +315,19 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "prometheus_tsdb_head_chunks",
+          "expr": "probe_success{instance=~\".*nginx.*\"}",
+          "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
+          "legendFormat": "",
           "refId": "A",
           "step": 10
         }
       ],
-      "thresholds": "",
+      "thresholds": "0,1",
       "timeFrom": "10s",
       "timeShift": null,
-      "title": "In-Memory Chunks",
+      "title": "Nginx Status",
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -320,20 +335,31 @@
           "op": "=",
           "text": "N/A",
           "value": "null"
+        },
+        {
+          "op": "=",
+          "text": "UP",
+          "value": "1"
+        },
+        {
+          "op": "=",
+          "text": "DOWN",
+          "value": "0"
         }
       ],
       "valueName": "avg"
     },
     {
       "cacheTimeout": null,
-      "colorBackground": false,
+      "colorBackground": true,
       "colorValue": false,
       "colors": [
         "rgba(245, 54, 54, 0.9)",
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "prometheus",
+      "datasource": "${DS_PROMETHEUS}",
+      "decimals": 1,
       "editable": true,
       "error": false,
       "format": "none",
@@ -351,7 +377,7 @@
         "y": 0
       },
       "hideTimeOverride": true,
-      "id": 2,
+      "id": 4,
       "interval": null,
       "isNew": true,
       "links": [],
@@ -370,7 +396,7 @@
       "nullPointMode": "connected",
       "nullText": null,
       "postfix": "",
-      "postfixFontSize": "50%",
+      "postfixFontSize": "80%",
       "prefix": "",
       "prefixFontSize": "50%",
       "rangeMaps": [
@@ -381,7 +407,7 @@
         }
       ],
       "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "fillColor": "#1f78c1",
         "full": false,
         "lineColor": "rgb(31, 120, 193)",
         "show": false
@@ -389,17 +415,19 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "prometheus_tsdb_head_series",
+          "expr": "probe_success{instance=~\".*proc.*\"}",
+          "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
+          "legendFormat": "",
           "refId": "A",
           "step": 10
         }
       ],
-      "thresholds": "",
+      "thresholds": "0,1",
       "timeFrom": "10s",
       "timeShift": null,
-      "title": "In-Memory Series",
+      "title": "Pipe Status",
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -407,6 +435,16 @@
           "op": "=",
           "text": "N/A",
           "value": "null"
+        },
+        {
+          "op": "=",
+          "text": "UP",
+          "value": "1"
+        },
+        {
+          "op": "=",
+          "text": "DOWN",
+          "value": "0"
         }
       ],
       "valueName": "avg"
@@ -422,11 +460,8 @@
     "list": [
       {
         "allValue": null,
-        "current": {
-          "text": "192.168.59.148",
-          "value": "192.168.59.148"
-        },
-        "datasource": "prometheus",
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
         "hide": 0,
         "includeAll": false,
         "label": "Server",
@@ -477,5 +512,5 @@
   "timezone": "browser",
   "title": "Application monitoring",
   "uid": "vfOCmVIik",
-  "version": 5
+  "version": 1
 }
