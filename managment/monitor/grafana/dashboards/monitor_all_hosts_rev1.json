@@ -735,6 +735,7 @@
         "current": true,
         "max": true,
         "min": false,
+        "rightSide": true,
         "show": true,
         "sort": "max",
         "sortDesc": true,
