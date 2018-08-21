@@ -203,7 +203,7 @@ services:
           - api.anyvision.local
     extra_hosts:
       - proc-a01.anyvision.local:<ip of a01 server>
-      - nginx-a02.anyvision.local:<ip of a01 server>
+      - nginx-a01.anyvision.local:<ip of a01 server>
       - proc-a02.anyvision.local:<ip of a02 server>
       - nginx-a02.anyvision.local:<ip of a01 server>
       - proc-a03.anyvision.local:<ip of a03 server>
