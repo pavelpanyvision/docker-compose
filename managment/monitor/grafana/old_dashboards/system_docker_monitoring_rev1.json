@@ -2571,7 +2571,7 @@
         "useTags": false
       },
       {
-        "auto": true,
+        "auto": false,
         "auto_count": 50,
         "auto_min": "50s",
         "current": {
