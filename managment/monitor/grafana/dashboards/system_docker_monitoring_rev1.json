@@ -2586,17 +2586,7 @@
         "name": "interval",
         "options": [
           {
-            "selected": false,
-            "text": "auto",
-            "value": "$__auto_interval_interval"
-          },
-          {
             "selected": true,
-            "text": "1m",
-            "value": "1m"
-          },
-          {
-            "selected": false,
             "text": "2m",
             "value": "2m"
           },
@@ -2661,7 +2651,7 @@
             "value": "30d"
           }
         ],
-        "query": "1m,2m,3m,5m,7m,10m,30m,1h,6h,12h,1d,7d,14d,30d",
+        "query": "2m,3m,5m,7m,10m,30m,1h,6h,12h,1d,7d,14d,30d",
         "refresh": 2,
         "type": "interval"
       }
