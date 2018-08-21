@@ -7,11 +7,11 @@ volumes:
 
 networks:
   anyvision:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.14.0.0/16
+#    driver: bridge
+#    ipam:
+#      driver: default
+#      config:
+#        - subnet: 172.14.0.0/16
 
 
 services:
@@ -38,7 +38,21 @@ services:
       options:
         max-size: 1g
 
-
+  cron:
+    image: gcr.io/anyvision-production/supercronic:latest
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+        - cron-a01.anyvision.local
+    volumes:
+      - /storage:/var/www/html
+      - ../../crontab/a_site_crontab:/etc/crontabs/crontab
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    logging:
+      options:
+        max-size: 1g
 
   backend:
     image: 'gcr.io/anyvision-production/backend-pyconcrete:1.19.2'
@@ -49,13 +63,21 @@ services:
       anyvision:
         aliases:
           - proc-a01.anyvision.local
+    extra_hosts:
+      - "api.anyvision.local:<ip of b server>"
+      - "apigateway.anyvision.local:<ip of b server>"
+      - "mongodb.anyvision.local:<ip of b server>"
+      - "reid-b.anyvision.local:<ip of b server>"
+      - "coll-b.anyvision.local:<ip of b server>"
+      - "arch-b.anyvision.local:<ip of b server>"
+      - "nginx-b.anyvision.local:<ip of b server>"
     ports:
       - "4005:4005"
       - "9067:9067"
       - "9068:9068"
       - "9069:9069"
       - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
-    dns: <EXTERNAL_IP_OF_SERVER_B>                                             ### internal DNS server address, replace this with external IP of CoreDNS server (A/B config)
+    #dns: <EXTERNAL_IP_OF_SERVER_B>                                          ### Enable when has coredns internal DNS server address, replace this with external IP of CoreDNS server (A/B config)
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
@@ -78,15 +100,9 @@ services:
       - collate_service_ip=coll-b.anyvision.local
       - track_archive_service_ip=arch-b.anyvision.local
       - ENABLE_DOCKERIZE=false
-      - ENABLE_MKDIR=true
-      - ENABLE_CONFD=true
-      - ENABLE_BUFFER_CLEANER=true
-      - ENABLE_FRAMESTORE_CLEANER=true
-      - ENABLE_PROCESS_SERVICE=true
       - ENABLE_REID_SERVICE=false
       - ENABLE_TRACK_ARCHIVE_SERVICE=false
       - ENABLE_COLLATE_SERVICE=false
-      - ENABLE_REDIS_SERVICE=true
       - ENABLE_XPRA_SERVICE=false
       - ENABLE_CRON_PIPE_IMG_TEMPORARY=false
     env_file:
