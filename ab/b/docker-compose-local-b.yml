@@ -314,7 +314,7 @@ services:
       - ssl=true
       - GATEWAY_HOST=apigateway.anyvision.local
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      - ENABLE_CHOWN=false
     env_file:
       - ../../env/global.env
       - ../../env/api-gateway.env
