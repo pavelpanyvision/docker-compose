@@ -280,7 +280,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     environment:
       - TZ=${TZ:-UTC}
-      - pipe_cpu_mode=true
+      - misc_pipe_cpu_mode=true
       - NVIDIA_VISIBLE_DEVICES=
       - NVIDIA_DRIVER_CAPABILITIES=
       - DISPLAY=${DISPLAY:-:1}
