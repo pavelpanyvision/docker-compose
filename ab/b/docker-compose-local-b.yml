@@ -205,11 +205,11 @@ services:
       - proc-a01.anyvision.local:<ip of a01 server>
       - nginx-a01.anyvision.local:<ip of a01 server>
       - proc-a02.anyvision.local:<ip of a02 server>
-      - nginx-a02.anyvision.local:<ip of a01 server>
+      - nginx-a02.anyvision.local:<ip of a02 server>
       - proc-a03.anyvision.local:<ip of a03 server>
-      - nginx-a03.anyvision.local:<ip of a01 server>
+      - nginx-a03.anyvision.local:<ip of a03 server>
       - proc-a04.anyvision.local:<ip of a04 server>
-      - nginx-a04.anyvision.local:<ip of a01 server>
+      - nginx-a04.anyvision.local:<ip of a04 server>
     ports:
       - "5443:5443"
       - "38389:38389"
@@ -308,7 +308,13 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
       #- /home/anyvision:/mnt                                                ### mount your home directory to the container
-      #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container
+      #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container  
+    extra_hosts:
+    
+      - nginx-a01.anyvision.local:<ip of a01 server>
+      - nginx-a02.anyvision.local:<ip of a02 server>
+      - nginx-a03.anyvision.local:<ip of a03 server>
+      - nginx-a04.anyvision.local:<ip of a04 server>
     environment:
       - DISPLAY=${DISPLAY:-1}                                                ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - ssl=true
