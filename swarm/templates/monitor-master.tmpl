@@ -1,0 +1,266 @@
+#filename: monitor-master.tmpl
+version: '3.3'
+
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  swarm-endpoints:
+
+### create prod overlay network: docker network create -d overlay --attachable prod
+### create proxy overlay network: docker network create -d overlay --attachable proxy
+### create proxy overlay network: docker network create -d overlay --attachable monitor
+
+networks:
+  monitor:
+    external: true
+  proxy:
+    external: true
+
+
+configs:
+  alert_manager_config:
+    file: ./monitor/alertmanager/config.yml
+  blackbox_exporter_config:
+    file: ./monitor/alertmanager/blackbox.yml
+  grafana_ini_config:
+    file: ./monitor/grafana/grafana.ini
+  grafana_dashboard_allhosts_config:
+    file: ./monitor/grafana/dashboards/monitor_all_hosts_rev1.json
+  grafana_dashboard_application_config:
+    file: ./monitor/grafana/dashboards/application_monitoring_rev1.json
+  grafana_dashboard_system_config:
+    file: ./monitor/grafana/dashboards/system_docker_monitoring_rev2.json
+  grafana_provisioning_dashboard_config:
+    file: ./monitor/grafana/provisioning/dashboards/provisioning_config_file.yml
+  grafana_provisioning_datasources_config:
+    file: ./monitor/grafana/provisioning/datasources/datasource.yml
+#  prometheus_alerts_config:
+#    file: ./monitor/prometheus/alert.rules
+#  prometheus_global_config:
+#    file: ./monitor/prometheus/prometheus.yml
+#  prometheus_scraps_all_nodes:
+#    file: ./monitor/prometheus/all_nodes.yml
+#  prometheus_scraps_url_healthcheck:
+#    file: ./monitor/prometheus/url_healthcheck.yml
+
+
+secrets:
+  prometheus_scraps_config:
+    file: ./monitor/prometheus/prometheus_scraps.yml
+#  anv_cert:
+#    file: ./tls/apigateway.anyvision.local.crt
+#  anv_key:
+#    file: ./tls/apigateway.anyvision.local.key.pem
+#  anv_ca:
+#    file: ./tls/anyvisionCA.pem
+#  anv_full:
+#    file: ./tls/apigateway.anyvision.local.full.pem
+#  anv_csr:
+#    file: ./tls/apigateway.anyvision.local.csr
+#  passinfo:
+#    file: ./tls/passinfo
+
+
+services:
+
+   #monitor: #This is also include prometheus
+   image: dockerflow/docker-flow-monitor
+   environment:
+     - LISTENER_ADDRESS=swarm-listener
+     - DF_GET_NODES_URL=http://swarm-listener:8080/v1/docker-flow-swarm-listener/get-nodes
+     - GLOBAL_SCRAPE_INTERVAL=10s
+     - ARG_WEB_ROUTE-PREFIX=/monitor
+     - ARG_ALERTMANAGER_URL=http://alert-manager:9093
+     - ARG_CONFIG_FILE=/etc/prometheus/prometheus.yml
+     - ARG_STORAGE_TSDB_PATH=/prometheus
+     - GLOBAL__SCRAPE_INTERVAL=60s
+     - GLOBAL__evaluation_interval=60s
+     - GLOBAL__scrape_timeout=60s
+   networks:
+     - monitor
+     - proxy
+   ports:
+     - 9090:9090
+   deploy:
+     replicas: 1
+     placement:
+       constraints: [node.role == manager]
+     restart_policy:
+       delay: 5s
+   logging:
+     options:
+       max-size: 1g
+     labels:
+       - com.df.notify: 'true'
+
+
+#  swarm-discover:
+#    image: seqvence/prometheus-swarm
+#    networks:
+#      - monitor
+#    command: ["-i", "5", "-o", "/swarm-endpoints/swarm-endpoints.json", "-p" , "monitor_prometheus"]
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - swarm-endpoints:/swarm-endpoints:rw
+#    deploy:
+#      placement:
+#        constraints:
+#          - node.role == manager
+#    logging:
+#      options:
+#        max-size: 1g
+#    labels:
+#        prometheus.ignore: "true"
+
+#  prometheus:
+#    image: prom/prometheus:v2.3.2
+#    restart: always
+#    ports:
+#      - 9090:9090
+#    networks:
+#      - monitor
+#    volumes:
+#      #- ./prometheus/:/etc/prometheus:rw
+#      - prometheus_data:/prometheus:rw
+#      - swarm-endpoints:/etc/swarm-endpoints:ro
+#    configs:
+#      - source: prometheus_alerts_config
+#        target: /etc/prometheus/alert.rules
+#        mode: 444
+#      - source: prometheus_global_config
+#        target: /etc/prometheus/prometheus.yml
+#        mode: 444
+#      - source: prometheus_scraps_all_nodes
+#        target: /etc/prometheus/all_nodes.yml
+#        mode: 444
+#      - source: prometheus_scraps_url_healthcheck
+#        target: /etc/prometheus/url_healthcheck.yml
+#        mode: 444
+#    command:
+#      - '--config.file=/etc/prometheus/prometheus.yml'
+#      - '--storage.tsdb.path=/prometheus'
+#      - '--storage.tsdb.retention=10d'
+#      - '--web.console.libraries=/etc/prometheus/console_libraries'
+#      - '--web.console.templates=/etc/prometheus/consoles'
+#      - '--web.enable-lifecycle'
+#    logging:
+#      options:
+#        max-size: 1g
+#    deploy:
+#      replicas: 1
+#      placement:
+#        constraints: [node.role == manager]
+#    labels:
+#      - com.df.notify: 'true#'
+
+  alert-manager:
+    image: prom/alertmanager:v0.15.2
+    #volumes:
+    #  - ./alertmanager:/etc/alertmanager:rw
+    configs:
+      - source: alert_manager_config
+        target: /etc/alertmanager/config.yml
+        mode: 444
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+    restart: always
+    #ports:
+    #  - 9093:9093
+    networks:
+      - monitor
+    environment:
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    labels:
+      - com.df.notify: 'true'
+
+  grafana:
+    image: grafana/grafana:5.2.2
+    volumes:
+      - grafana_data:/var/lib/grafana:rw
+    #  - ./grafana/grafana.ini:/etc/grafana/grafana.ini:rw
+    #  - ./grafana/provisioning:/etc/grafana/provisioning:rw
+    #  - ./grafana/dashboards:/var/lib/grafana/dashboards:rw
+    configs:
+      - source: grafana_ini_config
+        target: /etc/grafana/grafana.ini
+        mode: 444
+      - source: grafana_dashboard_allhosts_config
+        target: /etc/grafana/dashboards/monitor_all_hosts_rev1.json
+        mode: 444
+      - source: grafana_dashboard_application_config
+        target: /etc/grafana/dashboards/application_monitoring_rev1.json
+        mode: 444
+      - source: grafana_dashboard_system_config
+        target: /etc/grafana/dashboards/system_docker_monitoring_rev2.json
+        mode: 444
+      - source: grafana_provisioning_dashboard_config
+        target: /etc/grafana/provisioning/dashboards/provisioning_config_file.yml
+        mode: 444
+      - source: grafana_provisioning_datasources_config
+        target: /etc/grafana/provisioning/datasources/datasource.yml
+        mode: 444
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: always
+    #ports:
+    #  - 3001:3001
+    networks:
+      - monitor
+      - proxy
+    #depends_on:
+    #  - prometheus
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    logging:
+      options:
+        max-size: 1g
+      labels:
+        - com.df.notify: 'true'
+        - com.df.servicePath: "/monitor"
+        - com.df.reqPathSearchReplace: "/monitor,"
+        - com.df.port: 3001
+
+
+  blackbox:
+    image: prom/blackbox-exporter:v0.12.0
+    restart: always
+    #ports:
+    #  - "9115:9115"
+    networks:
+      - monitor
+      - prod
+    volumes:
+      - ./blackbox-exporter:/config
+    command:
+      - '--config.file=/config/blackbox.yml'
+      - '--log.level=debug'
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '1gb'
+    logging:
+      options:
+        max-size: 1g
+      labels:
+        - com.df.notify: 'true'
+        - com.df.scrapePort=9115
+        - com.df.scrapeNetwork=monitor
+        - com.df.site=monitor

@@ -10,18 +10,11 @@ networks:
 volumes:
     prometheus_data:
     grafana_data:
-    swarm-endpoints:
+
 
 services:
 
-#  swarm-discover:
-#    image: seqvence/prometheus-swarm
-#    command: ["-i", "5", "-o", "/swarm-endpoints/swarm-endpoints.json", "-p" , "prometheus_prometheus"]
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock:rw
-#      - swarm-endpoints:/swarm-endpoints:rw
-#    labels:
-#      prometheus.ignore: "true"
+
 
   prometheus:
     image: prom/prometheus:v2.3.2

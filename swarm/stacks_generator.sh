@@ -15,6 +15,7 @@ optparse.define short=s long=sites desc="Generate stacks from sites.txt" variabl
 optparse.define short=b long=ab desc="Generate A/B stacks from sites.txt" variable=generate_ab value=true default=false
 optparse.define short=m long=management desc="Generate management stack" variable=generate_management value=true default=false
 optparse.define short=i long=apimaster desc="Generate api-master stack" variable=generate_apimaster value=true default=false
+optparse.define short=g long=monitor desc="Generate monitor stack" variable=generate_monitor value=true default=false
 optparse.define short=a long=all desc="Generate all stacks" variable=generate_all value=true default=false
 optparse.define short=r long=registry desc="Registry URI, for example: \"gcr.io/anyvision-production\" or \"registry.anyvision.local:5000\"" variable=registry
 optparse.define short=d long=domain desc="Domain Name, for example: \"anyvision.local\" or \"tls.ai\"" variable=domain
@@ -118,6 +119,21 @@ if [ "$generate_ab" = "true" ]; then
     mkdir -p "$BASEDIR"/stacks/"$SITE_NAME"
     #cp -R "$BASEDIR"/../env --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
     cp -R -n "$BASEDIR"/../{env,crontab,guacamole} --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
+    ln -sf "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
+    /usr/local/bin/meta-compose -t templates/node-gpu-stack-b.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
+fi
+
+## Generate the monitor stack
+if [ "$generate_monitor" = "true" ]; then
+    echo "Generating Docker \"monitor\" stack file"
+    export SITE_NAME="monitor"
+    if [ "$force_overwrite" = "true" ] ; then
+        rm -rf "$BASEDIR"/stacks/"$SITE_NAME"
+    fi
+    mkdir -p "$BASEDIR"/stacks/"$SITE_NAME"
+    #cp -R "$BASEDIR"/../env --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
+    cp -R -n "$BASEDIR"/../{env,crontab,guacamole} --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
+    cp -R -n "$BASEDIR"/../managment/monitor --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
     ln -sf "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
     /usr/local/bin/meta-compose -t templates/node-gpu-stack-b.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
 fi
