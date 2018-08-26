@@ -148,13 +148,13 @@ services:
         target: /etc/grafana/grafana.ini
         mode: 444
       - source: grafana_dashboard_allhosts_config
-        target: /etc/grafana/dashboards/monitor_all_hosts_rev1.json
+        target: /var/lib/grafana/dashboards/monitor_all_hosts_rev1.json
         mode: 444
       - source: grafana_dashboard_application_config
-        target: /etc/grafana/dashboards/application_monitoring_rev1.json
+        target: /var/lib/grafana/dashboards/application_monitoring_rev1.json
         mode: 444
       - source: grafana_dashboard_system_config
-        target: /etc/grafana/dashboards/system_docker_monitoring_rev2.json
+        target: /var/lib/grafana/dashboards/system_docker_monitoring_rev2.json
         mode: 444
       - source: grafana_provisioning_dashboard_config
         target: /etc/grafana/provisioning/dashboards/provisioning_config_file.yml
