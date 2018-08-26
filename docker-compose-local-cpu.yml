@@ -300,7 +300,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
-      - pipe_cpu_mode=true
+      - misc_pipe_cpu_mode=true=true
       - NVIDIA_VISIBLE_DEVICES=
       - NVIDIA_DRIVER_CAPABILITIES=
       - ENABLE_OPENSSH_SERVICE=true
