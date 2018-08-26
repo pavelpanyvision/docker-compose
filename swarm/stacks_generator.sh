@@ -135,7 +135,7 @@ if [ "$generate_monitor" = "true" ] || [ "$generate_all" = "true" ]; then
     cp -R -n "$BASEDIR"/../{env,crontab,guacamole} --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
     cp -R -n "$BASEDIR"/../managment/monitor --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
     ln -sf "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
-    /usr/local/bin/meta-compose -t templates/monitor-master.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-monitor-master.yml
+    /usr/local/bin/meta-compose -t templates/monitor-stack.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-monitor.yml
 fi
 
 echo "Done!"
