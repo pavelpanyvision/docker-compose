@@ -55,8 +55,8 @@ services:
     environment:
       - limit_rate_speed=0
       - master_api_port=27183
+#     - master_api_port=80
       - master_api_ip=api-master.{{'anyvision.local'|env('DOMAIN_NAME')}}
-#      - master_api_ip=35.195.83.247/master
       - master_api_username=admin
       - master_api_password=admin
     env_file:

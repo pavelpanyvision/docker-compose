@@ -291,10 +291,6 @@ services:
       - reid_service_ip=reid-${node_name:-localnode}.anyvision.local
       - collate_service_ip=coll-${node_name:-localnode}.anyvision.local
       - track_archive_service_ip=arch-${node_name:-localnode}.anyvision.local
-      ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
-      #- reid_service_ip=reid-b.anyvision.local
-      #- collate_service_ip=coll-b.anyvision.local
-      #- track_archive_service_ip=arch-b.anyvision.local
     env_file:
       - env/backend.env
       - env/global.env
@@ -320,6 +316,8 @@ services:
       - /dev:/dev:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /run/user/1000/pulse:/tmp/pulse
+      - /storage/share/root_anyvision-exports:/root/anyvision-exports:rw
+      - /storage/share/user_anyvision-exports:/home/user/anyvision-exports:rw
     environment:
       - TZ=${TZ:-UTC}
       - DISPLAY=${DISPLAY:-:1}
