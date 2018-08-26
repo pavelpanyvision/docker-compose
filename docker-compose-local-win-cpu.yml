@@ -227,7 +227,9 @@ services:
     environment:
       - pipe_cpu_mode=true
       - NVIDIA_VISIBLE_DEVICES=
-      - NVIDIA_DRIVER_CAPABILITIES=      
+      - NVIDIA_DRIVER_CAPABILITIES=
+      - ENABLE_OPENSSH_SERVICE=true
+      - BACKEND_OPENSSH_PORT=5022
       - DISPLAY=10.0.75.1:0.0
       - external_ip=proc-${node_name:-localnode}.anyvision.local
       - storage_ip=nginx-${node_name:-localnode}.anyvision.local

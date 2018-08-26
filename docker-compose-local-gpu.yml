@@ -351,6 +351,8 @@ services:
       #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - ENABLE_OPENSSH_SERVICE=true
+      - BACKEND_OPENSSH_PORT=5022
       - ssl=true
       - GATEWAY_HOST=apigateway.anyvision.local
       - RUN_AS_USER=root
