@@ -148,19 +148,19 @@ services:
       restart_policy:
         delay: 5s
       labels:
-        - com.df.notify: 'true'
-        - com.df.healthurl=nginx-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
-        - com.df.scrapeNetwork=monitor
-        - com.df.port: 443
-        - com.df.srcPort: 443
-        - com.df.reqMode: sni
-        - com.df.pathType: "req.ssl_sni -i -m reg"
-        - com.df.servicePath: "^(nginx-{{'default'|env('SITE_NAME')}}\\.)"
-#       - com.df.port.2: 80
-#       - com.df.srcPort.2: 80
-#       - com.df.reqMode.2: http
-#       - com.df.pathType.2: "req.hdr_beg(host) -i"
-#       - com.df.servicePath.2: "nginx-{{'default'|env('SITE_NAME')}}."
+        com.df.notify: 'true'
+        com.df.healthurl: nginx-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
+        com.df.scrapeNetwork: monitor
+        com.df.port: 443
+        com.df.srcPort: 443
+        com.df.reqMode: sni
+        com.df.pathType: "req.ssl_sni -i -m reg"
+        com.df.servicePath: "^(nginx-{{'default'|env('SITE_NAME')}}\\.)"
+#       com.df.port.2: 80
+#       com.df.srcPort.2: 80
+#       com.df.reqMode.2: http
+#       com.df.pathType.2: "req.hdr_beg(host) -i"
+#       com.df.servicePath.2: "nginx-{{'default'|env('SITE_NAME')}}."
 
 
 

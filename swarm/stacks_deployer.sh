@@ -29,7 +29,7 @@ if [[ $rc != 0 ]]; then
 fi
 
 
-if [ "$deploy_sites" = "false" ] && [ "$deploy_all" = "false" ] && [ "$deploy_apimaster" = "false" ] && [ "$deploy_management" = "false" ] && [ "$deploy_ab" = "false" ]; then
+if [ "$deploy_sites" = "false" ] && [ "$deploy_all" = "false" ] && [ "$deploy_apimaster" = "false" ] && [ "$deploy_management" = "false" ] && [ "$deploy_ab" = "false" ] && [ "$deploy_monitor" = "false" ]; then
   echo "Error: Nothing to deploy, please choose which stacks you wish to deploy."
   exit 1
 fi

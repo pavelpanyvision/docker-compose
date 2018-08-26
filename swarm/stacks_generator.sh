@@ -28,7 +28,7 @@ docker_warning() {
 }
 
 
-if [ "$generate_sites" = "false" ] && [ "$generate_all" = "false" ] && [ "$generate_apimaster" = "false" ] && [ "$generate_management" = "false" ]; then
+if [ "$generate_sites" = "false" ] && [ "$generate_all" = "false" ] && [ "$generate_apimaster" = "false" ] && [ "$generate_management" = "false" ] && [ "$generate_monitor" = "false" ] ; then
   echo "Error: Nothing to generate, please choose which stacks you wish to generate."
   exit 1
 fi

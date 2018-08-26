@@ -73,10 +73,14 @@ services:
      - LISTENER_ADDRESS=swarm-listener
      - DF_GET_NODES_URL=http://swarm-listener:8080/v1/docker-flow-swarm-listener/get-nodes
      - GLOBAL_SCRAPE_INTERVAL=10s
-     - ARG_WEB_ROUTE-PREFIX=/monitor
+     #- ARG_WEB_ROUTE-PREFIX=/monitor
      - ARG_ALERTMANAGER_URL=http://alert-manager:9093
      - ARG_CONFIG_FILE=/etc/prometheus/prometheus.yml
      - ARG_STORAGE_TSDB_PATH=/prometheus
+     - ARG_STORAGE_TSDB_RETENTION=10d
+     - ARG_WEB_ENABLE-LIFECYCLE=
+     #- ARG_WEB_ENABLE-REMOTE-SHUTDOWN=true
+     #- ARG_WEB_ENABLE-ADMIN-API=
      - GLOBAL__SCRAPE_INTERVAL=60s
      - GLOBAL__evaluation_interval=60s
      - GLOBAL__scrape_timeout=60s
@@ -237,7 +241,7 @@ services:
     ports:
       - 9100:9100
     networks:
-      - monitor-net
+      - monitor
     deploy:
       mode: global
       restart_policy:
@@ -269,7 +273,7 @@ services:
     ports:
       - 9101:9101
     networks:
-      - monitor-net
+      - monitor
     command:
       - '--port=9101'
     deploy:
@@ -293,8 +297,8 @@ services:
     image: nvidia/dcgm-exporter
     restart: always
     privileged: true
-    networks:
-    - monitor-net
+    #networks:
+    #    - monitor
     volumes:
       - txt_file_exporter_data:/run/prometheus
     deploy:
