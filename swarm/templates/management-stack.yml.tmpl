@@ -98,6 +98,7 @@ services:
 
   df-swarm-listener:
     image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/docker-flow-swarm-listener:18.07.03-28
+    privileged: true
     networks:
       - proxy
     volumes:

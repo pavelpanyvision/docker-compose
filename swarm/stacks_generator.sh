@@ -110,7 +110,7 @@ if [ "$generate_apimaster" = "true" ] || [ "$generate_all" = "true" ]; then
 fi
 
 ## Generate the ab stack
-if [ "$generate_ab" = "true" ]; then
+if [ "$generate_ab" = "true" ] || [ "$generate_all" = "true" ]; then
     echo "Generating Docker \"B\" stack file"
     export SITE_NAME="b"
     if [ "$force_overwrite" = "true" ] ; then
@@ -124,7 +124,7 @@ if [ "$generate_ab" = "true" ]; then
 fi
 
 ## Generate the monitor stack
-if [ "$generate_monitor" = "true" ]; then
+if [ "$generate_monitor" = "true" ] || [ "$generate_all" = "true" ]; then
     echo "Generating Docker \"monitor\" stack file"
     export SITE_NAME="monitor"
     if [ "$force_overwrite" = "true" ] ; then
@@ -135,7 +135,7 @@ if [ "$generate_monitor" = "true" ]; then
     cp -R -n "$BASEDIR"/../{env,crontab,guacamole} --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
     cp -R -n "$BASEDIR"/../managment/monitor --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
     ln -sf "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
-    /usr/local/bin/meta-compose -t templates/node-gpu-stack-b.yml.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-"$SITE_NAME".yml
+    /usr/local/bin/meta-compose -t templates/monitor-master.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-monitor-master.yml
 fi
 
 echo "Done!"
