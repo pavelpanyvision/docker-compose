@@ -318,8 +318,9 @@ services:
       #- /dev/shm:/dev/shm:rw
       - /dev:/dev:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /storage/share/root_anyvision-exports:/root/anyvision-exports:rw
-      - /storage/share/user_anyvision-exports:/home/user/anyvision-exports:rw
+      - /storage/share/anyvision-exports:/root/anyvision-exports:rw
+      #- /storage/share/root_anyvision-exports:/root/anyvision-exports:rw
+      #- /storage/share/user_anyvision-exports:/home/user/anyvision-exports:rw
     environment:
       - TZ=${TZ:-UTC}
       - DISPLAY=:0
