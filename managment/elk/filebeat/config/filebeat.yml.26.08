@@ -16,18 +16,18 @@ filebeat:
       enabled: true
 
       paths:
-         - "/usr/share/filebeat/pipe-logs/pipe_236408ed-a726-41f4-aaf0-f18c354d20fb/track_archive.log"
-         - "/var/log/*.log"
+         - "/usr/share/filebeat/pipe-logs/pipe_236408ed-a726-41f4-aaf0-f18c354d20fb/*.log"
+           #- "/var/log/*.log"
 
     - type: log
 
       paths:
-         - "/usr/share/filebeat/api-logs/anyvision.2018-08-26.log"
+          - "/usr/share/filebeat/api-logs/*.log"
 
     - type: log
 
       paths:
-         - "/usr/share/filebeat/pipe-logs/pipe_236408ed-a726-41f4-aaf0-f18c354d20fb/reid_data_service.log"
+          - "/usr/share/filebeat/gateway-logs/*.log"
 
            #- type: log
 
@@ -49,7 +49,7 @@ output:
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
-logging.level: debug
+logging.level: info
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
