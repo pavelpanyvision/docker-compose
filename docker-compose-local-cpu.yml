@@ -288,6 +288,7 @@ services:
       - "9067:9067"
       - "9068:9068"
       - "9069:9069"
+      - "9022:9022" #ssh
       - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro
@@ -304,7 +305,7 @@ services:
       - NVIDIA_VISIBLE_DEVICES=
       - NVIDIA_DRIVER_CAPABILITIES=
       - ENABLE_OPENSSH_SERVICE=true
-      - BACKEND_OPENSSH_PORT=5022
+      - BACKEND_OPENSSH_PORT=9022
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - external_ip=proc-${node_name:-localnode}.anyvision.local
       - storage_ip=nginx-${node_name:-localnode}.anyvision.local
