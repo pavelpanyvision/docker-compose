@@ -111,6 +111,7 @@ services:
       - DF_NOTIFY_CREATE_NODE_URL=http://monitor:8080/v1/docker-flow-monitor/node/reconfigure
       - DF_NOTIFY_REMOVE_NODE_URL=http://monitor:8080/v1/docker-flow-monitor/node/remove
       - DF_INCLUDE_NODE_IP_INFO=true
+      - DEBUG=true
     deploy:
       replicas: 1
       placement:

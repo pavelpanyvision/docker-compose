@@ -85,7 +85,7 @@ services:
      - GLOBAL__evaluation_interval=60s
      - GLOBAL__scrape_timeout=60s
      - DF_SCRAPE_TARGET_LABELS=metricType,url_healthcheck
-     #- DF_NODE_TARGET_LABELS=aws_region,role
+     #- DF_NODE_TARGET_LABELS=site #need to label node with com.df.site=aria
    secrets:
      - source: prometheus_scraps_config
        target: /run/secrets/scrape_swarm_prometheus.yml
