@@ -106,7 +106,7 @@ services:
      options:
        max-size: 1g
    labels:
-     com.df.notify: 'true'
+     - com.df.notify='true'
 
   alert-manager:
     image: prom/alertmanager:v0.15.2
@@ -134,7 +134,7 @@ services:
       placement:
         constraints: [node.role == manager]
     labels:
-      com.df.notify: 'true'
+      - com.df.notify='true'
 
   grafana:
     image: grafana/grafana:5.2.2
@@ -181,10 +181,10 @@ services:
       options:
         max-size: 1g
     labels:
-      com.df.notify: 'true'
-      com.df.servicePath: "/monitor"
-      com.df.reqPathSearchReplace: "/monitor,"
-      com.df.port: 3001
+      - com.df.notify='true'
+      - com.df.servicePath="/monitor"
+      - com.df.reqPathSearchReplace="/monitor,"
+      - com.df.port=3001
 
   blackbox:
     image: prom/blackbox-exporter:v0.12.0
@@ -214,10 +214,10 @@ services:
       options:
         max-size: 1g
     labels:
-      com.df.notify: 'true'
-      com.df.scrapePort: 9115
-      com.df.scrapeNetwork: monitor
-      com.df.metricType: url_healthcheck
+      - com.df.notify='true'
+      - com.df.scrapePort=9115
+      - com.df.scrapeNetwork=monitor
+      - com.df.metricType=url_healthcheck
 
   nodeexporter:
     image: prom/node-exporter:v0.16.0
@@ -254,14 +254,14 @@ services:
       options:
         max-size: 1g
     labels:
-      com.df.notify: 'true'
-      com.df.scrapeNetwork: monitor
-      com.df.scrapePort: 9100
-      com.df.metricType: system
-      com.df.alertName.1: mem_load
-      com.df.alertIf.1: (sum by (instance) (node_memory_MemTotal) - sum by (instance) (node_memory_MemFree + node_memory_Buffers + node_memory_Cached)) / sum by (instance) (node_memory_MemTotal) > 0.8
-      com.df.alertName.2: diskload
-      com.df.alertIf.2: @node_fs_limit:0.8
+      - com.df.notify='true'
+      - com.df.scrapeNetwork=monitor
+      - com.df.scrapePort=9100
+      - com.df.metricType=system
+      - com.df.alertName.1=mem_load
+      - com.df.alertIf.1=(sum by (instance) (node_memory_MemTotal) - sum by (instance) (node_memory_MemFree + node_memory_Buffers + node_memory_Cached)) / sum by (instance) (node_memory_MemTotal) > 0.8
+      - com.df.alertName.2=diskload
+      - com.df.alertIf.2=@node_fs_limit:0.8
 
   cadvisor:
     image: google/cadvisor:v0.30.2
@@ -292,10 +292,10 @@ services:
       options:
         max-size: 1g
     labels:
-      com.df.notify: 'true'
-      com.df.scrapeNetwork: monitor
-      com.df.scrapePort: 9101
-      com.df.metricType: system
+      - com.df.notify='true'
+      - com.df.scrapeNetwork=monitor
+      - com.df.scrapePort=9101
+      - com.df.metricType=system
 
   nvidia-dcgm-exporter:
     image: nvidia/dcgm-exporter
@@ -319,8 +319,8 @@ services:
       options:
         max-size: 1g
     labels:
-      com.df.notify: 'true'
-      com.df.metricType: system
+      - com.df.notify='true'
+      - com.df.metricType=system
 
 
 
