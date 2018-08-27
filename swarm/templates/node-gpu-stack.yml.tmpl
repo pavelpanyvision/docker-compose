@@ -151,6 +151,12 @@ services:
         com.df.notify: 'true'
         com.df.healthurl: nginx-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
         com.df.scrapeNetwork: monitor
+        com.df.metricType: url_healthcheck
+        com.df.alertName: mem_limit
+        com.df.alertIf: @service_mem_limit:0.8
+        com.df.alertFor: 5s
+        com.df.scaleMin: 2
+        com.df.scaleMax: 4
         com.df.port: 443
         com.df.srcPort: 443
         com.df.reqMode: sni
