@@ -1,4 +1,16 @@
-version: '2.2'
+version: '3.3'
+
+volumes:
+  backend_data:
+
+networks:
+  anyvision:
+#    driver: bridge
+#    ipam:
+#      driver: default
+#      config:
+#        - subnet: 172.14.0.0/16
+#          gateway: 172.14.0.1
 
 services:
 
@@ -9,26 +21,21 @@ services:
       - anyvision
     image: gcr.io/anyvision-training/dslr
     volumes:
-      - backend_data:/root/pipe_data
-      - c:/anv/storage:/var/www/html
-      - c:/anv/storage/logs:/var/www/html/logs
-      - c:/anv/storage/cameraMount:/root/mount
+      - type: volume
+        source: backend_data
+        target: /root/pipe_data
+      - type: bind
+        source: c:/anv/storage
+        target: /var/www/html
+      - type: bind
+        source: c:/anv/storage/logs
+        target: /var/www/html/logs
+      - type: bind
+        source: c:/anv/storage/cameraMount
+        target: /root/mount
     environment:
       - pipe_cpu_mode=true
     env_file:
       - env/dslr.env
       - env/backend.env
       - env/global.env
-
-
-volumes:
-  backend_data:
-
-networks:
-  anyvision:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.14.0.0/16
-          gateway: 172.14.0.1
