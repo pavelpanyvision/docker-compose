@@ -78,3 +78,6 @@ docker-compose -f docker-compose-dslr.yml up -d
 docker-compose -f docker-compose-dslr-windows.yml pull
 docker-compose -f docker-compose-dslr-windows.yml up -d
 ```
+
+### run startup.bat
+run ```startup.bat``` inside ```windows_watcher```
