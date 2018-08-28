@@ -43,8 +43,9 @@ git clone -b dslr git@github.com:AnyVisionltd/docker-compose.git
 
 ### download git DSLR windows watcher files
 ```
-git clone https://github.com/AnyVisionltd/IDF_DSLR 
+git clone https://github.com/AnyVisionltd/IDF_DSLR
 ```
+delete the directory ```face_extractor``` that located inside ```IDF_DSLR-master```
 
 ### credentials for docker login
 option 1: with token
