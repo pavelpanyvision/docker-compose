@@ -64,6 +64,10 @@ Second, edit env/dslr.env with the relevant API_IP , API_PORT and etc...
 
 Third, Edit the IDF_DSLR/windows_watcher/Settings.json with the relevant Directory path
 
+### create mount directories 
+C:\anv\storage
+C:\anv\storage\cameraMount
+C:\anv\storage\logs
 
 ### docker pull & up -d
 ```
