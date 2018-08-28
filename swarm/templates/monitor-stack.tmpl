@@ -86,11 +86,11 @@ services:
      - GLOBAL__scrape_timeout=60s
      - DF_SCRAPE_TARGET_LABELS=metricType,url_healthcheck
      #- DF_NODE_TARGET_LABELS=site #need to label node with com.df.site=aria
-   secrets:
-     - source: prometheus_scraps_config
-       target: /run/secrets/scrape_swarm_prometheus.yml
-       #uid: "0"
-       mode: 444
+   #secrets:
+   #  - source: prometheus_scraps_config
+   #    target: /run/secrets/scrape_swarm_prometheus.yml
+   #    #uid: "0"
+   #    mode: 444
    networks:
      - monitor
      - proxy
@@ -219,7 +219,7 @@ services:
       - com.df.scrapeNetwork=monitor
       - com.df.metricType=url_healthcheck
 
-  nodeexporter:
+  node-exporter:
     image: prom/node-exporter:v0.16.0
     user: root
     privileged: true

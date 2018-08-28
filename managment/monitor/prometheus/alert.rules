@@ -1,4 +1,5 @@
 groups:
+
 - name: targets
   rules:
   - alert: monitor_service_down
@@ -61,6 +62,23 @@ groups:
     annotations:
       summary: "High request latency on {{ $labels.instance }}"
       description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
+
+
+route:
+  group_by: [Alertname]
+  # Send all notifications to me.
+  receiver: email-notification
+
+receivers:
+- name: email-notification
+  email_configs:
+  - to: 'dors@anyvision.co'
+    require_tls: false
+    from: $GMAIL_ACCOUNT
+    smarthost: smtp.gmail.com:587
+    auth_username: "av.jenkins.reader@anyvision.co"
+    auth_identity: "av.jenkins.reader@anyvision.co"
+    auth_password: "L96BpK=k"
 
 
 #- name: containers
