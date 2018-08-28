@@ -277,7 +277,7 @@ services:
 
 
 #  broadcaster:
-#    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/broadcaster:1.19.4-rc.3
+#    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/broadcaster:1.19.4
 #    hostname: broadcaster
 #    networks:
 #      {{'default'|env('SITE_NAME')}}:
@@ -380,7 +380,7 @@ services:
 
 
   api:
-    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/api:1.19.4-rc.3
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/api:1.19.4
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
@@ -431,7 +431,7 @@ services:
 
 
   backend:
-    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/backend-pyconcrete:1.19.4-rc.3
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/backend-pyconcrete:1.19.4
     networks:
       {{'default'|env('SITE_NAME')}}:
         aliases:
@@ -501,7 +501,7 @@ services:
 
 
   dashboard:
-    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/dashboard:1.19.4-rc.3
+    image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/dashboard:1.19.4
     networks:
       - {{'default'|env('SITE_NAME')}}
     volumes:
