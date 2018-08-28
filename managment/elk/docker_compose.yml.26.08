@@ -4,6 +4,7 @@ services:
   # brocker
   redis:
     image: redis:3.2.6
+    restart: always
     container_name: redis
     volumes:
       - redis-data:/data
@@ -13,6 +14,7 @@ services:
   # index, search & agregation
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.2
+    restart: always
     container_name: elastic
     environment:
       ES_JAVA_OPTS: "-Xms1g -Xmx1g"
@@ -28,6 +30,7 @@ services:
   # UI
   kibana:
     image: docker.elastic.co/kibana/kibana-oss:6.3.2
+    restart: always
     container_name: kibana
     ports:
       - 5601:5601
@@ -41,6 +44,7 @@ services:
   # indexer
   logstash:
     image: docker.elastic.co/logstash/logstash-oss:6.3.2
+    restart: always
     container_name: logstash
     command: logstash -f /config/
     environment:
@@ -55,6 +59,7 @@ services:
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:6.3.2
+    restart: always
     container_name: filebeat
     volumes:
       - $PWD/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
