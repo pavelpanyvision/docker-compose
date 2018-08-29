@@ -69,7 +69,7 @@ services:
 #        max-size: 1g
 
 
-  df-proxy:
+  proxy:
     image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/docker-flow-proxy:18.07.18-74
     ports:
       - "80:80"
@@ -81,7 +81,7 @@ services:
         aliases:
           - proxy
     environment:
-      - LISTENER_ADDRESS=df-swarm-listener
+      - LISTENER_ADDRESS=swarm-listener
       - MODE=swarm
       - DEBUG=true
     deploy:
@@ -96,7 +96,7 @@ services:
         max-size: 1g
 
 
-  df-swarm-listener:
+  swarm-listener:
     image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/docker-flow-swarm-listener:18.07.03-28
     privileged: true
     networks:
@@ -104,8 +104,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - DF_NOTIFY_CREATE_SERVICE_URL=http://df-proxy:8080/v1/docker-flow-proxy/reconfigure
-      - DF_NOTIFY_REMOVE_SERVICE_URL=http://df-proxy:8080/v1/docker-flow-proxy/remove
+      - DF_NOTIFY_CREATE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/reconfigure
+      - DF_NOTIFY_REMOVE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/remove
       - DF_NOTIFY_CREATE_SERVICE_URL=http://monitor:8080/v1/docker-flow-monitor/reconfigure
       - DF_NOTIFY_REMOVE_SERVICE_URL=http://monitor:8080/v1/docker-flow-monitor/remove
       - DF_NOTIFY_CREATE_NODE_URL=http://monitor:8080/v1/docker-flow-monitor/node/reconfigure

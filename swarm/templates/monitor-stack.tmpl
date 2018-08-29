@@ -70,8 +70,8 @@ services:
   monitor: #This is also include prometheus
    image: dockerflow/docker-flow-monitor
    environment:
-     - LISTENER_ADDRESS=df-swarm-listener
-     - DF_GET_NODES_URL=http://df-swarm-listener:8080/v1/docker-flow-swarm-listener/get-nodes
+     - LISTENER_ADDRESS=swarm-listener
+     - DF_GET_NODES_URL=http://swarm-listener:8080/v1/docker-flow-swarm-listener/get-nodes
      - GLOBAL_SCRAPE_INTERVAL=10s
      #- ARG_WEB_ROUTE-PREFIX=/monitor
      - ARG_ALERTMANAGER_URL=http://alert-manager:9093
