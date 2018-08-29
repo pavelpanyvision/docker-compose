@@ -33,8 +33,8 @@ services:
       - 9090:9090
     networks:
       - monitor-net
-    labels:
-      org.label-schema.group: "monitoring"
+    #labels:
+    #  org.label-schema.group: "monitoring"
     logging:
       options:
         max-size: 1g
@@ -46,6 +46,10 @@ services:
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
+      - '--log.level=debug'
+      - '--web.external-url=http://devops.anyvision.co'
+    #- '--web.route-prefix=/'
+    #- '--web.listen-address=:9093'
     restart: always
     ports:
       - 9093:9093
@@ -54,8 +58,8 @@ services:
     environment:
       - ADMIN_USER=${ADMIN_USER:-admin}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-    labels:
-      org.label-schema.group: "monitoring"
+    #labels:
+    #  org.label-schema.group: "monitoring"
     logging:
       options:
         max-size: 1g
@@ -83,8 +87,8 @@ services:
       - monitor-net
     depends_on:
       - prometheus
-    labels:
-      org.label-schema.group: "monitoring"
+    #labels:
+    #  org.label-schema.group: "monitoring"
     logging:
       options:
         max-size: 1g
@@ -102,8 +106,8 @@ services:
     command:
       - '--config.file=/config/blackbox.yml'
       - '--log.level=debug'
-    labels:
-      org.label-schema.group: "monitoring"
+    #labels:
+    #  org.label-schema.group: "monitoring"
     deploy:
       resources:
         limits:

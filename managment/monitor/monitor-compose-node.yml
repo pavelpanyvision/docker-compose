@@ -35,8 +35,8 @@ services:
       - 9100:9100
     networks:
       - monitor-net
-    labels:
-      org.label-schema.group: "monitoring"
+    #labels:
+    #  org.label-schema.group: "monitoring"
     deploy:
       resources:
         limits:
@@ -65,8 +65,8 @@ services:
       - monitor-net
     command:
       - '--port=9101'
-    labels:
-      org.label-schema.group: "monitoring"
+    #labels:
+    #  org.label-schema.group: "monitoring"
 #    environment:
 #      - LD_LIBRARY_PATH=<path-where-nvml-is-present>
 #    device_cgroup_rules:
@@ -91,8 +91,8 @@ services:
     - monitor-net
     volumes:
       - nvidia_dcgm_exporter_date:/run/prometheus
-    labels:
-      org.label-schema.group: "monitoring"
+    #labels:
+    #  org.label-schema.group: "monitoring"
     deploy:
       resources:
         limits:
