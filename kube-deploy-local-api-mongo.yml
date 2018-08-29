@@ -14,7 +14,7 @@ spec:
   selector:
     matchLabels:
       app: ui-deployment
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -27,6 +27,9 @@ spec:
         image: gcr.io/anyvision-production/mongo:3.6-jessie
         ports:
         - containerPort: 27017
+        volumeMounts:
+        - mountPath: "/data/db"
+          name: mongo-db-data
         env:
         - name: DASHBOARD_XPRA_HOST
           value: "dashboard"
@@ -50,6 +53,11 @@ spec:
         - containerPort: 5443
         - containerPort: 38389
         - containerPort: 3000
+        volumeMounts:
+        - mountPath: "/var/www/html"
+          name: html
+        - mountPath: "/usr/local/share/ca-certificates/anyvision"
+          name: certificates
         env:
         - name: NODE_DEBUG_OPTION 
           value: "--inspect=0.0.0.0:38389"
