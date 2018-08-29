@@ -29,7 +29,7 @@ spec:
         - containerPort: 27017
         volumeMounts:
         - mountPath: "/data/db"
-          name: mongo-db-data
+          name: mongo
         env:
         - name: DASHBOARD_XPRA_HOST
           value: "dashboard"
@@ -114,13 +114,13 @@ spec:
       volumes:
       - name: html
         persistentVolumeClaim:
-          claimName: html-vol
+          claimName: html-claim
       - name: certificates
         persistentVolumeClaim:
-          claimName: certificates-vol
-      - name: mongo-db-data
+          claimName: certificates-claim
+      - name: mongo
         persistentVolumeClaim:
-          claimName: mongo-db-data-vol
+          claimName: mongo-claim
 ---
 apiVersion: v1
 kind: Service
@@ -148,74 +148,83 @@ spec:
   selector:
     app: ui-deployment
 ---
+kind: PersistentVolumeClaim
 apiVersion: v1
-kind: PersistentVolume
 metadata:
-  name: html-vol
+  name: html-claim
 spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
+  storageClassName: manual
   accessModes:
-  - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: certificates-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mongo-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
     path: "/storage"
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: ui-deployment
-          operator: In
-          values:
-          - kubegpu02
-          - kubegpu01
 ---
-apiVersion: v1
 kind: PersistentVolume
+apiVersion: v1
 metadata:
-  name: certificates-vol
+  name: task-pv-volume1
+  labels:
+    type: local
 spec:
+  storageClassName: manual
   capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
+    storage: 4Gi
   accessModes:
-  - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
-    path: "/usr/local/share/ca-certificates/anyvision"
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: ui-deployment
-          operator: In
-          values:
-          - kubegpu02
-          - kubegpu01
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage1"
 ---
-apiVersion: v1
 kind: PersistentVolume
+apiVersion: v1
 metadata:
-  name: mongo-db-data-vol
+  name: task-pv-volume2
+  labels:
+    type: local
 spec:
+  storageClassName: manual
   capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
+    storage: 4Gi
   accessModes:
-  - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
-    path: "/data/db"
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: ui-deployment
-          operator: In
-          values:
-          - kubegpu02
-          - kubegpu01
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage2"
