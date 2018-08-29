@@ -4,9 +4,9 @@
 SCRIPT=$(readlink -f "$0")
 # Absolute path to the script directory
 BASEDIR=$(dirname "$SCRIPT")
-
+echo "creating "$BASEDIR"/stacks/management/coredns"
 mkdir -p "$BASEDIR"/stacks/management/coredns
-
+echo "running j2 "$BASEDIR"/templates/coredns-zonefile.tmpl sites.yml > "$BASEDIR"/stacks/management/coredns/db.zonefile"
 j2 "$BASEDIR"/templates/coredns-zonefile.tmpl sites.yml > "$BASEDIR"/stacks/management/coredns/db.zonefile
 j2 "$BASEDIR"/templates/coredns-Corefile.tmpl sites.yml > "$BASEDIR"/stacks/management/coredns/Corefile
 
