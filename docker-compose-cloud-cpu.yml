@@ -270,7 +270,7 @@ services:
       #- "9067:9067"
       #- "9068:9068"
       #- "9069:9069"
-      - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
+      - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
