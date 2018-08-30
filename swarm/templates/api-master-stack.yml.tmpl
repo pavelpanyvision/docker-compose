@@ -93,8 +93,8 @@ services:
       prod:
         aliases:
           - api-master.{{'anyvision.local'|env('DOMAIN_NAME')}}
-    ports:
-      - "27183:27183"
+            #ports:
+            #- "27183:27183"
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
