@@ -57,6 +57,7 @@ services:
 
   nginx:
     image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    #command: --disable-services --no-exitkills --debug sleep 1d
     restart: always
     networks:
       anyvision:
