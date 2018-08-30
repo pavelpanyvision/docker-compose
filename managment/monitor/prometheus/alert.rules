@@ -1,15 +1,15 @@
 groups:
 
-- name: targets
-  rules:
-  - alert: monitor_service_down
-    expr: up == 0
-    for: 60s
-    labels:
-      severity: critical
-    annotations:
-      summary: "Monitor service non-operational"
-      description: "Service {{ $labels.instance }} is down."
+#- name: targets
+#  rules:
+#  - alert: monitor_service_down
+#    expr: up == 0
+#    for: 60s
+#    labels:
+#      severity: critical
+#    annotations:
+#      summary: "Monitor service non-operational"
+#      description: "Service {{ $labels.instance }} is down."
 
 
 
@@ -17,8 +17,8 @@ groups:
 - name: host
   rules:
   - alert: high_cpu_load
-    expr: node_load1 > 3.5
-    for: 120s
+    expr: sum(node_load1/ count by(job, instance)(count by(job, instance, cpu)(node_cpu_seconds_total))) > 0.9
+    for: 180s
     labels:
       severity: warning
     annotations:
@@ -27,7 +27,7 @@ groups:
 
   - alert: high_memory_load
     expr: (sum(node_memory_MemTotal_bytes) - sum(node_memory_MemFree_bytes + node_memory_Buffers_bytes + node_memory_Cached_bytes) ) / sum(node_memory_MemTotal_bytes) * 100 > 85
-    for: 120s
+    for: 180s
     labels:
       severity: warning
     annotations:
@@ -36,7 +36,7 @@ groups:
 
   - alert: high_storage_load
     expr: (node_filesystem_size_bytes{fstype="ext4"} - node_filesystem_free_bytes{fstype="ext4"}) / node_filesystem_size_bytes{fstype="ext4"}  * 100 > 85
-    for: 120s
+    for: 180s
     labels:
       severity: warning
     annotations:
@@ -50,19 +50,29 @@ groups:
     expr: up == 0
     for: 5m
     labels:
-      severity: page
+      severity: critical
     annotations:
       summary: "Instance {{ $labels.instance }} down"
       description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
 
-  # Alert for any instance that has a median request latency >1s.
-  - alert: APIHighRequestLatency
-    expr: api_http_request_latencies_second{quantile="0.5"} > 1
-    for: 10m
-    annotations:
-      summary: "High request latency on {{ $labels.instance }}"
-      description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
 
+#  # Alert for any instance that has a median request latency >1s.
+#  - alert: APIHighRequestLatency
+#    expr: api_http_request_latencies_second{quantile="0.5"} > 1
+#    for: 10m
+#    annotations:
+#      summary: "High request latency on {{ $labels.instance }}"
+#      description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
+
+
+  - alert: monitor_app_down
+    expr: probe_success == 0
+    for: 180s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Monitor app down"
+      description: "Service {{ $labels.instance }} is down."
 
 
 #- name: containers
