@@ -67,9 +67,9 @@ spec:
         - name: NODE_DEBUG_OPTION 
           value: "--inspect=0.0.0.0:38389"
         - name: API_IP
-          value: "api.anyvision.local"
+          value: "ui-deployment.default.svc.cluster.local"
         - name: MONGO_DB_IP
-          value: "mongodb.anyvision.local"
+          value: "ui-deployment.default.svc.cluster.local"
         - name: CA_HOST
           value: "apigateway.anyvision.local"
         - name: MASS_IMPORT_IP
