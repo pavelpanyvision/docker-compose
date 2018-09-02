@@ -17,7 +17,7 @@ groups:
 - name: host
   rules:
   - alert: high_cpu_load
-    expr: sum(node_load1/ count by(job, instance)(count by(job, instance, cpu)(node_cpu_seconds_total))) > 0.9
+    expr: sum(node_load1/ count by(job, instance)(count by(job, instance, cpu)(node_cpu_seconds_total))) > 0.6
     for: 180s
     labels:
       severity: warning
