@@ -349,6 +349,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
       - /dev:/dev:rw
+      - /storage/share/anyvision-exports:/root/anyvision-exports:rw
       #- /home/anyvision:/mnt                                                ### mount your home directory to the container
       #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container
     environment:
