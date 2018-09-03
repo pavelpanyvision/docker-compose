@@ -312,6 +312,7 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
       - /media:/home/user/media:ro
       - /storage/share:/home/user/share:rw
+      - /home:/home/user/localusers:rw
       #- /dev/shm:/dev/shm:rw
       - /dev:/dev:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
