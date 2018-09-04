@@ -38,7 +38,7 @@ services:
           - dashboard-master.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     secrets:
       - source: anv_cert
         target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
@@ -98,7 +98,7 @@ services:
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
       - api_service_ip=api-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
       - api_service_port=3000
@@ -159,7 +159,7 @@ services:
     volumes:
       - /storage:/opt/nginx/html:ro
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     secrets:
       - source: anv_cert
         target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
@@ -216,7 +216,7 @@ services:
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     secrets:
       - source: anv_key
         target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
@@ -264,7 +264,7 @@ services:
     volumes:
       - /ssd/mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     env_file:
       - env/global.env
     logging:
@@ -298,7 +298,7 @@ services:
       - /dev/shm:/dev/shm:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     secrets:
       - source: anv_cert
         target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt

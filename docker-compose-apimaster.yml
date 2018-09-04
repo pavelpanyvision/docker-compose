@@ -29,8 +29,9 @@ services:
       - "80:80"
     volumes:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - limit_rate_speed=0
       - master_api_ip=api-master.anyvision.local
       - master_api_username=admin
@@ -55,8 +56,9 @@ services:
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - api_service_ip=api.anyvision.local
       - api_service_port=3000
       - MONGO_DB_IP=mongodb.anyvision.local
@@ -85,8 +87,9 @@ services:
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - limit_rate_speed=0
     env_file:
       - env/global.env
@@ -109,9 +112,10 @@ services:
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
@@ -139,8 +143,8 @@ services:
       - "27017:27017"
     volumes:
       - mongo_db_data:/data/db
-    environment:
-      - TZ=${TZ:-UTC}
+    #environment:
+    #  - TZ=${TZ:-UTC}
     env_file:
       - env/global.env
     logging:
@@ -174,10 +178,10 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - DISPLAY=:0
       - external_ip=proc-${node_name:-localnode}.anyvision.local
       - storage_ip=nginx-master-${node_name:-localnode}.anyvision.local

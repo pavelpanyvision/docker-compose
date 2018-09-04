@@ -122,7 +122,7 @@ services:
       - proxy
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     configs:
       - source: management_cron_config
         target: /etc/crontabs/crontab
@@ -205,7 +205,7 @@ services:
     volumes:
       - portainer_data:/data
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     networks:
       - agent_network
     deploy:

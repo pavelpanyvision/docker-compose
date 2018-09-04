@@ -26,7 +26,7 @@ services:
     volumes:
       - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - GUACD_LOGLEVEL=info
     env_file:
       - env/global.env
@@ -44,8 +44,8 @@ services:
     volumes:
       - /storage/sftp_data:/home/user
     command: user:pass:2000:2000:files
-    environment:
-      - TZ=${TZ:-UTC}
+    #environment:
+      #- TZ=${TZ:-UTC}
     env_file:
       - env/global.env
     logging:
@@ -68,8 +68,9 @@ services:
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - limit_rate_speed=0
     env_file:
       - env/global.env
@@ -89,8 +90,9 @@ services:
     volumes:
       - /storage:/var/www/html
       - ./crontab/site_crontab:/etc/crontabs/crontab
+      - /etc/localtime:/etc/localtime:ro
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - TO_DATE_TRACK_DELETE=30
     logging:
       options:
@@ -110,8 +112,9 @@ services:
       #- "15761:15761"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
-    environment:
-      - TZ=${TZ:-UTC}
+      - /etc/localtime:/etc/localtime:ro
+    #environment:
+    #  - TZ=${TZ:-UTC}
     env_file:
       - env/global.env
     logging:
@@ -131,8 +134,9 @@ services:
       #- "27017:27017"
     volumes:
       - mongo_db_data:/data/db
-    environment:
-      - TZ=${TZ:-UTC}
+      - /etc/localtime:/etc/localtime:ro
+    #environment:
+    #  - TZ=${TZ:-UTC}
     env_file:
       - env/global.env
     logging:
@@ -152,8 +156,9 @@ services:
       - net.core.somaxconn=511
     volumes:
       - redis_db_data:/data:rw
-    environment:
-      - TZ=${TZ:-UTC}
+      - /etc/localtime:/etc/localtime:ro
+    #environment:
+    #  - TZ=${TZ:-UTC}
     logging:
       options:
         max-size: 1g
@@ -171,10 +176,11 @@ services:
           - broadcaster.anyvision.local
     volumes:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - api
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - api_service_ip=api.anyvision.local
       - BCAST_SOCKETIO_API_URL=https://api.anyvision.local:5443
       - api_service_port=5443
@@ -203,10 +209,11 @@ services:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - redis
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - GATEWAY_HOST=apigateway.anyvision.local
       - API_HOST=api.anyvision.local
       - DASH_API_URL=https://api.anyvision.local:5443
@@ -237,8 +244,9 @@ services:
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
       - CA_HOST=apigateway.anyvision.local
@@ -278,8 +286,9 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /dev:/dev:rw       ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - misc_pipe_cpu_mode=true
       - NVIDIA_VISIBLE_DEVICES=
       - NVIDIA_DRIVER_CAPABILITIES=
@@ -321,10 +330,11 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /run/user/1000/pulse:/tmp/pulse
       - /storage/share/anyvision-exports:/root/anyvision-exports:rw
+      - /etc/localtime:/etc/localtime:ro
     #- /storage/share/root_anyvision-exports:/root/anyvision-exports:rw
     #- /storage/share/user_anyvision-exports:/home/user/anyvision-exports:rw
     environment:
-      - TZ=${TZ:-UTC}
+      #- TZ=${TZ:-UTC}
       - DISPLAY=${DISPLAY:-:1}
       - ssl=true
       - GATEWAY_HOST=apigateway.anyvision.local

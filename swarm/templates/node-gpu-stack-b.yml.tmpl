@@ -50,7 +50,7 @@ services:
          - guacamole-{{'default'|env('SITE_NAME')}}.{{'anyvision.local'|env('DOMAIN_NAME')}}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     configs:
       - source: {{'default'|env('SITE_NAME')}}_guacamole_mapping
         target: /etc/guacamole/user-mapping.xml
@@ -88,7 +88,7 @@ services:
     volumes:
       - /storage/sftp_data:/home/user
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     command: user:pass:2000:2000:files
     env_file:
       - env/global.env
@@ -117,7 +117,7 @@ services:
     volumes:
       - /storage:/opt/nginx/html:ro
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     secrets:
       - source: anv_cert
         target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
@@ -172,7 +172,7 @@ services:
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     configs:
       - source: {{'default'|env('SITE_NAME')}}_cron_config
         target: /etc/crontabs/crontab
@@ -233,7 +233,7 @@ services:
     volumes:
       - /ssd/mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     env_file:
       - env/global.env
     logging:
@@ -260,7 +260,7 @@ services:
     volumes:
       - redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     logging:
       options:
         max-size: 1g
@@ -328,7 +328,7 @@ services:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     secrets:
       - source: anv_key
         target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
@@ -391,7 +391,7 @@ services:
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     secrets:
       - source: anv_key
         target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem
@@ -452,7 +452,7 @@ services:
       - /dev/shm:/dev/shm:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     secrets:
       - source: anv_cert
         target: /usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.crt
@@ -511,7 +511,7 @@ services:
       - /dev/shm:/dev/shm:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     secrets:
       - source: anv_ca
         target: /usr/local/share/ca-certificates/anyvision/anyvisionCA.pem
@@ -553,7 +553,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /dev/shm:/dev/shm:rw
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
       - DISPLAY=:0
       - VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
