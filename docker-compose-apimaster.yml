@@ -31,7 +31,7 @@ services:
     volumes:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
       - master_api_ip=api-master.anyvision.local
@@ -58,7 +58,7 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
       - api_service_ip=api.anyvision.local
       - api_service_port=3000
@@ -89,7 +89,7 @@ services:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
     env_file:
@@ -114,7 +114,7 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
@@ -145,7 +145,7 @@ services:
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     env_file:
       - env/global.env
     logging:
@@ -179,7 +179,7 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - DISPLAY=:0

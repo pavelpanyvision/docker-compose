@@ -12,7 +12,7 @@ services:
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
 
   migration:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
@@ -20,7 +20,7 @@ services:
     volumes:
      - mongo_db_data:/data/db
      - /etc/localtime:/etc/localtime:ro
-     - /etc/timezone:/etc/timezone:ro
+     #- /etc/timezone:/etc/timezone:ro
      - ./migration:/tmp/migration
     environment:
         - COMPOSE_PROJECT_NAME=anyvision

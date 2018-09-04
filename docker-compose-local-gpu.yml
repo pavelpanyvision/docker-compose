@@ -26,7 +26,7 @@ services:
     volumes:
       - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
       - GUACD_LOGLEVEL=info
     env_file:
@@ -45,7 +45,7 @@ services:
     volumes:
       - /storage/sftp_data:/home/user
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     command: user:pass:2000:2000:files
     env_file:
       - env/global.env
@@ -71,7 +71,7 @@ services:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
     env_file:
@@ -93,7 +93,7 @@ services:
       - /storage:/var/www/html
       - ./crontab/site_crontab:/etc/crontab
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
       - TO_DATE_TRACK_DELETE=30
     env_file:
@@ -120,7 +120,7 @@ services:
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     env_file:
       - env/global.env
     logging:
@@ -141,7 +141,7 @@ services:
     volumes:
       - mongo_db_data:/data/db
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     env_file:
       - env/global.env
     logging:
@@ -162,7 +162,7 @@ services:
     volumes:
       - redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     logging:
       options:
         max-size: 1g
@@ -181,7 +181,7 @@ services:
     volumes:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
     depends_on:
       - api
     environment:
@@ -216,7 +216,7 @@ services:
       - api_gateway_keys:/home/user/api-gateway/config/keys
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/API-gateway:/home/user/api-gateway         ### mount your local project directory to the container
     depends_on:
       - redis
@@ -255,7 +255,7 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
@@ -304,7 +304,7 @@ services:
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
@@ -347,7 +347,7 @@ services:
       - /media:/home/user/media:ro
       - /storage/share:/home/user/share:rw
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      #- /etc/timezone:/etc/timezone:ro
       - /dev:/dev:rw
       - /storage/share/anyvision-exports:/root/anyvision-exports:rw
       #- /home/anyvision:/mnt                                                ### mount your home directory to the container
