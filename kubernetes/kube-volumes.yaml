@@ -1,0 +1,164 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume1
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage1"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume2
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage2"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume3
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage3"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume4
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage4"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume5
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage5"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume6
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage6"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume7
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage7"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume8
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage8"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume9
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage9"
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume10
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage10"
