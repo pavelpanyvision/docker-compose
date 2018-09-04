@@ -1,11 +1,4 @@
 ---
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: local-storage
-provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer
----
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -61,8 +54,9 @@ spec:
         volumeMounts:
         - mountPath: "/var/www/html"
           name: html
-        - mountPath: "/usr/local/share/ca-certificates/anyvision"
-          name: certificates
+        - name: secret-volume
+          mountPath: "/usr/local/share/ca-certificates/anyvision"
+          readOnly: true
         env:
         - name: NODE_DEBUG_OPTION 
           value: "--inspect=0.0.0.0:38389"
@@ -120,12 +114,19 @@ spec:
       - name: html
         persistentVolumeClaim:
           claimName: html-claim
-      - name: certificates
-        persistentVolumeClaim:
-          claimName: certificates-claim
       - name: mongo
         persistentVolumeClaim:
           claimName: mongo-claim
+      - name: secret-volume
+        secret:
+          secretName: secretname
+          items:
+          - key: apigateway.anyvision.local.crt
+            path: tls
+          - key: apigateway.anyvision.local.key.pem
+            path: tls
+          - key: anyvisionCA.pem
+            path: tls
 ---
 apiVersion: v1
 kind: Service
@@ -152,84 +153,3 @@ spec:
     protocol: TCP
   selector:
     app: ui-deployment
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: html-claim
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 3Gi
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: certificates-claim
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 3Gi
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: mongo-claim
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 3Gi
----
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: task-pv-volume
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 4Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/storage"
----
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: task-pv-volume1
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 4Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/storage1"
----
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: task-pv-volume2
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 4Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/storage2"
