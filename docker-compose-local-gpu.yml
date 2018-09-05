@@ -299,6 +299,7 @@ services:
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
+      - BACKEND_OPENSSH_PORT=9022
       - /storage:/var/www/html
       - /dev:/dev:rw       ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
@@ -355,7 +356,6 @@ services:
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - ENABLE_OPENSSH_SERVICE=true
-      - BACKEND_OPENSSH_PORT=9022
       - ssl=true
       - GATEWAY_HOST=apigateway.anyvision.local
       - RUN_AS_USER=root
