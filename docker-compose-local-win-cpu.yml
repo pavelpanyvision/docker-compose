@@ -226,7 +226,7 @@ services:
       - c:/anv/storage:/var/www/html
       - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
     environment:
-      - misc_pipe_cpu_mode=true=true
+      - misc_pipe_cpu_mode=true
       - NVIDIA_VISIBLE_DEVICES=
       - NVIDIA_DRIVER_CAPABILITIES=
       - ENABLE_OPENSSH_SERVICE=true
