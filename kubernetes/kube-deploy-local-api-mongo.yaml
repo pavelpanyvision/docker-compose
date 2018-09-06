@@ -28,6 +28,8 @@ spec:
         volumeMounts:
         - mountPath: "/data/db"
           name: mongo
+        - name: tz-config
+          mountPath: /etc/localtime
         env:
         - name: DASHBOARD_XPRA_HOST
           value: "dashboard"
@@ -54,6 +56,8 @@ spec:
         volumeMounts:
         - mountPath: "/var/www/html"
           name: html
+        - name: tz-config
+          mountPath: /etc/localtime
         - name: secret-volume
           mountPath: "/usr/local/share/ca-certificates/anyvision"
           readOnly: true
@@ -127,6 +131,9 @@ spec:
             path: tls
           - key: anyvisionCA.pem
             path: tls
+      - name: tz-config
+        hostPath:
+           path: /etc/localtime
 ---
 apiVersion: v1
 kind: Service

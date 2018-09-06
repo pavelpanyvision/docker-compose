@@ -148,6 +148,7 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/storage9"
+---
 kind: PersistentVolume
 apiVersion: v1
 metadata:
@@ -162,3 +163,33 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/storage10"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume11
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage11"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume12
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage12"

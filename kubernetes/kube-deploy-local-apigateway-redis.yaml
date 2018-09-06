@@ -84,6 +84,8 @@ spec:
         volumeMounts:
         - mountPath: "/var/www/html"
           name: html
+        - name: tz-config
+          mountPath: /etc/localtime
         - name: secret-volume
           mountPath: "/usr/local/share/ca-certificates/anyvision"
           readOnly: true
@@ -92,6 +94,8 @@ spec:
         volumeMounts:
         - mountPath: "/data"
           name: redis-db-data
+        - name: tz-config
+          mountPath: /etc/localtime
       volumes:
       - name: html
         persistentVolumeClaim:
@@ -111,6 +115,9 @@ spec:
             path: tls
           - key: apigateway.anyvision.local.full.pem
             path: tls
+      - name: tz-config
+        hostPath:
+           path: /etc/localtime
 ---
 apiVersion: v1
 kind: Service
