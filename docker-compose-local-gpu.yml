@@ -312,6 +312,7 @@ services:
       - storage_ip=nginx-${node_name:-localnode}.anyvision.local
       - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
       - redis_host=127.0.0.1
+      - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - api_service_ip=api.anyvision.local
       - mongodb_host=mongodb.anyvision.local
@@ -355,7 +356,6 @@ services:
       #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
-      - ENABLE_OPENSSH_SERVICE=true
       - ssl=true
       - GATEWAY_HOST=apigateway.anyvision.local
       - RUN_AS_USER=root
