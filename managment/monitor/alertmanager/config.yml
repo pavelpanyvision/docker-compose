@@ -51,7 +51,7 @@ receivers:
         smarthost: smtp.gmail.com:587
         auth_username: "av.jenkins.reader@anyvision.co"
         auth_identity: "av.jenkins.reader@anyvision.co"
-        auth_password: "L96BpK=k"
+        auth_password: "##########"
         send_resolved: true # Whether or not to notify about resolved alerts.
         #html: '{{ template "email.html" . }}'
 
