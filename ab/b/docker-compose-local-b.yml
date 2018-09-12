@@ -170,7 +170,7 @@ services:
           - apigateway.anyvision.local
     ports:
       - "9443:9443"
-      - "38391:38391"
+      #- "38391:38391"
     #dns: 172.14.0.250                                                        ### internal DNS server address, replace this with external IP of CoreDNS server (A/B config)
     volumes:
       - /storage:/var/www/html
@@ -182,7 +182,7 @@ services:
     depends_on:
       - redis
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+      #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -212,7 +212,7 @@ services:
       - nginx-a04.anyvision.local:<ip of a04 server>
     ports:
       - "5443:5443"
-      - "38389:38389"
+      #- "38389:38389"
     #dns: 172.14.0.250                                                        ### internal DNS server address, replace this with external IP of CoreDNS server (A/B config)
     volumes:
       - /storage:/var/www/html
@@ -221,7 +221,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
+      #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
       - CA_HOST=apigateway.anyvision.local
