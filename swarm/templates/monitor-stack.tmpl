@@ -96,17 +96,19 @@ services:
      - proxy
    ports:
      - 9090:9090
+   logging:
+     options:
+       max-size: 1g
    deploy:
      replicas: 1
      placement:
        constraints: [node.role == manager]
      restart_policy:
        delay: 5s
-   logging:
-     options:
-       max-size: 1g
-   labels:
-     - com.df.notify='true'
+     labels:
+       - com.df.notify='true'
+
+
 
   alert-manager:
     image: prom/alertmanager:v0.15.2
@@ -133,8 +135,8 @@ services:
       replicas: 1
       placement:
         constraints: [node.role == manager]
-    labels:
-      - com.df.notify='true'
+      labels:
+        - com.df.notify='true'
 
   grafana:
     image: grafana/grafana:5.2.2
@@ -173,18 +175,20 @@ services:
       - proxy
     #depends_on:
     #  - prometheus
+    logging:
+      options:
+        max-size: 1g
     deploy:
       replicas: 1
       placement:
         constraints: [node.role == manager]
-    logging:
-      options:
-        max-size: 1g
-    labels:
-      - com.df.notify='true'
-      - com.df.servicePath="/monitor"
-      - com.df.reqPathSearchReplace="/monitor,"
-      - com.df.port=3001
+      labels:
+        - com.df.notify='true'
+        - com.df.servicePath="/monitor"
+        - com.df.reqPathSearchReplace="/monitor,"
+        - com.df.port=3001
+
+
 
   blackbox:
     image: prom/blackbox-exporter:v0.12.0
@@ -210,19 +214,20 @@ services:
         limits:
           cpus: '0.1'
           memory: '1gb'
+      labels:
+        - com.df.notify='true'
+        - com.df.scrapePort=9115
+        - com.df.scrapeNetwork=monitor
+        - com.df.metricType=url_healthcheck
     logging:
       options:
         max-size: 1g
-    labels:
-      - com.df.notify='true'
-      - com.df.scrapePort=9115
-      - com.df.scrapeNetwork=monitor
-      - com.df.metricType=url_healthcheck
+
 
   node-exporter:
     image: prom/node-exporter:v0.16.0
-    user: root
-    privileged: true
+    #user: root
+    #privileged: true
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -237,11 +242,14 @@ services:
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|docker|tmpfs)($$|/)'
       - '--collector.filesystem.ignored-fs-types=^/(aufs|cgroup|devpts|mqueue|nsfs|sysfs|proc|tmpfs|loop|shm|none|overlay)($$|/)'
       - '--collector.textfile.directory=/etc/node-exporter'
-    restart: always
+    #restart: always
     ports:
       - 9100:9100
     networks:
       - monitor
+    logging:
+      options:
+        max-size: 1g
     deploy:
       mode: global
       restart_policy:
@@ -250,22 +258,20 @@ services:
         limits:
           cpus: '0.1'
           memory: '1gb'
-    logging:
-      options:
-        max-size: 1g
-    labels:
-      - com.df.notify='true'
-      - com.df.scrapeNetwork=monitor
-      - com.df.scrapePort=9100
-      - com.df.metricType=system
-      - com.df.alertName.1=mem_load
-      - com.df.alertIf.1=(sum by (instance) (node_memory_MemTotal) - sum by (instance) (node_memory_MemFree + node_memory_Buffers + node_memory_Cached)) / sum by (instance) (node_memory_MemTotal) > 0.8
-      - com.df.alertName.2=diskload
-      - com.df.alertIf.2=@node_fs_limit:0.8
+      labels:
+        - com.df.notify='true'
+        - com.df.scrapeNetwork=monitor
+        - com.df.scrapePort=9100
+        - com.df.metricType=system
+        - com.df.alertName.1=mem_load
+        - com.df.alertIf.1=(sum by (instance) (node_memory_MemTotal) - sum by (instance) (node_memory_MemFree + node_memory_Buffers + node_memory_Cached)) / sum by (instance) (node_memory_MemTotal) > 0.8
+        - com.df.alertName.2=diskload
+        - com.df.alertIf.2=@node_fs_limit:0.8
+
 
   cadvisor:
     image: google/cadvisor:v0.30.2
-    privileged: true
+    #privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /:/rootfs:ro
@@ -273,13 +279,16 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
-    restart: always
+    #restart: always
     ports:
       - 9101:9101
     networks:
       - monitor
     command:
       - '--port=9101'
+    logging:
+      options:
+        max-size: 1g
     deploy:
       mode: global
       restart_policy:
@@ -288,23 +297,24 @@ services:
         limits:
           cpus: '0.1'
           memory: '1gb'
-    logging:
-      options:
-        max-size: 1g
-    labels:
-      - com.df.notify='true'
-      - com.df.scrapeNetwork=monitor
-      - com.df.scrapePort=9101
-      - com.df.metricType=system
+        labels:
+          - com.df.notify='true'
+          - com.df.scrapeNetwork=monitor
+          - com.df.scrapePort=9101
+          - com.df.metricType=system
+
 
   nvidia-dcgm-exporter:
     image: nvidia/dcgm-exporter
-    restart: always
-    privileged: true
+    #restart: always
+    #privileged: true
     #networks:
     #    - monitor
     volumes:
       - txt_file_exporter_data:/run/prometheus
+    logging:
+      options:
+        max-size: 1g
     deploy:
       mode: global
       placement:
@@ -315,12 +325,8 @@ services:
         limits:
           cpus: '0.1'
           memory: '1gb'
-    logging:
-      options:
-        max-size: 1g
-    labels:
-      - com.df.notify='true'
-      - com.df.metricType=system
+      labels:
+        - com.df.notify='true'
 
 
 

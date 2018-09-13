@@ -1,5 +1,3 @@
-# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
-# This requires a Kibana endpoint configuration.
 setup.kibana:
 
   # Kibana Host
@@ -11,24 +9,105 @@ setup.kibana:
 #----------------------------- Logstash output --------------------------------
 filebeat:
   prospectors:
-    -
-      paths:
-        - "/usr/share/filebeat/logs/*"
-#      document_type: nginx-access
+
+  - type: log
+    input_type: log
+    enabled: true
+    fields:
+      type: pipe-logs
+    fields_under_root: true
+    paths:
+    - /var/storage/pipe-logs/*/*.log
+    exclude_files: [".gz"]
+    ignore_older: 24h
+    encoding: utf-8
+
+  - type: log
+    input_type: log
+    enabled: true
+    fields:
+      type: api-logs
+    fields_under_root: true
+    paths:
+    - /var/storage/api-logs/*.log
+    exclude_files: [".gz"]
+    ignore_older: 24h
+    encoding: utf-8
+
+  - type: log
+    input_type: log
+    enabled: true
+    fields:
+      type: gateway-logs
+    fields_under_root: true
+    paths:
+    - /var/storage/gateway-logs/*.log
+    exclude_files: [".gz"]
+    ignore_older: 24h
+    encoding: utf-8
+
+  - type: log
+    input_type: log
+    enabled: true
+    fields:
+      type: api-master-logs
+    fields_under_root: true
+    paths:
+    - /var/storage/api-master-logs/*.log
+    exclude_files: [".gz"]
+    ignore_older: 24h
+    scan_frequency: 60s
+    encoding: utf-8
+
+    #  - type: log
+#    input_type: log
+#    enabled: true
+#    fields:
+#      type: pipe-logs
+#    fields_under_root: true
+#    paths:
+#    #- /var/storage/pipe-logs/*/*.log
+#    #- /var/storage/api-logs/*/anyvision.log
+#    #- /var/storage/gateway-logs/*/anyvision.log
+#    #- /var/storage/api-master-logs/*/anyvision.log
+#    #- /var/storage/*-logs/*/*.log
+#    #- /var/storage/*-logs/*.log
+#    exclude_files: [".gz"]
+#    ignore_older: 24h
+#    encoding: utf-8
+
+
+#    - type: log
+#      enabled: true
+#      paths:
+#         - "/usr/share/filebeat/pipe-logs/pipe_236408ed-a726-41f4-aaf0-f18c354d20fb/*.log"
+#           #- "/var/log/*.log"
+#
+#    - type: log
+#      paths:
+#          - "/usr/share/filebeat/api-logs/*.log"
+#
+#    - type: log
+#      paths:
+#          - "/usr/share/filebeat/gateway-logs/*.log"
+
+
+# document_type: nginx-access
 output:
-  redis:
-    hosts: ["redis"]
-    port: 6379
-    key: "logstash"
-    timeout: 5
+  logstash:
+    hosts: ["logstash"]
+    port: 5044
+
 
 #================================ Logging =====================================
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
-#logging.level: error
+logging.level: info
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
 # "publish", "service".
-#logging.selectors: ["*"]
+logging.selectors: ["*"]
+
+#from: https://www.elastic.co/guide/en/beats/filebeat/1.2/configuration-filebeat-options.html

@@ -1,0 +1,106 @@
+version: "3.3"
+
+volumes:
+  es-data:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  logging:
+    driver: bridge
+
+
+services:
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:6.3.2
+    restart: always
+    container_name: filebeat
+    networks:
+    - logging
+    volumes:
+    - ./filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+    - /storage:/var/storage:ro
+    #- /storage/elk-logs:/usr/share/filebeat/logs
+    #- /storage/api-logs/anyvision.2018-08-26.log:/usr/share/filebeat/api-logs/anyvision.2018-08-26.log
+    #- /storage/gateway-logs:/usr/share/filebeat/gateway-logs
+    #- /storage/pipe-logs:/usr/share/filebeat/pipe-logs
+    #- /storage/api-logs:/usr/share/filebeat/api-logs
+    logging:
+      options:
+        max-size: 1g
+
+  # indexer
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:6.3.2
+    restart: always
+    container_name: logstash
+    command: logstash -f /config/
+    environment:
+    - LS_JAVA_OPTS=-Xms1g -Xmx1g
+    volumes:
+    - ./logstash/config:/config
+    networks:
+    - logging
+    depends_on:
+    - elasticsearch
+    - redis
+    logging:
+      options:
+        max-size: 1g
+
+
+  # brocker
+  redis:
+    image: redis:3.2.6
+    restart: always
+    container_name: redis
+    volumes:
+    - redis-data:/data
+    networks:
+    - logging
+    logging:
+      options:
+        max-size: 1g
+
+  # index, search & agregation
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.2
+    restart: always
+    container_name: elastic
+    environment:
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+    ports:
+    - 9200:9200
+    - 9300:9300
+    volumes:
+    - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    - "es-data:/usr/share/elasticsearch/data"
+    networks:
+    - logging
+    logging:
+      options:
+        max-size: 1g
+
+  # UI
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.3.2
+    restart: always
+    container_name: kibana
+    ports:
+    - 5601:5601
+    volumes:
+    - ./kibana/config/kibana.yml:/etc/kibana/kibana.yml
+    networks:
+    - logging
+    depends_on:
+    - elasticsearch
+    logging:
+      options:
+        max-size: 1g
+
+
+
+
+
