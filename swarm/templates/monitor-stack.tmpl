@@ -106,7 +106,7 @@ services:
      restart_policy:
        delay: 5s
      labels:
-       - com.df.notify='true'
+       - com.df.notify=true
 
 
 
@@ -132,11 +132,11 @@ services:
       options:
         max-size: 1g
     deploy:
-      replicas: 1
+      replias: 1
       placement:
         constraints: [node.role == manager]
       labels:
-        - com.df.notify='true'
+        - com.df.notify=true
 
   grafana:
     image: grafana/grafana:5.2.2
@@ -183,9 +183,9 @@ services:
       placement:
         constraints: [node.role == manager]
       labels:
-        - com.df.notify='true'
-        - com.df.servicePath="/monitor"
-        - com.df.reqPathSearchReplace="/monitor,"
+        - com.df.notify=true
+        - com.df.servicePath=/monitor
+        - com.df.reqPathSearchReplace=/monitor,
         - com.df.port=3001
 
 
@@ -206,8 +206,12 @@ services:
     command:
       - '--config.file=/config/blackbox.yml'
       - '--log.level=debug'
+    logging:
+      options:
+        max-size: 1g
     deploy:
       replicas: 1
+      endpoint_mode: dnsrr
       placement:
         constraints: [node.role == manager]
       resources:
@@ -215,13 +219,11 @@ services:
           cpus: '0.1'
           memory: '1gb'
       labels:
-        - com.df.notify='true'
+        - com.df.notify=true
         - com.df.scrapePort=9115
         - com.df.scrapeNetwork=monitor
         - com.df.metricType=url_healthcheck
-    logging:
-      options:
-        max-size: 1g
+
 
 
   node-exporter:
@@ -252,6 +254,7 @@ services:
         max-size: 1g
     deploy:
       mode: global
+      endpoint_mode: dnsrr
       restart_policy:
         delay: 5s
       resources:
@@ -259,7 +262,7 @@ services:
           cpus: '0.1'
           memory: '1gb'
       labels:
-        - com.df.notify='true'
+        - com.df.notify=true
         - com.df.scrapeNetwork=monitor
         - com.df.scrapePort=9100
         - com.df.metricType=system
@@ -291,17 +294,18 @@ services:
         max-size: 1g
     deploy:
       mode: global
+      endpoint_mode: dnsrr
       restart_policy:
         delay: 5s
       resources:
         limits:
           cpus: '0.1'
           memory: '1gb'
-        labels:
-          - com.df.notify='true'
-          - com.df.scrapeNetwork=monitor
-          - com.df.scrapePort=9101
-          - com.df.metricType=system
+      labels:
+        - com.df.notify=true
+        - com.df.scrapeNetwork=monitor
+        - com.df.scrapePort=9101
+        - com.df.metricType=system
 
 
   nvidia-dcgm-exporter:
@@ -317,6 +321,7 @@ services:
         max-size: 1g
     deploy:
       mode: global
+      endpoint_mode: dnsrr
       placement:
         constraints: [node.role == worker]
       restart_policy:
@@ -326,7 +331,7 @@ services:
           cpus: '0.1'
           memory: '1gb'
       labels:
-        - com.df.notify='true'
+        - com.df.notify=true
 
 
 

@@ -87,8 +87,8 @@ services:
     deploy:
 #      replicas: 1
       mode: global
-      placement:
-        constraints: [node.role == manager]
+      #placement:
+      #  constraints: [node.role == manager]
       restart_policy:
         delay: 5s
     logging:
@@ -98,7 +98,7 @@ services:
 
   swarm-listener:
     image: {{'gcr.io/anyvision-production'|env('REGISTRY_HOST')}}/docker-flow-swarm-listener:18.07.03-28
-    privileged: true
+    #privileged: true
     networks:
       - proxy
     volumes:
