@@ -43,7 +43,8 @@ services:
       - mongodb
     environment:
       - MONGO_DB_IP=mongodb.anyvision.local
-      - DB_NAME=anyVision2
+      - MONGO_DB_NAME=anyVision2
+      - API_IP=api.anyvision.local
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
