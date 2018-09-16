@@ -278,7 +278,7 @@ services:
         - com.df.alertFor.3=180s
         - com.df.alertLabels.3=severity=high
         - com.df.alertName.4=high_cpu_load
-        - com.df.alertIf.4=sum by (instance) (node_load1) / count by(instance)(count by(instance, cpu)(node_cpu_seconds_total))
+        - com.df.alertIf.4=sum by (instance) (node_load1) / count by(instance)(count by(instance, cpu)(node_cpu_seconds_total)) > 0.6
         - com.df.alertFor.4=180s
         - com.df.alertLabels.4=severity=high
         - com.df.alertName.5=storage_space
