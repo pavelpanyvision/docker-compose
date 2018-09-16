@@ -282,7 +282,7 @@ services:
         - com.df.alertFor.4=180s
         - com.df.alertLabels.4=severity=high
         - com.df.alertName.5=storage_space
-        - com.df.alertIf.5=sum(node_filesystem_size_bytes{fstype="ext4"} - node_filesystem_free_bytes{fstype="ext4"}) / node_filesystem_size_bytes{fstype="ext4"}  * 100 > 85
+        - com.df.alertIf.5=sum by (instance,device) (sum by (instance,device) (node_filesystem_size_bytes{fstype="ext4"}) - sum by (instance,device) (node_filesystem_free_bytes{fstype="ext4"}))  / sum by (instance,device) (node_filesystem_size_bytes{fstype="ext4"}) * 100 > 85
         - com.df.alertFor.5=180s
         - com.df.alertLabels.5=severity=high
         - com.df.alertName.6=InstanceDown
