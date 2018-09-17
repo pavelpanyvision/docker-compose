@@ -22,7 +22,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - nginx-aXX.anyvision.local
+          - nginx-a<XX>.anyvision.local
     ports:
       - "1935:1935"
       - "443:443"
@@ -44,7 +44,7 @@ services:
     networks:
       anyvision:
         aliases:
-        - cron-aXX.anyvision.local
+        - cron-a<XX>.anyvision.local
     volumes:
       - /storage:/var/www/html
       - ../../crontab/a_site_crontab:/etc/crontabs/crontab
@@ -62,7 +62,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - proc-aXX.anyvision.local
+          - proc-a<XX>.anyvision.local
     extra_hosts:
       - "api.anyvision.local:<ip of b server>"
       - "apigateway.anyvision.local:<ip of b server>"
