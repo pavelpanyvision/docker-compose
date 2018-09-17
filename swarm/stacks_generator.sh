@@ -18,7 +18,7 @@ optparse.define short=i long=apimaster desc="Generate api-master stack" variable
 optparse.define short=g long=monitor desc="Generate monitor stack" variable=generate_monitor value=true default=false
 optparse.define short=a long=all desc="Generate all stacks" variable=generate_all value=true default=false
 optparse.define short=r long=registry desc="Registry URI, for example: \"gcr.io/anyvision-production\" or \"registry.anyvision.local:5000\"" variable=registry
-optparse.define short=d long=domain desc="Domain Name, for example: \"anyvision.local\" or \"tls.ai\"" variable=domain
+optparse.define short=d long=domain desc="Domain Name, for example: \"anyvision.local\" or \"tls.ai\"" variable=domain default=anyvision.local
 optparse.define short=o long=overwrite desc="Force overwrite stack files" variable=force_overwrite value=true default=false
 # Source the output file ----------------------------------------------------------
 source $( optparse.build )
@@ -136,7 +136,17 @@ if [ "$generate_monitor" = "true" ] || [ "$generate_all" = "true" ]; then
     cp -R -n "$BASEDIR"/../managment/monitor --target-directory="$BASEDIR"/stacks/"$SITE_NAME"/
     ln -sf "$BASEDIR"/tls "$BASEDIR"/stacks/"$SITE_NAME"/tls
     /usr/local/bin/meta-compose -t templates/monitor-stack.tmpl -o "$BASEDIR"/stacks/"$SITE_NAME"/docker-stack-monitor.yml
+
+    #prepare url health check
+    echo '- targets:' > "$BASEDIR"/stacks/"$SITE_NAME"/monitor/prometheus/url_healthcheck.yml
+    while IFS='' read -r site || [[ -n "$site" ]]; do
+        TARGET_SITE_NAME="$site"
+        echo "  - https://apigateway-${TARGET_SITE_NAME}.${DOMAIN_NAME}:9443" >> "$BASEDIR"/stacks/"$SITE_NAME"/monitor/prometheus/url_healthcheck.yml
+        echo "  - https://api-${TARGET_SITE_NAME}.${DOMAIN_NAME}:5443" >> "$BASEDIR"/stacks/"$SITE_NAME"/monitor/prometheus/url_healthcheck.yml
+        echo "  - https://proc-${TARGET_SITE_NAME}.${DOMAIN_NAME}:4005" >> "$BASEDIR"/stacks/"$SITE_NAME"/monitor/prometheus/url_healthcheck.yml
+        echo "  - https://nginx-${TARGET_SITE_NAME}.${DOMAIN_NAME}:443" >> "$BASEDIR"/stacks/"$SITE_NAME"/monitor/prometheus/url_healthcheck.yml
+    done < "$BASEDIR"/sites.txt
 fi
 
 echo "Done!"
-exit 0
+#exit 0

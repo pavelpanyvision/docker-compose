@@ -38,19 +38,20 @@ configs:
     file: ./monitor/grafana/provisioning/dashboards/provisioning_config_file.yml
   grafana_provisioning_datasources_config:
     file: ./monitor/grafana/provisioning/datasources/datasource.yml
+  prometheus_scraps_url_healthcheck_targets:
+    file: ./monitor/prometheus/url_healthcheck.yml
 #  prometheus_alerts_config:
 #    file: ./monitor/prometheus/alert.rules
 #  prometheus_global_config:
 #    file: ./monitor/prometheus/prometheus.yml
 #  prometheus_scraps_all_nodes:
 #    file: ./monitor/prometheus/all_nodes.yml
-#  prometheus_scraps_url_healthcheck:
-#    file: ./monitor/prometheus/url_healthcheck.yml
+
 
 
 secrets:
-  prometheus_scraps_config:
-    file: ./monitor/prometheus/scrape_swarm_prometheus.yml
+  prometheus_scraps_url_healthcheck:
+    file: ./monitor/prometheus/scrape_swarm_prometheus_blackbox.yml
 #  anv_cert:
 #    file: ./tls/apigateway.anyvision.local.crt
 #  anv_key:
@@ -86,11 +87,14 @@ services:
      - GLOBAL__scrape_timeout=60s
      - DF_SCRAPE_TARGET_LABELS=metricType,url_healthcheck
      #- DF_NODE_TARGET_LABELS=site #need to label node with com.df.site=aria
-   #secrets:
-   #  - source: prometheus_scraps_config
-   #    target: /run/secrets/scrape_swarm_prometheus.yml
-   #    #uid: "0"
-   #    mode: 444
+   secrets:
+     - source: prometheus_scraps_url_healthcheck
+       target: /run/secrets/scrape_swarm_prometheus.yml
+       mode: 444
+   configs:
+     - source: prometheus_scraps_url_healthcheck_targets
+       target: /run/url_healthcheck.yml
+       mode: 444
    networks:
      monitor:
         aliases:
@@ -189,43 +193,6 @@ services:
         - com.df.servicePath=/monitor
         - com.df.reqPathSearchReplace=/monitor,
         - com.df.port=3001
-
-
-
-  blackbox:
-    image: prom/blackbox-exporter:v0.12.0
-    #ports:
-    #  - "9115:9115"
-    networks:
-      - monitor
-      - prod
-    #volumes:
-    #  - ./blackbox-exporter:/config
-    configs:
-      - source: blackbox_exporter_config
-        target: /config/blackbox.yml
-        mode: 444
-    command:
-      - '--config.file=/config/blackbox.yml'
-      - '--log.level=debug'
-    logging:
-      options:
-        max-size: 1g
-    deploy:
-      replicas: 1
-      endpoint_mode: dnsrr
-      placement:
-        constraints: [node.role == manager]
-      resources:
-        limits:
-          cpus: '0.1'
-          memory: '1gb'
-      labels:
-        - com.df.notify=true
-        - com.df.scrapePort=9115
-        - com.df.scrapeNetwork=monitor
-        - com.df.metricType=url_healthcheck
-
 
 
   node-exporter:
@@ -355,6 +322,41 @@ services:
           memory: '1gb'
       labels:
         - com.df.notify=true
+
+
+  blackbox:
+    image: prom/blackbox-exporter:v0.12.0
+    #ports:
+    #  - "9115:9115"
+    networks:
+      - monitor
+      - prod
+    #volumes:
+    #  - ./blackbox-exporter:/config
+    configs:
+      - source: blackbox_exporter_config
+        target: /config/blackbox.yml
+        mode: 444
+    command:
+      - '--config.file=/config/blackbox.yml'
+      - '--log.level=debug'
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      replicas: 1
+      endpoint_mode: dnsrr
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '1gb'
+      labels:
+        - com.df.notify=true
+        #- com.df.scrapePort=9115
+        #- com.df.scrapeNetwork=monitor
+        #- com.df.metricType=url_healthcheck
 
 
 
