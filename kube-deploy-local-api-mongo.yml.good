@@ -1,5 +1,5 @@
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ui-deployment
@@ -13,22 +13,16 @@ spec:
       labels:
         app: ui-deployment
     spec:
-      hostname: ui-deployment
-      hostAliases:
-        - ip: "127.0.0.1"
-          hostnames:
-          - "mongo.default.svc.cluster.local"
+      dnsPolicy: ClusterFirst
       restartPolicy: Always
       containers:
       - name: mongodb
         image: gcr.io/anyvision-production/mongo:3.6-jessie
         ports:
-        - containerPort: 27017
+        - containerPort: 80
         volumeMounts:
         - mountPath: "/data/db"
-          name: mongo
-        - name: tz-config
-          mountPath: /etc/localtime
+          name: mongo-db-data
         env:
         - name: DASHBOARD_XPRA_HOST
           value: "dashboard"
@@ -51,22 +45,20 @@ spec:
         ports:
         - containerPort: 5443
         - containerPort: 38389
-        - containerPort: 3000
+        - containerPort: 38389
+        - containerPort: 3000      
         volumeMounts:
         - mountPath: "/var/www/html"
           name: html
-        - name: tz-config
-          mountPath: /etc/localtime
-        - name: secret-volume
-          mountPath: "/usr/local/share/ca-certificates/anyvision"
-          readOnly: true
+        - mountPath: "/usr/local/share/ca-certificates/anyvision"
+          name: certificates
         env:
         - name: NODE_DEBUG_OPTION 
           value: "--inspect=0.0.0.0:38389"
         - name: API_IP
-          value: "ui-deployment.default.svc.cluster.local"
+          value: "api.anyvision.local"
         - name: MONGO_DB_IP
-          value: "mongo.default.svc.cluster.local"
+          value: "mongodb.anyvision.local"
         - name: CA_HOST
           value: "apigateway.anyvision.local"
         - name: MASS_IMPORT_IP
@@ -74,7 +66,7 @@ spec:
         - name: RUN_AS_USER
           value: "user"
         - name: ENABLE_CHOWN
-          value: "false"
+          value: "true"
         - name: MASS_IMPORT_PORT 
           value: "9069"
         - name: PORT 
@@ -88,11 +80,11 @@ spec:
         - name: MONGO_DB_NAME
           value: "anyVision2"
         - name: CA_PATH
-          value: "/usr/local/share/ca-certificates/anyvision/ca.crt"
+          value: "/usr/local/share/ca-certificates/anyvision/anyvisionCA.pem"
         - name: TLS_PRIVATE_KEY_PATH
-          value: "/usr/local/share/ca-certificates/anyvision/server.key"
+          value: "/usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem"
         - name: TLS_FULL_CHAIN_PATH
-          value: "/usr/local/share/ca-certificates/anyvision/server.crt"
+          value: "/usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.full.pem"
         - name: ENABLE_DOCKER_STDOUT
           value: "true"
         - name: ENABLE_DOCKER_LOG
@@ -115,40 +107,52 @@ spec:
           value: "password"
       volumes:
       - name: html
-        persistentVolumeClaim:
-          claimName: html-claim
-      - name: mongo
-        persistentVolumeClaim:
-          claimName: mongo-claim
-      - name: secret-volume
-        secret:
-          secretName: secretname
-      - name: tz-config
-        hostPath:
-           path: /etc/localtime
+        persistentVolume:
+          claimName: html-vol
+      volumes:
+      - name: certificates
+        persistentVolume:
+          claimName: certificates-vol
+      volumes:
+      - name: mongo-db-data
+        persistentVolume:
+          claimName: mongo-db-data-vol
 ---
+kind: PersistentVolume
 apiVersion: v1
-kind: Service
 metadata:
-  name: ui-deployment
+  name: html-vol
 spec:
-  clusterIP: None
-  ports:
-  - name: "mongo"
-    port: 27017
-    targetPort: 27017
-    protocol: TCP
-  - name: "ui1"
-    port: 5443
-    targetPort: 5443
-    protocol: TCP
-  - name: "ui2"
-    port: 38389
-    targetPort: 38389
-    protocol: TCP
-  - name: "ui3"
-    port: 3000
-    targetPort: 3000
-    protocol: TCP
-  selector:
-    app: ui-deployment
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/storage"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: certificates-vol
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/usr/local/share/ca-certificates/anyvision"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: mongo-db-data-vol
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/data/db"

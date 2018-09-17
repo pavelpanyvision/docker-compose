@@ -1,4 +1,11 @@
 ---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -7,18 +14,16 @@ spec:
   selector:
     matchLabels:
       app: ui-deployment
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
         app: ui-deployment
     spec:
-      hostname: ui-deployment
-      hostAliases:
-        - ip: "127.0.0.1"
-          hostnames:
-          - "mongo.default.svc.cluster.local"
+      dnsPolicy: ClusterFirst
       restartPolicy: Always
+      hostname: mongodb
+      subdomain: anyvision
       containers:
       - name: mongodb
         image: gcr.io/anyvision-production/mongo:3.6-jessie
@@ -27,8 +32,6 @@ spec:
         volumeMounts:
         - mountPath: "/data/db"
           name: mongo
-        - name: tz-config
-          mountPath: /etc/localtime
         env:
         - name: DASHBOARD_XPRA_HOST
           value: "dashboard"
@@ -55,18 +58,15 @@ spec:
         volumeMounts:
         - mountPath: "/var/www/html"
           name: html
-        - name: tz-config
-          mountPath: /etc/localtime
-        - name: secret-volume
-          mountPath: "/usr/local/share/ca-certificates/anyvision"
-          readOnly: true
+        - mountPath: "/usr/local/share/ca-certificates/anyvision"
+          name: certificates
         env:
         - name: NODE_DEBUG_OPTION 
           value: "--inspect=0.0.0.0:38389"
         - name: API_IP
-          value: "ui-deployment.default.svc.cluster.local"
+          value: "api.anyvision.local"
         - name: MONGO_DB_IP
-          value: "mongo.default.svc.cluster.local"
+          value: "mongodb.anyvision.local"
         - name: CA_HOST
           value: "apigateway.anyvision.local"
         - name: MASS_IMPORT_IP
@@ -74,7 +74,7 @@ spec:
         - name: RUN_AS_USER
           value: "user"
         - name: ENABLE_CHOWN
-          value: "false"
+          value: "true"
         - name: MASS_IMPORT_PORT 
           value: "9069"
         - name: PORT 
@@ -88,11 +88,11 @@ spec:
         - name: MONGO_DB_NAME
           value: "anyVision2"
         - name: CA_PATH
-          value: "/usr/local/share/ca-certificates/anyvision/ca.crt"
+          value: "/usr/local/share/ca-certificates/anyvision/anyvisionCA.pem"
         - name: TLS_PRIVATE_KEY_PATH
-          value: "/usr/local/share/ca-certificates/anyvision/server.key"
+          value: "/usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.key.pem"
         - name: TLS_FULL_CHAIN_PATH
-          value: "/usr/local/share/ca-certificates/anyvision/server.crt"
+          value: "/usr/local/share/ca-certificates/anyvision/apigateway.anyvision.local.full.pem"
         - name: ENABLE_DOCKER_STDOUT
           value: "true"
         - name: ENABLE_DOCKER_LOG
@@ -117,22 +117,19 @@ spec:
       - name: html
         persistentVolumeClaim:
           claimName: html-claim
+      - name: certificates
+        persistentVolumeClaim:
+          claimName: certificates-claim
       - name: mongo
         persistentVolumeClaim:
           claimName: mongo-claim
-      - name: secret-volume
-        secret:
-          secretName: secretname
-      - name: tz-config
-        hostPath:
-           path: /etc/localtime
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: ui-deployment
 spec:
-  clusterIP: None
+  type: LoadBalancer
   ports:
   - name: "mongo"
     port: 27017
@@ -152,3 +149,84 @@ spec:
     protocol: TCP
   selector:
     app: ui-deployment
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: html-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: certificates-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mongo-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume1
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage1"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume2
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/storage2"

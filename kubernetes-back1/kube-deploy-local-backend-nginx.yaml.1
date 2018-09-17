@@ -49,6 +49,12 @@ spec:
         - name: tz-config
           mountPath: /etc/localtime
         env:
+        - name: paths_pipe_uuid_file_path
+          value: "/root/pipedata/pipe_id"
+        - name: paths_custom_ip_settings_path
+          value: "/root/pipedata/custom_ip_settings_file.json"
+        - name: api_service_ip
+          value: "ui-deployment.default.svc.cluster.local"
         - name: DASHBOARD_XPRA_HOST
           value: "dashboard"
         - name: DASHBOARD_XPRA_PORT
@@ -155,6 +161,45 @@ spec:
           value: "coll-localnode.anyvision.local"
         - name: track_archive_service_ip
           value: "arch.localnode.anyvision.local"
+      - name: nginx
+        image: gcr.io/anyvision-training/nginx-rtmp:ssl
+        ports:
+        - containerPort: 1935
+        - containerPort: 443
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/opt/nginx/html"
+          name: html
+        - name: secret-volume
+          mountPath: "/usr/local/share/ca-certificates/anyvision"
+          readOnly: true
+        - name: tz-config
+          mountPath: /etc/localtime
+        env:
+        - name: CERT_KEY
+          value: "/usr/local/share/ca-certificates/anyvision/tls.ai.key"
+        - name: CERT_FILE
+          value: "/usr/local/share/ca-certificates/anyvision/tls.ai.crt"
+        - name: CERT_PASS_FILE
+          value: "/usr/local/share/ca-certificates/anyvision/tls.pass"
+        - name: DASHBOARD_XPRA_HOST
+          value: "dashboard"
+        - name: DASHBOARD_XPRA_PORT
+          value: "20000"
+        - name: BACKEND_XPRA_HOST
+          value: "backend"
+        - name: BACKEND_XPRA_PORT
+          value: "10000"
+        - name: LINES
+          value: "40"
+        - name: COLUMNS
+          value: "160"
+        - name: RABBITMQ_DEFAULT_USER
+          value: "user"
+        - name: RABBITMQ_DEFAULT_PASS
+          value: "password"
+        - name: limit_rate_speed
+          value: "0"
       volumes:
       - name: licenseex
         persistentVolumeClaim:
@@ -177,3 +222,25 @@ spec:
       - name: tz-config
         hostPath:
            path: /etc/localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-deployment
+spec:
+  type: LoadBalancer
+  ports:
+  - name: "http"
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  - name: "https"
+    port: 443
+    targetPort: 443
+    protocol: TCP
+  - name: "1935"
+    port: 1935
+    targetPort: 1935
+    protocol: TCP
+  selector:
+    app: ui-deployment

@@ -46,11 +46,11 @@ spec:
         - name: TLS_DOMAIN
           value: "*.default.svc.cluster.local"
         - name: TLS_PEM_PATH
-          value: "/usr/local/share/ca-certificates/anyvision/server.key"
+          value: "/usr/local/share/ca-certificates/anyvision/tls.ai.key"
         - name: TLS_CRT_PATH
-          value: "/usr/local/share/ca-certificates/anyvision/server.crt"
+          value: "/usr/local/share/ca-certificates/anyvision/tls.ai.crt"
         - name: CA_PATH
-          value: "/usr/local/share/ca-certificates/anyvision/ca.crt"
+          value: "/usr/local/share/ca-certificates/anyvision/tls.ai.full.pem"
         - name: API_PORT
           value: "5443"
         - name: API_HOST
@@ -64,11 +64,11 @@ spec:
         - name: JWT_API_PUBKEY_PATH
           value: "config/keys/bettertomorrowJwtSecret.pem"
         - name: API_JWT_SECRET
-          value: "thehouseisonfire"
+          value: ""
         - name: IS_FORCE_JWT_SECRET_CHANGE
           value: "false"
         - name: CA_FULL_CHAIN_CERTS
-          value: "/usr/local/share/ca-certificates/anyvision/server.crt"
+          value: "/usr/local/share/ca-certificates/anyvision/tls.ai.full.pem"
         - name: REDIS_HOST
           value: "apigateway.default.svc.cluster.local"
         - name: ENABLE_DOCKER_STDOUT
@@ -80,7 +80,7 @@ spec:
         - name: ENABLE_CHOWN
           value: "false"
         - name: ENABLE_CREATE_SSL
-          value: "false"
+          value: "true"
         volumeMounts:
         - mountPath: "/var/www/html"
           name: html
@@ -115,7 +115,7 @@ kind: Service
 metadata:
   name: apigateway
 spec:
-  clusterIP: None
+  type: LoadBalancer
   ports:
   - name: "apigateway"
     port: 9443

@@ -5,4 +5,6 @@ metadata:
   namespace: kube-system
 data:
   stubDomains: |
-    {“tls.ai”: [“1.2.3.4”]}
+    {“anyvision.local”: [“1.2.3.4”]}
+  upstreamNameservers: |
+    [“8.8.8.8”, “8.8.4.4”]

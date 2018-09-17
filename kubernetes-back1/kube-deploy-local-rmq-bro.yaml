@@ -37,7 +37,7 @@ spec:
           value: "password"
         - name: NODE_DEBUG_OPTION
           value: "--inspect=0.0.0.0:38391"
-        - name: api_service_ip
+        - name: api_service_ipc
           value: "ui-deployment.default.svc.cluster.local"
         - name: BCAST_SOCKETIO_API_URL
           value: "https://ui-deployment.default.svc.cluster.local:5443"
@@ -50,7 +50,7 @@ spec:
         - name: ENABLE_DOCKER_LOG
           value: "false"
         - name: CA_PATH
-          value: "/usr/local/share/ca-certificates/anyvision/ca.crt"
+          value: "/usr/local/share/ca-certificates/anyvision/tls.ai.full.pem"
         - name: BCAST_RMQ_ONLY_SUBJECTS
           value: "true"
         volumeMounts:
@@ -98,7 +98,7 @@ spec:
       - name: tz-config
         hostPath:
            path: /etc/localtime
-      - name: rabbitmq
+      - name: rabbirmq
         persistentVolumeClaim:
           claimName: rabbitmq-claim
 ---
@@ -107,7 +107,7 @@ kind: Service
 metadata:
   name: broadcaster-deployment
 spec:
-  clusterIP: None
+  type: LoadBalancer
   ports:
   - name: "5671"
     port: 5671
