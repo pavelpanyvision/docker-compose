@@ -30,6 +30,7 @@ services:
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - limit_rate_speed=0
     env_file:
@@ -49,7 +50,6 @@ services:
       - /storage:/var/www/html
       - ../../crontab/a_site_crontab:/etc/crontabs/crontab
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     logging:
       options:
         max-size: 1g
@@ -86,7 +86,6 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /dev:/dev
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - DISPLAY=${DISPLAY:-1}                                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
