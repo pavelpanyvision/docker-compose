@@ -205,6 +205,7 @@ services:
       - nginx-a04.anyvision.local:<ip of a04 server>
     ports:
       - "5443:5443"
+      - "3000:3000"
       #- "38389:38389"
     #dns: 172.14.0.250                                                        ### internal DNS server address, replace this with external IP of CoreDNS server (A/B config)
     volumes:
@@ -248,6 +249,8 @@ services:
       - "9069:9069"
       - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
     #dns: 172.14.0.250                                                        ### internal DNS server address, replace this with external IP of CoreDNS server (A/B config)
+    extra_hosts:
+      - nginx-a01.anyvision.local:<ip of a01 server>
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
