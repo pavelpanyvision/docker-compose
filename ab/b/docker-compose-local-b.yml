@@ -281,7 +281,7 @@ services:
     ipc: host
 
   dashboard:
-    image: 'gcr.io/anyvision-production/dashboard:1.19.2'
+    image: 'gcr.io/anyvision-production/dashboard:development'
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
