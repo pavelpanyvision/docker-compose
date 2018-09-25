@@ -17,7 +17,7 @@ services:
     networks:
       docker_registry:
         aliases:
-          - dockerregistry.anyvision.local
+          - dockerregistry.tls.ai
     ports:
      - 5000:5000
     volumes:
