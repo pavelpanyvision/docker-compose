@@ -35,7 +35,7 @@ services:
 #      - "9153:9153/tcp"
 #    volumes:
 #      - ../../coredns/Corefile:/conf/Corefile
-#      - ../../coredns/db.anyvision.local:/conf/db.anyvision.local
+#      - ../../coredns/db.tls.ai:/conf/db.tls.ai
 #      - /etc/localtime:/etc/localtime:ro
 #      - /etc/timezone:/etc/timezone:ro
 #    cap_drop:
@@ -80,19 +80,19 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    image: gcr.io/anyvision-training/nginx-rtmp:tls.ai
     restart: always
     networks:
       anyvision:
         aliases:
-          - nginx-b.anyvision.local
+          - nginx-b.tls.ai
     ports:
       - "1935:1935"
       - "443:443"
       - "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
     environment:
       - limit_rate_speed=0
@@ -109,7 +109,7 @@ services:
     networks:
       anyvision:
         aliases:
-        - cron-b.anyvision.local
+        - cron-b.tls.ai
     volumes:
     - /storage:/var/www/html
     - ../../crontab/site_crontab:/etc/crontabs/crontab
@@ -124,7 +124,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - mongodb.anyvision.local
+          - mongodb.tls.ai
     #ports:
     #  - "27017:27017"
     volumes:
@@ -161,7 +161,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - apigateway.anyvision.local
+          - apigateway.tls.ai
     ports:
       - "9443:9443"
       #- "38391:38391"
@@ -169,7 +169,7 @@ services:
     volumes:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /home/anyvision/Projects/API-gateway:/home/user/api-gateway         ### mount your local project directory to the container
     depends_on:
@@ -193,16 +193,16 @@ services:
     networks:
       anyvision:
         aliases:
-          - api.anyvision.local
+          - api.tls.ai
     extra_hosts:
-      - proc-a01.anyvision.local:<ip of a01 server>
-      - nginx-a01.anyvision.local:<ip of a01 server>
-      - proc-a02.anyvision.local:<ip of a02 server>
-      - nginx-a02.anyvision.local:<ip of a02 server>
-      - proc-a03.anyvision.local:<ip of a03 server>
-      - nginx-a03.anyvision.local:<ip of a03 server>
-      - proc-a04.anyvision.local:<ip of a04 server>
-      - nginx-a04.anyvision.local:<ip of a04 server>
+      - proc-a01.tls.ai:<ip of a01 server>
+      - nginx-a01.tls.ai:<ip of a01 server>
+      - proc-a02.tls.ai:<ip of a02 server>
+      - nginx-a02.tls.ai:<ip of a02 server>
+      - proc-a03.tls.ai:<ip of a03 server>
+      - nginx-a03.tls.ai:<ip of a03 server>
+      - proc-a04.tls.ai:<ip of a04 server>
+      - nginx-a04.tls.ai:<ip of a04 server>
     ports:
       - "5443:5443"
       - "3000:3000"
@@ -210,17 +210,17 @@ services:
     #dns: 172.14.0.250                                                        ### internal DNS server address, replace this with external IP of CoreDNS server (A/B config)
     volumes:
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
       #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
-      - API_IP=api.anyvision.local
-      - MONGO_DB_IP=mongodb.anyvision.local
-      - CA_HOST=apigateway.anyvision.local
+      - API_IP=api.tls.ai
+      - MONGO_DB_IP=mongodb.tls.ai
+      - CA_HOST=apigateway.tls.ai
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
-      - MASS_IMPORT_IP=reid-b.anyvision.local                               ### use this configuration to configure the "b" server reid service in a/b architecture
+      - MASS_IMPORT_IP=reid-b.tls.ai                               ### use this configuration to configure the "b" server reid service in a/b architecture
     env_file:
       - ../../env/global.env
       - ../../env/api.env
@@ -238,10 +238,10 @@ services:
     networks:
       anyvision:
         aliases:
-          - proc-b.anyvision.local
-          - reid-b.anyvision.local
-          - coll-b.anyvision.local
-          - arch-b.anyvision.local
+          - proc-b.tls.ai
+          - reid-b.tls.ai
+          - coll-b.tls.ai
+          - arch-b.tls.ai
     ports:
       - "4005:4005"
       - "9067:9067"
@@ -250,27 +250,27 @@ services:
       - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
     #dns: 172.14.0.250                                                        ### internal DNS server address, replace this with external IP of CoreDNS server (A/B config)
     extra_hosts:
-      - nginx-a01.anyvision.local:<ip of a01 server>
+      - nginx-a01.tls.ai:<ip of a01 server>
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /dev:/dev
       - /etc/localtime:/etc/localtime:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
-      - external_ip=proc-b.anyvision.local
-      - storage_ip=nginx-b.anyvision.local
-      - frame_store_storage_ip=nginx-b.anyvision.local
+      - external_ip=proc-b.tls.ai
+      - storage_ip=nginx-b.tls.ai
+      - frame_store_storage_ip=nginx-b.tls.ai
       - redis_host=127.0.0.1
-      - api_service_ip=api.anyvision.local
-      - mongodb_host=mongodb.anyvision.local
-      - reid_service_ip=reid-b.anyvision.local
-      - collate_service_ip=coll-b.anyvision.local
-      - track_archive_service_ip=arch-b.anyvision.local
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      - reid_service_ip=reid-b.tls.ai
+      - collate_service_ip=coll-b.tls.ai
+      - track_archive_service_ip=arch-b.tls.ai
       - ENABLE_FRAMESTORE_CLEANER=false
       - ENABLE_PROCESS_SERVICE=false
       - ENABLE_XPRA_SERVICE=false
@@ -294,7 +294,7 @@ services:
     shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /dev:/dev      
       - /media:/home/user/media:ro
@@ -303,14 +303,14 @@ services:
       #- /home/anyvision:/mnt                                                ### mount your home directory to the container
       #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container  
     extra_hosts:
-      - nginx-a01.anyvision.local:<ip of a01 server>
-      - nginx-a02.anyvision.local:<ip of a02 server>
-      - nginx-a03.anyvision.local:<ip of a03 server>
-      - nginx-a04.anyvision.local:<ip of a04 server>
+      - nginx-a01.tls.ai:<ip of a01 server>
+      - nginx-a02.tls.ai:<ip of a02 server>
+      - nginx-a03.tls.ai:<ip of a03 server>
+      - nginx-a04.tls.ai:<ip of a04 server>
     environment:
       - DISPLAY=${DISPLAY:-1}                                                ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - ssl=true
-      - GATEWAY_HOST=apigateway.anyvision.local
+      - GATEWAY_HOST=apigateway.tls.ai
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:

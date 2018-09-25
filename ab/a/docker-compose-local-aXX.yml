@@ -17,19 +17,19 @@ networks:
 services:
 
   nginx:
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    image: gcr.io/anyvision-training/nginx-rtmp:tls.ai
     restart: always
     networks:
       anyvision:
         aliases:
-          - nginx-a<XX>.anyvision.local
+          - nginx-a<XX>.tls.ai
     ports:
       - "1935:1935"
       - "443:443"
       - "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
     environment:
       - limit_rate_speed=0
@@ -45,7 +45,7 @@ services:
     networks:
       anyvision:
         aliases:
-        - cron-a<XX>.anyvision.local
+        - cron-a<XX>.tls.ai
     volumes:
       - /storage:/var/www/html
       - ../../crontab/a_site_crontab:/etc/crontabs/crontab
@@ -62,15 +62,15 @@ services:
     networks:
       anyvision:
         aliases:
-          - proc-a<XX>.anyvision.local
+          - proc-a<XX>.tls.ai
     extra_hosts:
-      - "api.anyvision.local:<ip of b server>"
-      - "apigateway.anyvision.local:<ip of b server>"
-      - "mongodb.anyvision.local:<ip of b server>"
-      - "reid-b.anyvision.local:<ip of b server>"
-      - "coll-b.anyvision.local:<ip of b server>"
-      - "arch-b.anyvision.local:<ip of b server>"
-      - "nginx-b.anyvision.local:<ip of b server>"
+      - "api.tls.ai:<ip of b server>"
+      - "apigateway.tls.ai:<ip of b server>"
+      - "mongodb.tls.ai:<ip of b server>"
+      - "reid-b.tls.ai:<ip of b server>"
+      - "coll-b.tls.ai:<ip of b server>"
+      - "arch-b.tls.ai:<ip of b server>"
+      - "nginx-b.tls.ai:<ip of b server>"
     ports:
       - "4005:4005"
       - "9067:9067"
@@ -82,22 +82,22 @@ services:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /dev:/dev
       - /etc/localtime:/etc/localtime:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - DISPLAY=${DISPLAY:-1}                                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
-      - external_ip=proc-aXX.anyvision.local
-      - storage_ip=nginx-b.anyvision.local
-      - frame_store_storage_ip=nginx-aXX.anyvision.local
+      - external_ip=proc-aXX.tls.ai
+      - storage_ip=nginx-b.tls.ai
+      - frame_store_storage_ip=nginx-aXX.tls.ai
       - redis_host=127.0.0.1
-      - api_service_ip=api.anyvision.local
-      - mongodb_host=mongodb.anyvision.local
-      - reid_service_ip=reid-b.anyvision.local
-      - collate_service_ip=coll-b.anyvision.local
-      - track_archive_service_ip=arch-b.anyvision.local
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      - reid_service_ip=reid-b.tls.ai
+      - collate_service_ip=coll-b.tls.ai
+      - track_archive_service_ip=arch-b.tls.ai
       - ENABLE_DOCKERIZE=false
       - ENABLE_REID_SERVICE=false
       - ENABLE_TRACK_ARCHIVE_SERVICE=false
