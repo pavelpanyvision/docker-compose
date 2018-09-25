@@ -17,7 +17,7 @@ services:
 
 
   guacamole:
-    image: gcr.io/anyvision-production/guacamole:0.9.14
+    image: gcr.io/anyvision-training/guacamole:0.9.14
     restart: always
     networks:
       - anyvision
@@ -37,7 +37,7 @@ services:
 
 
   sftp:
-    image: gcr.io/anyvision-production/sftp:alpine
+    image: gcr.io/anyvision-training/sftp:alpine
     restart: always
     networks:
       - anyvision
@@ -55,7 +55,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-production/nginx-rtmp:ssl
+    image: gcr.io/anyvision-training/nginx-rtmp:ssl
     restart: always
     networks:
       anyvision:
@@ -81,7 +81,7 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-production/supercronic:latest
+    image: gcr.io/anyvision-training/supercronic:latest
     restart: always
     networks:
       anyvision:
@@ -101,7 +101,7 @@ services:
 
 
   rabbitmq:
-    image: gcr.io/anyvision-production/rabbitmq:latest
+    image: gcr.io/anyvision-training/rabbitmq:latest
     restart: always
     networks:
       anyvision:
@@ -124,7 +124,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-production/mongo:3.6-jessie
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
     restart: always
     networks:
       anyvision:
@@ -146,7 +146,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-production/redis:latest
+    image: gcr.io/anyvision-training/redis:latest
     restart: always
     networks:
       anyvision:
@@ -166,7 +166,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:development
+    image: gcr.io/anyvision-training/broadcaster:development
     restart: always
 #    network_mode: "host"
     hostname: broadcaster
@@ -197,7 +197,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:development
+    image: gcr.io/anyvision-training/api-gateway:development
     restart: always
     networks:
       anyvision:
@@ -233,7 +233,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:development
+    image: gcr.io/anyvision-training/api:development
     restart: always
     networks:
       anyvision:
@@ -263,7 +263,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-cpu-pyconcrete:development
+    image: gcr.io/anyvision-training/backend-cpu-pyconcrete:development
     restart: always
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
@@ -314,7 +314,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-production/dashboard:development
+    image: gcr.io/anyvision-training/dashboard:development
     restart: always
     privileged: true
     networks:
@@ -352,7 +352,7 @@ services:
 
 
   desktop:
-    image: gcr.io/anyvision-production/desktop
+    image: gcr.io/anyvision-training/desktop
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
