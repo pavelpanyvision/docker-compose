@@ -17,7 +17,7 @@ networks:
 services:
 
   nginx:
-    image: gcr.io/anyvision-training/nginx-rtmp:tls.ai
+    image: gcr.io/anyvision-training/nginx:tls.ai
     restart: always
     networks:
       anyvision:
