@@ -44,6 +44,31 @@ services:
 #      - NET_BIND_SERVICE
 #    read_only: true
 
+  dante-proxy:
+    image: gcr.io/anyvision-training/dante-proxy
+    restart: always
+    networks:
+      - anyvision
+    ports:
+      - "1080:1080"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: 1g
+
+
+  docker-hoster:
+    image: gcr.io/anyvision-training/docker-hoster
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+      - /etc/hosts:/tmp/hosts
+    logging:
+      options:
+        max-size: 1g
+
+
   guacamole:
       image: gcr.io/anyvision-training/guacamole:0.9.14
       restart: always
