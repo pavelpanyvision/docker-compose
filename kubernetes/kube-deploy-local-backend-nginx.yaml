@@ -12,6 +12,7 @@ spec:
     metadata:
       labels:
         app: ui-deployment
+        run: nginx
     spec:
       hostname: backend
       hostAliases:
@@ -242,4 +243,18 @@ spec:
     targetPort: 1935
     protocol: TCP
   selector:
-    app: ui-deployment
+    run: nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-lb
+spec:
+  externalIPs:
+  - 10.132.0.35
+  type: LoadBalancer
+  ports:
+   - name: https
+     port: 443
+  selector:
+    run: nginx

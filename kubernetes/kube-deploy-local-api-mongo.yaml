@@ -12,6 +12,7 @@ spec:
     metadata:
       labels:
         app: ui-deployment
+        run: api
     spec:
       hostname: ui-deployment
       hostAliases:
@@ -151,4 +152,19 @@ spec:
     targetPort: 3000
     protocol: TCP
   selector:
-    app: ui-deployment
+    run: api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-lb
+spec:
+  externalIPs:
+  - 10.132.0.35
+  type: LoadBalancer
+  ports:
+   - name: http-api
+     port: 5443
+     targetPort: 5443
+  selector:
+    run: api

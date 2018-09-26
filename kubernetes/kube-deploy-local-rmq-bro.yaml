@@ -12,6 +12,7 @@ spec:
     metadata:
       labels:
         app: ui-deployment
+        run: bro
     spec:
       hostname: broadcaster
       restartPolicy: Always
@@ -126,4 +127,4 @@ spec:
     targetPort: 15672
     protocol: TCP
   selector:
-    app: ui-deployment
+    run: bro

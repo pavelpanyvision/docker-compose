@@ -12,6 +12,7 @@ spec:
     metadata:
       labels:
         app: ui-deployment
+        run: apig
     spec:
       hostname: apigateway
       restartPolicy: Always
@@ -122,4 +123,19 @@ spec:
     targetPort: 9443
     protocol: TCP
   selector:
-    app: ui-deployment
+    run: apig
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apig-lb
+spec:
+  externalIPs:
+  - 10.132.0.35
+  type: LoadBalancer
+  ports:
+   - name: http-apig
+     port: 9443
+     targetPort: 9443
+  selector:
+    run: apig
