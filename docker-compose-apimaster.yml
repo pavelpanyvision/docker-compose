@@ -8,11 +8,6 @@ volumes:
 
 networks:
   anyvision:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.14.0.0/16
 
 
 services:
@@ -24,17 +19,17 @@ services:
     networks:
       anyvision:
         aliases:
-          - dashboard-master-${node_name:-localnode}.anyvision.local
+          - dashboard-master-${node_name:-localnode}.tls.ai
     ports:
     #  - "443:443"
       - "80:80"
     volumes:
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
-      - master_api_ip=api-master.anyvision.local
+      - master_api_ip=api-master.tls.ai
       - master_api_username=admin
       - master_api_password=admin
     env_file:
@@ -51,18 +46,18 @@ services:
     networks:
       anyvision:
         aliases:
-          - api-master.anyvision.local
+          - api-master.tls.ai
     ports:
       - "27183:27183"
     volumes:
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
-      - api_service_ip=api.anyvision.local
+      - api_service_ip=api.tls.ai
       - api_service_port=3000
-      - MONGO_DB_IP=mongodb.anyvision.local
+      - MONGO_DB_IP=mongodb.tls.ai
       - MONGO_DB_PORT=27017
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
@@ -77,17 +72,17 @@ services:
 
 
   nginx-master:
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    image: gcr.io/anyvision-training/nginx:tls.ai
     restart: always
     networks:
       anyvision:
         aliases:
-          - nginx-master-${node_name:-localnode}.anyvision.local
+          - nginx-master-${node_name:-localnode}.tls.ai
     ports:
       - "443:443"
     volumes:
       - /storage:/opt/nginx/html:ro
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
@@ -106,22 +101,22 @@ services:
     networks:
       anyvision:
         aliases:
-          - api.anyvision.local
+          - api.tls.ai
     ports:
       - "5443:5443"
       - "38389:38389"
     volumes:
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
-      - API_IP=api.anyvision.local
-      - MONGO_DB_IP=mongodb.anyvision.local
-      - CA_HOST=apigateway.anyvision.local
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
+      - API_IP=api.tls.ai
+      - MONGO_DB_IP=mongodb.tls.ai
+      - CA_HOST=apigateway.tls.ai
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
       - ENABLE_CHOWN=true
     env_file:
@@ -139,7 +134,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - mongodb.anyvision.local
+          - mongodb.tls.ai
     ports:
       - "27017:27017"
     volumes:
@@ -162,42 +157,42 @@ services:
     networks:
       anyvision:
         aliases:
-          - proc-${node_name:-localnode}.anyvision.local
-          - reid-${node_name:-localnode}.anyvision.local
-          - coll-${node_name:-localnode}.anyvision.local
-          - arch-${node_name:-localnode}.anyvision.local
+          - proc-${node_name:-localnode}.tls.ai
+          - reid-${node_name:-localnode}.tls.ai
+          - coll-${node_name:-localnode}.tls.ai
+          - arch-${node_name:-localnode}.tls.ai
     ports:
       - "4005:4005"
       - "9067:9067"
       - "9068:9068"
       - "9069:9069"
-      - "5000-5025:5000-5025/udp"                                            ### for remote VMS rtsp connections
+      - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - DISPLAY=:0
-      - external_ip=proc-${node_name:-localnode}.anyvision.local
-      - storage_ip=nginx-master-${node_name:-localnode}.anyvision.local
-      - frame_store_storage_ip=nginx-master-${node_name:-localnode}.anyvision.local
+      - external_ip=proc-${node_name:-localnode}.tls.ai
+      - storage_ip=nginx-master-${node_name:-localnode}.tls.ai
+      - frame_store_storage_ip=nginx-master-${node_name:-localnode}.tls.ai
       - redis_host=127.0.0.1
-      - api_service_ip=api.anyvision.local
-      - mongodb_host=mongodb.anyvision.local
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
       #- ENABLE_CRON_PIPE_IMG_TEMPORARY=false
       ########################################################################## use the configuration below to configure localhost services
-      - reid_service_ip=reid-${node_name:-localnode}.anyvision.local
-      - collate_service_ip=coll-${node_name:-localnode}.anyvision.local
-      - track_archive_service_ip=arch-${node_name:-localnode}.anyvision.local
+      - reid_service_ip=reid-${node_name:-localnode}.tls.ai
+      - collate_service_ip=coll-${node_name:-localnode}.tls.ai
+      - track_archive_service_ip=arch-${node_name:-localnode}.tls.ai
       ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
-      #- reid_service_ip=reid-b.anyvision.local
-      #- collate_service_ip=coll-b.anyvision.local
-      #- track_archive_service_ip=arch-b.anyvision.local
+      #- reid_service_ip=reid-b.tls.ai
+      #- collate_service_ip=coll-b.tls.ai
+      #- track_archive_service_ip=arch-b.tls.ai
     env_file:
       - env/backend.env
       - env/global.env

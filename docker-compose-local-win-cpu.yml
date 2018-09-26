@@ -17,19 +17,19 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    image: gcr.io/anyvision-training/nginx:tls.ai
     restart: always
     networks:
       anyvision:
         aliases:
-          - nginx-${node_name:-localnode}.anyvision.local
+          - nginx-${node_name:-localnode}.tls.ai
     ports:
       - "1935:1935"
       #- "443:443"
       #- "80:80"
     volumes:
       - c:/anv/storage:/opt/nginx/html:ro
-      - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
       - limit_rate_speed=0
     env_file:
@@ -46,7 +46,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - cron-${node_name:-localnode}.anyvision.local
+          - cron-${node_name:-localnode}.tls.ai
     volumes:
       - c:/anv/storage:/var/www/html
       - ./crontab/site_crontab:/etc/crontab
@@ -64,7 +64,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - rabbitmq.anyvision.local
+          - rabbitmq.tls.ai
     #ports:
       #- "5761:5761"
       #- "15761:15761"
@@ -84,7 +84,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - mongodb.anyvision.local
+          - mongodb.tls.ai
     #ports:
       #- "27017:27017"
     volumes:
@@ -103,7 +103,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - redis.anyvision.local
+          - redis.tls.ai
     sysctls:
       - net.core.somaxconn=511
     volumes:
@@ -121,15 +121,15 @@ services:
     networks:
       anyvision:
         aliases:
-          - broadcaster.anyvision.local
+          - broadcaster.tls.ai
     #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
-      - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     depends_on:
       - api
     environment:
-      - api_service_ip=api.anyvision.local
-      - BCAST_SOCKETIO_API_URL=https://api.anyvision.local:5443
+      - api_service_ip=api.tls.ai
+      - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -147,22 +147,22 @@ services:
     networks:
       anyvision:
         aliases:
-          - apigateway.anyvision.local
+          - apigateway.tls.ai
     ports:
       - "9443:9443"
     volumes:
       - c:/anv/storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
-      - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     depends_on:
       - redis
     environment:
-      - GATEWAY_HOST=apigateway.anyvision.local
-      - API_HOST=api.anyvision.local
-      - DASH_API_URL=https://api.anyvision.local:5443
-      - GATEWAY_SECURE_URL=https://apigateway.anyvision.local:9443
-      - GATEWAY_URL=http://apigateway.anyvision.local:8080
-      - REDIS_HOST=redis.anyvision.local
+      - GATEWAY_HOST=apigateway.tls.ai
+      - API_HOST=api.tls.ai
+      - DASH_API_URL=https://api.tls.ai:5443
+      - GATEWAY_SECURE_URL=https://apigateway.tls.ai:9443
+      - GATEWAY_URL=http://apigateway.tls.ai:8080
+      - REDIS_HOST=redis.tls.ai
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -180,17 +180,17 @@ services:
     networks:
       anyvision:
         aliases:
-          - api.anyvision.local
+          - api.tls.ai
     ports:
       - "5443:5443"
     volumes:
       - c:/anv/storage:/var/www/html
-      - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
-      - API_IP=api.anyvision.local
-      - MONGO_DB_IP=mongodb.anyvision.local
-      - CA_HOST=apigateway.anyvision.local
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
+      - API_IP=api.tls.ai
+      - MONGO_DB_IP=mongodb.tls.ai
+      - CA_HOST=apigateway.tls.ai
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
     env_file:
@@ -209,10 +209,10 @@ services:
     networks:
       anyvision:
         aliases:
-          - proc-${node_name:-localnode}.anyvision.local
-          - reid-${node_name:-localnode}.anyvision.local
-          - coll-${node_name:-localnode}.anyvision.local
-          - arch-${node_name:-localnode}.anyvision.local
+          - proc-${node_name:-localnode}.tls.ai
+          - reid-${node_name:-localnode}.tls.ai
+          - coll-${node_name:-localnode}.tls.ai
+          - arch-${node_name:-localnode}.tls.ai
     ports:
       #- "4005:4005"
       #- "9067:9067"
@@ -224,7 +224,7 @@ services:
       - c:/anv/home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
       - c:/anv/storage:/var/www/html
-      - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
       - misc_pipe_cpu_mode=true
       - NVIDIA_VISIBLE_DEVICES=
@@ -232,20 +232,20 @@ services:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=10.0.75.1:0.0
-      - external_ip=proc-${node_name:-localnode}.anyvision.local
-      - storage_ip=nginx-${node_name:-localnode}.anyvision.local
-      - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
+      - external_ip=proc-${node_name:-localnode}.tls.ai
+      - storage_ip=nginx-${node_name:-localnode}.tls.ai
+      - frame_store_storage_ip=nginx-${node_name:-localnode}.tls.ai
       - redis_host=127.0.0.1
-      - api_service_ip=api.anyvision.local
-      - mongodb_host=mongodb.anyvision.local
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
       ########################################################################## use the configuration below to configure localhost services
-      - reid_service_ip=reid-${node_name:-localnode}.anyvision.local
-      - collate_service_ip=coll-${node_name:-localnode}.anyvision.local
-      - track_archive_service_ip=arch-${node_name:-localnode}.anyvision.local
+      - reid_service_ip=reid-${node_name:-localnode}.tls.ai
+      - collate_service_ip=coll-${node_name:-localnode}.tls.ai
+      - track_archive_service_ip=arch-${node_name:-localnode}.tls.ai
       ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
-      #- reid_service_ip=reid-b.anyvision.local
-      #- collate_service_ip=coll-b.anyvision.local
-      #- track_archive_service_ip=arch-b.anyvision.local
+      #- reid_service_ip=reid-b.tls.ai
+      #- collate_service_ip=coll-b.tls.ai
+      #- track_archive_service_ip=arch-b.tls.ai
     env_file:
       - env/backend.env
       - env/global.env
@@ -265,12 +265,12 @@ services:
     shm_size: 1024M
     volumes:
       - c:/anv/storage/sftp_data:/sftp:rw
-      - c:/anv/usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
+      - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro
       - c:/anv/storage/share:/home/user/share:rw
     environment:
       - DISPLAY=10.0.75.1:0.0
       - ssl=true
-      - GATEWAY_HOST=apigateway.anyvision.local
+      - GATEWAY_HOST=apigateway.tls.ai
       - RUN_AS_USER=root
       - ENABLE_CHOWN=false
       - isPersonEnabled=false
