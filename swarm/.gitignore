@@ -1,6 +1,0 @@
-tls/*.pem
-tls/*.srl
-tls/*.crt
-tls/*.csr
-tls/passinfo
-stacks/
