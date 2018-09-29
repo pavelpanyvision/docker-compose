@@ -1,4 +1,4 @@
-#filename: docker-compose-local-cpu.yml
+#filename: docker-compose-local-gpu.yml
 version: '3.3'
 
 
@@ -63,7 +63,7 @@ services:
         aliases:
           - nginx-${node_name:-localnode}.tls.ai
     ports:
-      - "1935:1935"
+      #- "1935:1935"
       - "443:443"
       - "80:80"
     volumes:
@@ -275,7 +275,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-cpu:development
+    image: gcr.io/anyvision-training/backend:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -307,9 +307,6 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
-      - misc_pipe_cpu_mode=true
-      - NVIDIA_VISIBLE_DEVICES=
-      - NVIDIA_DRIVER_CAPABILITIES=
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
@@ -362,7 +359,6 @@ services:
   #     - GATEWAY_HOST=apigateway.tls.ai
   #     - RUN_AS_USER=root
   #     - ENABLE_CHOWN=true
-  #     - isPersonEnabled=false
   #   env_file:
   #     - env/global.env
   #     - env/api-gateway.env
@@ -398,6 +394,26 @@ services:
     logging:
       options:
         max-size: 1g
+
+
+
+simple-rtmp-server:
+  image: gcr.io/anyvision-production/srs
+  restart: always
+  networks:
+    anyvision:
+      aliases:
+        - srs-${node_name:-localnode}.tls.ai
+        - srs
+  ports:
+    - "9080:8080"
+    - "1935:1935"
+    - "1985:1985"
+  volumes:
+    - /etc/localtime:/etc/localtime:ro
+  logging:
+    options:
+      max-size: 1g
 
 
 
