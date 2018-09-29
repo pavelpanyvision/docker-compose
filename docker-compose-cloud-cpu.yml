@@ -25,8 +25,9 @@ services:
       - "8080:8080"
     volumes:
       - ./guacamole/user-mapping-cloud.xml:/etc/guacamole/user-mapping.xml
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
-      #- TZ=${TZ:-UTC}
       - GUACD_LOGLEVEL=info
     env_file:
       - env/global.env
@@ -43,9 +44,9 @@ services:
       - anyvision
     volumes:
       - /storage/sftp_data:/home/user
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
     command: user:pass:2000:2000:files
-    #environment:
-    #  - TZ=${TZ:-UTC}
     env_file:
       - env/global.env
     logging:
@@ -55,296 +56,25 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx-rtmp:ssl
+    image: gcr.io/anyvision-training/nginx:tls.ai
     restart: always
     networks:
       anyvision:
         aliases:
-          - nginx-${node_name:-localnode}.anyvision.local
+          - nginx-${node_name:-localnode}.tls.ai
     ports:
       - "1935:1935"
       - "443:443"
       - "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
-      #- TZ=${TZ:-UTC}
       - limit_rate_speed=0
     env_file:
       - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  cron:
-    image: gcr.io/anyvision-training/supercronic:latest
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - cron-${node_name:-localnode}.anyvision.local
-    volumes:
-      - /storage:/var/www/html
-      - ./crontab/site_crontab:/etc/crontabs/crontab
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      #- TZ=${TZ:-UTC}
-      - TO_DATE_TRACK_DELETE=30
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - rabbitmq.anyvision.local
-    #ports:
-      #- "5761:5761"
-      #- "15761:15761"
-    volumes:
-      - /storage/rabbitmq:/var/lib/rabbitmq
-      - /etc/localtime:/etc/localtime:ro
-    #environment:
-    #  - TZ=${TZ:-UTC}
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - mongodb.anyvision.local
-    #ports:
-      #- "27017:27017"
-    volumes:
-      - mongo_db_data:/data/db
-      - /etc/localtime:/etc/localtime:ro
-    #environment:
-    #  - TZ=${TZ:-UTC}
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  redis:
-    image: gcr.io/anyvision-training/redis:latest
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - redis.anyvision.local
-    sysctls:
-      - net.core.somaxconn=511
-    volumes:
-      - redis_db_data:/data:rw
-      - /etc/localtime:/etc/localtime:ro
-    #environment:
-    #  - TZ=${TZ:-UTC}
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:development
-    restart: always
-#    network_mode: "host"
-    hostname: broadcaster
-    networks:
-      anyvision:
-        aliases:
-          - broadcaster.anyvision.local
-    volumes:
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /etc/localtime:/etc/localtime:ro
-    depends_on:
-      - api
-    environment:
-      #- TZ=${TZ:-UTC}
-      - api_service_ip=api.anyvision.local
-      - BCAST_SOCKETIO_API_URL=https://api.anyvision.local:5443
-      - api_service_port=5443
-#      - ENABLE_DOCKERIZE=false
-      - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-    env_file:
-      - env/global.env
-      - env/broadcaster.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - apigateway.anyvision.local
-    ports:
-      - "9443:9443"
-    volumes:
-      - /storage:/var/www/html
-      - api_gateway_keys:/home/user/api-gateway/config/keys
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /etc/localtime:/etc/localtime:ro
-    depends_on:
-      - redis
-    environment:
-      #- TZ=${TZ:-UTC}
-      - GATEWAY_HOST=apigateway.anyvision.local
-      - API_HOST=api.anyvision.local
-      - DASH_API_URL=https://api.anyvision.local:5443
-      - GATEWAY_SECURE_URL=https://apigateway.anyvision.local:9443
-      - GATEWAY_URL=http://apigateway.anyvision.local:8080
-      - REDIS_HOST=redis.anyvision.local
-      - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-      - ENABLE_CREATE_SSL=true
-    env_file:
-      - env/api-gateway.env
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  api:
-    image: gcr.io/anyvision-training/api:development
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - api.anyvision.local
-    ports:
-      - "5443:5443"
-    volumes:
-      - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      #- TZ=${TZ:-UTC}
-      - API_IP=api.anyvision.local
-      - MONGO_DB_IP=mongodb.anyvision.local
-      - CA_HOST=apigateway.anyvision.local
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
-      - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-    env_file:
-      - env/global.env
-      - env/api.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  backend:
-    image: gcr.io/anyvision-training/backend-cpu-pyconcrete:development
-    restart: always
-    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
-    networks:
-      anyvision:
-        aliases:
-          - proc-${node_name:-localnode}.anyvision.local
-          - reid-${node_name:-localnode}.anyvision.local
-          - coll-${node_name:-localnode}.anyvision.local
-          - arch-${node_name:-localnode}.anyvision.local
-    ports:
-      #- "4005:4005"
-      #- "9067:9067"
-      #- "9068:9068"
-      #- "9069:9069"
-      - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
-    volumes:
-      - /home/user/license:/home/user/license:ro
-      - backend_data:/root/pipe_data
-      - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-      - /dev:/dev:rw       ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      #- TZ=${TZ:-UTC}
-      - misc_pipe_cpu_mode=true
-      - NVIDIA_VISIBLE_DEVICES=
-      - NVIDIA_DRIVER_CAPABILITIES=
-      - DISPLAY=:0
-      - external_ip=proc-${node_name:-localnode}.anyvision.local
-      - storage_ip=nginx-${node_name:-localnode}.anyvision.local
-      - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
-      - redis_host=127.0.0.1
-      - api_service_ip=api.anyvision.local
-      - mongodb_host=mongodb.anyvision.local
-      ########################################################################## use the configuration below to configure localhost services
-      - reid_service_ip=reid-${node_name:-localnode}.anyvision.local
-      - collate_service_ip=coll-${node_name:-localnode}.anyvision.local
-      - track_archive_service_ip=arch-${node_name:-localnode}.anyvision.local
-    env_file:
-      - env/backend.env
-      - env/global.env
-    ipc: host
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  dashboard:
-    image: gcr.io/anyvision-training/dashboard:development
-    restart: always
-    privileged: true
-    networks:
-      - anyvision
-    volumes:
-      - /storage/sftp_data:/sftp:rw
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision:ro
-      - /media:/home/user/media:ro
-      - /storage/share:/home/user/share:rw
-      - /home:/home/user/localusers:rw
-      #- /dev/shm:/dev/shm:rw
-      - /dev:/dev:rw
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /storage/share/anyvision-exports:/root/anyvision-exports:rw
-      - /etc/localtime:/etc/localtime:ro
-      #- /storage/share/root_anyvision-exports:/root/anyvision-exports:rw
-      #- /storage/share/user_anyvision-exports:/home/user/anyvision-exports:rw
-    environment:
-      #- TZ=${TZ:-UTC}
-      - DISPLAY=:0
-      - ssl=true
-      - GATEWAY_HOST=apigateway.anyvision.local
-      - RUN_AS_USER=root
-      - ENABLE_CHOWN=false
-      - isPersonEnabled=false
-    env_file:
-      - env/global.env
-      - env/api-gateway.env
-      - env/dashboard.env
-    ipc: host
     logging:
       options:
         max-size: 1g
@@ -360,15 +90,330 @@ services:
     volumes:
       - /storage/sftp_data:/sftp:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /dev/shm:/dev/shm:rw
       - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
     environment:
-      #- TZ=${TZ:-UTC}
       - DISPLAY=:0
-      - VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
+      - VNC_OPTIONS=-auth /home/user/.Xauthority -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
     env_file:
       - env/global.env
     ipc: host
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  cron:
+    image: gcr.io/anyvision-training/supercronic:latest
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - cron-${node_name:-localnode}.tls.ai
+    volumes:
+      - /storage:/var/www/html
+      - ./crontab/site_crontab:/etc/crontab
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - TO_DATE_TRACK_DELETE=30
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  rabbitmq:
+    image: gcr.io/anyvision-training/rabbitmq:latest
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - rabbitmq.tls.ai
+    # those port should be opened only development
+    #ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "15672:15672"
+      - "15671:15671"
+    volumes:
+      - /storage/rabbitmq:/var/lib/rabbitmq
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  mongodb:
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - mongodb.tls.ai
+    #ports:
+      #- "27017:27017"
+    volumes:
+      - mongo_db_data:/data/db
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  redis:
+    image: gcr.io/anyvision-training/redis:latest
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - redis.tls.ai
+    sysctls:
+      - net.core.somaxconn=511
+    volumes:
+      - redis_db_data:/data:rw
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  broadcaster:
+    image: gcr.io/anyvision-training/broadcaster:development
+    restart: always
+    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
+    hostname: broadcaster
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    networks:
+      anyvision:
+        aliases:
+          - broadcaster.tls.ai
+    volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    depends_on:
+      - api
+    environment:
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+      - api_service_ip=api.tls.ai
+      - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
+      - RUN_AS_USER=user
+      #- ENABLE_DOCKERIZE=false
+      - ENABLE_CHOWN=true
+    env_file:
+      - env/global.env
+      - env/broadcaster.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  apigateway:
+    image: gcr.io/anyvision-training/api-gateway:development
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    networks:
+      anyvision:
+        aliases:
+          - apigateway.tls.ai
+    ports:
+      - "9443:9443"
+      - "38391:38391"
+    volumes:
+      - /storage:/var/www/html
+      - api_gateway_keys:/home/user/api-gateway/config/keys
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      #- /home/anyvision/Projects/API-gateway:/home/user/api-gateway         ### mount your local project directory to the container
+    depends_on:
+      - redis
+    environment:
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+      - GATEWAY_HOST=apigateway.tls.ai
+      - API_HOST=api.tls.ai
+      - DASH_API_URL=https://api.tls.ai:5443
+      - GATEWAY_SECURE_URL=https://apigateway.tls.ai:9443
+      - GATEWAY_URL=http://apigateway.tls.ai:8080
+      - REDIS_HOST=redis.tls.ai
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=true
+    env_file:
+      - env/api-gateway.env
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  api:
+    image: gcr.io/anyvision-training/api:development
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity
+    networks:
+      anyvision:
+        aliases:
+          - api.tls.ai
+    ports:
+      - "5443:5443"
+      - "38389:38389"
+      - "3000:3000"
+    volumes:
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
+    environment:
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
+      - API_IP=api.tls.ai
+      - MONGO_DB_IP=mongodb.tls.ai
+      - CA_HOST=apigateway.tls.ai
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.tls.ai          ### use this configuration to configure localhost reid service
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=true
+    env_file:
+      - env/global.env
+      - env/api.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  backend:
+    image: gcr.io/anyvision-training/backend-cpu-pyconcrete:development
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      anyvision:
+        aliases:
+          - proc-${node_name:-localnode}.tls.ai
+          - reid-${node_name:-localnode}.tls.ai
+          - coll-${node_name:-localnode}.tls.ai
+          - arch-${node_name:-localnode}.tls.ai
+    extra_hosts:
+    #The IP here should point to nginx of the master API
+      - "nginx-master-${node_name:-localnode}.tls.ai:1.1.1.1"
+    ports:
+      - "4005:4005"
+      - "9067:9067"
+      - "9068:9068"
+      - "9069:9069"
+      - "9022:9022" #ssh
+      - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
+    volumes:
+      - /home/user/license:/home/user/license:ro
+      - backend_data:/root/pipe_data
+      - /storage:/var/www/html
+      #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+    environment:
+      - misc_pipe_cpu_mode=true
+      - NVIDIA_VISIBLE_DEVICES=
+      - NVIDIA_DRIVER_CAPABILITIES=
+      - ENABLE_OPENSSH_SERVICE=true
+      - BACKEND_OPENSSH_PORT=9022
+      - DISPLAY=:0
+      - external_ip=proc-${node_name:-localnode}.tls.ai
+      - storage_ip=nginx-${node_name:-localnode}.tls.ai
+      - frame_store_storage_ip=nginx-${node_name:-localnode}.tls.ai
+      - redis_host=127.0.0.1
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      ########################################################################## use the configuration below to configure localhost services
+      - reid_service_ip=reid-${node_name:-localnode}.tls.ai
+      - collate_service_ip=coll-${node_name:-localnode}.tls.ai
+      - track_archive_service_ip=arch-${node_name:-localnode}.tls.ai
+    env_file:
+      - env/backend.env
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    ipc: host
+
+
+
+  # dashboard:
+  #   image: gcr.io/anyvision-training/dashboard:development
+  #   restart: always
+  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+  #   privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+  #   networks:
+  #     - anyvision
+  #   shm_size: 1024M
+  #   volumes:
+  #     - /storage/sftp_data:/sftp:rw
+  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro
+  #     - /tmp/.X11-unix:/tmp/.X11-unix:rw
+  #     - /media:/home/user/media:ro
+  #     - /storage/share:/home/user/share:rw
+  #     - /etc/localtime:/etc/localtime:ro
+  #     #- /etc/timezone:/etc/timezone:ro
+  #     - /storage/share/anyvision-exports:/root/anyvision-exports:rw
+  #     #- /home/anyvision:/mnt                                                ### mount your home directory to the container
+  #     #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container
+  #   environment:
+  #     - DISPLAY=:0
+  #     - ssl=true
+  #     - GATEWAY_HOST=apigateway.tls.ai
+  #     - RUN_AS_USER=root
+  #     - ENABLE_CHOWN=true
+  #     - isPersonEnabled=false
+  #   env_file:
+  #     - env/global.env
+  #     - env/api-gateway.env
+  #     - env/dashboard.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
+  #   ipc: host
+
+
+
+  dante-proxy:
+    image: gcr.io/anyvision-training/dante-proxy
+    restart: always
+    networks:
+      - anyvision
+    ports:
+      - "1080:1080"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  docker-hoster:
+    image: gcr.io/anyvision-training/docker-hoster
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+      - /etc/hosts:/tmp/hosts
     logging:
       options:
         max-size: 1g

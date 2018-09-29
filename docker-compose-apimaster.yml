@@ -6,6 +6,7 @@ volumes:
   mongo_db_data:
   backend_data:
 
+
 networks:
   anyvision:
 
@@ -21,7 +22,7 @@ services:
         aliases:
           - dashboard-master-${node_name:-localnode}.tls.ai
     ports:
-    #  - "443:443"
+      #- "443:443"
       - "80:80"
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -60,7 +61,7 @@ services:
       - MONGO_DB_IP=mongodb.tls.ai
       - MONGO_DB_PORT=27017
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
+      - ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/api-master.env

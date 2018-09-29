@@ -25,8 +25,8 @@ services:
           - nginx-${node_name:-localnode}.tls.ai
     ports:
       - "1935:1935"
-      #- "443:443"
-      #- "80:80"
+      - "443:443"
+      - "80:80"
     volumes:
       - c:/anv/storage:/opt/nginx/html:ro
       - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -52,6 +52,8 @@ services:
       - ./crontab/site_crontab:/etc/crontab
     environment:
       - TO_DATE_TRACK_DELETE=30
+    env_file:
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -65,9 +67,12 @@ services:
       anyvision:
         aliases:
           - rabbitmq.tls.ai
+    # those port should be opened only development
     #ports:
-      #- "5761:5761"
-      #- "15761:15761"
+      #- "5671:5671"
+      #- "5672:5672"
+      #- "15672:15672"
+      #- "15671:15671"
     volumes:
       - c:/anv/storage/rabbitmq:/var/lib/rabbitmq
     env_file:
@@ -117,12 +122,13 @@ services:
   broadcaster:
     image: gcr.io/anyvision-training/broadcaster:development
     restart: always
+    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     networks:
       anyvision:
         aliases:
           - broadcaster.tls.ai
-    #dns: 172.14.0.1                                                          ### internal DNS server address, replace this with external IP of CoreDNS/Consul server (A/B config)
     volumes:
       - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     depends_on:
@@ -131,7 +137,8 @@ services:
       - api_service_ip=api.tls.ai
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
+      #- ENABLE_DOCKERIZE=false
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/broadcaster.env
@@ -144,6 +151,7 @@ services:
   apigateway:
     image: gcr.io/anyvision-training/api-gateway:development
     restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     networks:
       anyvision:
         aliases:
@@ -164,7 +172,7 @@ services:
       - GATEWAY_URL=http://apigateway.tls.ai:8080
       - REDIS_HOST=redis.tls.ai
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
+      #- ENABLE_CHOWN=true
     env_file:
       - env/api-gateway.env
       - env/global.env
@@ -183,6 +191,7 @@ services:
           - api.tls.ai
     ports:
       - "5443:5443"
+      - "3000:3000"
     volumes:
       - c:/anv/storage:/var/www/html
       - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -192,7 +201,7 @@ services:
       - CA_HOST=apigateway.tls.ai
       - MASS_IMPORT_IP=reid-${node_name:-localnode}.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/api.env
@@ -205,6 +214,7 @@ services:
   backend:
     image: gcr.io/anyvision-training/backend-cpu:development
     restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
@@ -213,6 +223,9 @@ services:
           - reid-${node_name:-localnode}.tls.ai
           - coll-${node_name:-localnode}.tls.ai
           - arch-${node_name:-localnode}.tls.ai
+    extra_hosts:
+    #The IP here should point to nginx of the master API
+      - "nginx-master-${node_name:-localnode}.tls.ai:1.1.1.1"
     ports:
       #- "4005:4005"
       #- "9067:9067"
@@ -229,7 +242,7 @@ services:
       - misc_pipe_cpu_mode=true
       - NVIDIA_VISIBLE_DEVICES=
       - NVIDIA_DRIVER_CAPABILITIES=
-      - ENABLE_OPENSSH_SERVICE=true
+      #- ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=10.0.75.1:0.0
       - external_ip=proc-${node_name:-localnode}.tls.ai
@@ -256,29 +269,45 @@ services:
 
 
 
-  dashboard:
-    image: gcr.io/anyvision-training/dashboard:development
+  # dashboard:
+  #   image: gcr.io/anyvision-training/dashboard:development
+  #   restart: always
+  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+  #   privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+  #   networks:
+  #     - anyvision
+  #   shm_size: 1024M
+  #   volumes:
+  #     - c:/anv/storage/sftp_data:/sftp:rw
+  #     - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro
+  #     - c:/anv/storage/share:/home/user/share:rw
+  #   environment:
+  #     - DISPLAY=10.0.75.1:0.0
+  #     - ssl=true
+  #     - GATEWAY_HOST=apigateway.tls.ai
+  #     - RUN_AS_USER=root
+  #     #- ENABLE_CHOWN=true
+  #     - isPersonEnabled=false
+  #   env_file:
+  #     - env/global.env
+  #     - env/api-gateway.env
+  #     - env/dashboard.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
+  #   ipc: host
+
+
+
+  dante-proxy:
+    image: gcr.io/anyvision-training/dante-proxy
     restart: always
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       - anyvision
-    shm_size: 1024M
+    ports:
+      - "1080:1080"
     volumes:
-      - c:/anv/storage/sftp_data:/sftp:rw
-      - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro
-      - c:/anv/storage/share:/home/user/share:rw
-    environment:
-      - DISPLAY=10.0.75.1:0.0
-      - ssl=true
-      - GATEWAY_HOST=apigateway.tls.ai
-      - RUN_AS_USER=root
-      - ENABLE_CHOWN=false
-      - isPersonEnabled=false
-    env_file:
-      - env/global.env
-      - env/api-gateway.env
-      - env/dashboard.env
+      - /etc/localtime:/etc/localtime:ro
     logging:
       options:
         max-size: 1g
-    ipc: host
