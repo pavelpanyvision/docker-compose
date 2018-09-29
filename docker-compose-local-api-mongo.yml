@@ -5,18 +5,21 @@ version: '3'
 volumes:
   mongo_db_data:
 
+
 networks:
   anyvision:
 
+
 services:
 
+
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     restart: always
     networks:
       anyvision:
         aliases:
-          - mongodb.anyvision.local
+          - mongodb.tls.ai
     #ports:
       #- "27017:27017"
     volumes:
@@ -29,32 +32,33 @@ services:
       options:
         max-size: 1g
 
+
+
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-production/api:development
     restart: always
     networks:
       anyvision:
         aliases:
-          - api.anyvision.local
+          - api.tls.ai
     ports:
       - "5443:5443"
-      - "38389:38389"
+      #- "38389:38389"
       - "3000:3000"
-
     volumes:
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
-      - API_IP=api.anyvision.local
-      - MONGO_DB_IP=mongodb.anyvision.local
-      - CA_HOST=apigateway.anyvision.local
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
+      #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
+      - API_IP=api.tls.ai
+      - MONGO_DB_IP=mongodb.tls.ai
+      - CA_HOST=apigateway.tls.ai
+      - MASS_IMPORT_IP=reid-${node_name:-localnode}.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/api.env

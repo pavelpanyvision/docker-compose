@@ -7,7 +7,7 @@ volumes:
 services:
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     restart: always
     volumes:
       - mongo_db_data:/data/db
@@ -15,7 +15,7 @@ services:
       #- /etc/timezone:/etc/timezone:ro
 
   migration:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     restart: "no"
     volumes:
      - mongo_db_data:/data/db

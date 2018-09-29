@@ -6,6 +6,7 @@ volumes:
   mongo_db_data:
   backend_data:
 
+
 networks:
   anyvision:
 
@@ -14,14 +15,14 @@ services:
 
 
   dashboard-master:
-    image: gcr.io/anyvision-training/dashboard-master:development
+    image: gcr.io/anyvision-production/dashboard-master:1.0.1
     restart: always
     networks:
       anyvision:
         aliases:
           - dashboard-master-${node_name:-localnode}.tls.ai
     ports:
-    #  - "443:443"
+      #- "443:443"
       - "80:80"
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -41,7 +42,7 @@ services:
 
 
   api-master:
-    image: gcr.io/anyvision-training/api-master:development
+    image: gcr.io/anyvision-production/api-master:1.0.0
     restart: always
     networks:
       anyvision:
@@ -60,7 +61,7 @@ services:
       - MONGO_DB_IP=mongodb.tls.ai
       - MONGO_DB_PORT=27017
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/api-master.env
@@ -72,7 +73,7 @@ services:
 
 
   nginx-master:
-    image: gcr.io/anyvision-training/nginx:tls.ai
+    image: gcr.io/anyvision-production/nginx:tls.ai
     restart: always
     networks:
       anyvision:
@@ -96,7 +97,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-production/api:development
     restart: always
     networks:
       anyvision:
@@ -104,7 +105,7 @@ services:
           - api.tls.ai
     ports:
       - "5443:5443"
-      - "38389:38389"
+      #- "38389:38389"
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -112,13 +113,13 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
+      #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.tls.ai
       - MONGO_DB_IP=mongodb.tls.ai
       - CA_HOST=apigateway.tls.ai
       - MASS_IMPORT_IP=reid-${node_name:-localnode}.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/api.env
@@ -129,7 +130,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     restart: always
     networks:
       anyvision:
@@ -150,7 +151,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:development
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.19.5-rc.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -162,10 +163,10 @@ services:
           - coll-${node_name:-localnode}.tls.ai
           - arch-${node_name:-localnode}.tls.ai
     ports:
-      - "4005:4005"
-      - "9067:9067"
-      - "9068:9068"
-      - "9069:9069"
+      #- "4005:4005"
+      #- "9067:9067"
+      #- "9068:9068"
+      #- "9069:9069"
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro

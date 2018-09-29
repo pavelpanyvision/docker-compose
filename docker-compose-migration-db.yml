@@ -5,10 +5,13 @@ version: '3.3'
 volumes:
   mongo_db_data:
 
+
 networks:
   anyvision:
 
+
 services:
+
 
   mongodb:
     image: gcr.io/anyvision-production/mongo:3.6-jessie
@@ -16,7 +19,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - mongodb.anyvision.local
+          - mongodb.tls.ai
     #ports:
       #- "27017:27017"
     volumes:
@@ -31,22 +34,22 @@ services:
 
 
   migration_manager:
-    image: gcr.io/anyvision-training/migration_manager:development
+    image: gcr.io/anyvision-production/migration_manager:development
     #restart: always
     networks:
       anyvision:
         aliases:
-          - apigateway.anyvision.local
+          - apigateway.tls.ai
     volumes:
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - mongodb
     environment:
-      - MONGO_DB_IP=mongodb.anyvision.local
+      - MONGO_DB_IP=mongodb.tls.ai
       - MONGO_DB_NAME=anyVision2
-      - API_IP=api.anyvision.local
+      - API_IP=api.tls.ai
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
     logging:

@@ -11,23 +11,23 @@ services:
     networks:
       default:
         aliases:
-          - backend-jmeter.anyvision.local
+          - backend-jmeter.tls.ai
     #command: sleep 1d
-    image: gcr.io/anyvision-training/backend-jmeter:latest
+    image: gcr.io/anyvision-production/backend-jmeter:latest
     restart: "no"
     volumes:
       - /storage:/var/www/html
       - /storage/logs:/storage/logs
       - /storage/pipe_store/test_data:/root/backend_trunk/tests/test_data
       - /storage/results:/tmp/results
-      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
-      - HOST=proc-${node_name:-localnode}.anyvision.local
+      - HOST=proc-${node_name:-localnode}.tls.ai
       - PORT=4005
     ports:
       - "6000:6000"
     #extra_hosts:
-    # - "backend-jmeter.anyvision.local:192.168.20.202"
+    # - "backend-jmeter.tls.ai:192.168.20.202"
     logging:
       options:
         max-size: 1g
