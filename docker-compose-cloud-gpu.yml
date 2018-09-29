@@ -339,7 +339,6 @@ services:
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
-      ########################################################################## use the configuration below to configure localhost services
       - reid_service_ip=reid-${node_name:-localnode}.tls.ai
       - collate_service_ip=coll-${node_name:-localnode}.tls.ai
       - track_archive_service_ip=arch-${node_name:-localnode}.tls.ai

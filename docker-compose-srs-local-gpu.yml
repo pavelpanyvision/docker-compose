@@ -317,14 +317,9 @@ services:
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
       - frame_store_rtmp_url=srs-${node_name:-localnode}.tls.ai
-      ########################################################################## use the configuration below to configure localhost services
       - reid_service_ip=reid-${node_name:-localnode}.tls.ai
       - collate_service_ip=coll-${node_name:-localnode}.tls.ai
       - track_archive_service_ip=arch-${node_name:-localnode}.tls.ai
-      ########################################################################## use the configuration below to configure the "b" server(s) hostname(s) in a/b architecture
-      #- reid_service_ip=reid-b.tls.ai
-      #- collate_service_ip=coll-b.tls.ai
-      #- track_archive_service_ip=arch-b.tls.ai
     env_file:
       - env/backend.env
       - env/global.env

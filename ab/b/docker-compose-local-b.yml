@@ -1,4 +1,4 @@
-#filename: docker-compose-local-cpu.yml
+#filename: docker-compose-local-a.yml
 version: '3.3'
 
 
@@ -24,13 +24,13 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
+      - ../../guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - GUACD_LOGLEVEL=info
     env_file:
-      - env/global.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
@@ -48,7 +48,7 @@ services:
       #- /etc/timezone:/etc/timezone:ro
     command: user:pass:2000:2000:files
     env_file:
-      - env/global.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
@@ -61,7 +61,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - nginx-${node_name:-localnode}.tls.ai
+          - nginx-b.tls.ai
     ports:
       - "1935:1935"
       - "443:443"
@@ -74,7 +74,7 @@ services:
     environment:
       - limit_rate_speed=0
     env_file:
-      - env/global.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
@@ -87,44 +87,44 @@ services:
     networks:
       anyvision:
         aliases:
-          - cron-${node_name:-localnode}.tls.ai
+        - cron-b.tls.ai
     volumes:
       - /storage:/var/www/html
-      - ./crontab/site_crontab:/etc/crontab
+      - ../../crontab/site_crontab:/etc/crontabs/crontab
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - TO_DATE_TRACK_DELETE=30
     env_file:
-      - env/global.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
 
 
 
-  rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
-    restart: always
-    networks:
-      anyvision:
-        aliases:
-          - rabbitmq.tls.ai
-    # those port should be opened only development
-    ports:
-      - "5671:5671"
-      - "5672:5672"
-      - "15672:15672"
-      - "15671:15671"
-    volumes:
-      - /storage/rabbitmq:/var/lib/rabbitmq
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
+  # rabbitmq:
+  #   image: gcr.io/anyvision-training/rabbitmq:latest
+  #   restart: always
+  #   networks:
+  #     anyvision:
+  #       aliases:
+  #         - rabbitmq.tls.ai
+  #   # those port should be opened only development
+  #   ports:
+  #     - "5671:5671"
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #     - "15671:15671"
+  #   volumes:
+  #     - /storage/rabbitmq:/var/lib/rabbitmq
+  #     - /etc/localtime:/etc/localtime:ro
+  #     #- /etc/timezone:/etc/timezone:ro
+  #   env_file:
+  #     - env/global.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
 
@@ -142,7 +142,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     env_file:
-      - env/global.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
@@ -168,35 +168,35 @@ services:
 
 
 
-  broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:development
-    restart: always
-    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
-    hostname: broadcaster
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
-    networks:
-      anyvision:
-        aliases:
-          - broadcaster.tls.ai
-    volumes:
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    depends_on:
-      - api
-    environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
-      - api_service_ip=api.tls.ai
-      - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
-      - RUN_AS_USER=user
-      #- ENABLE_DOCKERIZE=false
-      - ENABLE_CHOWN=true
-    env_file:
-      - env/global.env
-      - env/broadcaster.env
-    logging:
-      options:
-        max-size: 1g
+  # broadcaster:
+  #   image: gcr.io/anyvision-training/broadcaster:development
+  #   restart: always
+  #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
+  #   hostname: broadcaster
+  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+  #   networks:
+  #     anyvision:
+  #       aliases:
+  #         - broadcaster.tls.ai
+  #   volumes:
+  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+  #     - /etc/localtime:/etc/localtime:ro
+  #     #- /etc/timezone:/etc/timezone:ro
+  #   depends_on:
+  #     - api
+  #   environment:
+  #     #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+  #     - api_service_ip=api.tls.ai
+  #     - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
+  #     - RUN_AS_USER=user
+  #     #- ENABLE_DOCKERIZE=false
+  #     #- ENABLE_CHOWN=true
+  #   env_file:
+  #     - env/global.env
+  #     - env/broadcaster.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
 
@@ -210,7 +210,7 @@ services:
           - apigateway.tls.ai
     ports:
       - "9443:9443"
-      - "38391:38391"
+      #- "38391:38391"
     volumes:
       - /storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
@@ -221,7 +221,7 @@ services:
     depends_on:
       - redis
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+      #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - GATEWAY_HOST=apigateway.tls.ai
       - API_HOST=api.tls.ai
       - DASH_API_URL=https://api.tls.ai:5443
@@ -229,10 +229,10 @@ services:
       - GATEWAY_URL=http://apigateway.tls.ai:8080
       - REDIS_HOST=redis.tls.ai
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
-      - env/api-gateway.env
-      - env/global.env
+      - ../../env/api-gateway.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
@@ -247,9 +247,18 @@ services:
       anyvision:
         aliases:
           - api.tls.ai
+    extra_hosts:
+      - proc-a01.tls.ai:<ip of a01 server>
+      - nginx-a01.tls.ai:<ip of a01 server>
+      #- proc-a02.tls.ai:<ip of a02 server>
+      #- nginx-a02.tls.ai:<ip of a02 server>
+      #- proc-a03.tls.ai:<ip of a03 server>
+      #- nginx-a03.tls.ai:<ip of a03 server>
+      #- proc-a04.tls.ai:<ip of a04 server>
+      #- nginx-a04.tls.ai:<ip of a04 server>
     ports:
       - "5443:5443"
-      - "38389:38389"
+      #- "38389:38389"
       - "3000:3000"
     volumes:
       - /storage:/var/www/html
@@ -258,16 +267,16 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
+      #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.tls.ai
       - MONGO_DB_IP=mongodb.tls.ai
       - CA_HOST=apigateway.tls.ai
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.tls.ai          ### use this configuration to configure localhost reid service
+      - MASS_IMPORT_IP=reid-b.tls.ai                               ### use this configuration to configure the "b" server reid service in a/b architecture
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
-      - env/global.env
-      - env/api.env
+      - ../../env/global.env
+      - ../../env/api.env
     logging:
       options:
         max-size: 1g
@@ -275,27 +284,29 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-cpu:development
+    image: gcr.io/anyvision-training/backend:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
-    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
         aliases:
-          - proc-${node_name:-localnode}.tls.ai
-          - reid-${node_name:-localnode}.tls.ai
-          - coll-${node_name:-localnode}.tls.ai
-          - arch-${node_name:-localnode}.tls.ai
-    extra_hosts:
-    #The IP here should point to nginx of the master API
-      - "nginx-master-${node_name:-localnode}.tls.ai:1.1.1.1"
+          - proc-b.tls.ai
+          - reid-b.tls.ai
+          - coll-b.tls.ai
+          - arch-b.tls.ai
     ports:
       - "4005:4005"
       - "9067:9067"
       - "9068:9068"
       - "9069:9069"
-      - "9022:9022" #ssh
+      #- "9022:9022" #ssh
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
+    extra_hosts:
+      - nginx-a01.tls.ai:<ip of a01 server>
+      #- nginx-a02.tls.ai:<ip of a02 server>
+      #- nginx-a03.tls.ai:<ip of a03 server>
+      #- nginx-a04.tls.ai:<ip of a04 server>
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
@@ -307,24 +318,25 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
-      - misc_pipe_cpu_mode=true
-      - NVIDIA_VISIBLE_DEVICES=
-      - NVIDIA_DRIVER_CAPABILITIES=
-      - ENABLE_OPENSSH_SERVICE=true
+      #- ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
-      - external_ip=proc-${node_name:-localnode}.tls.ai
-      - storage_ip=nginx-${node_name:-localnode}.tls.ai
-      - frame_store_storage_ip=nginx-${node_name:-localnode}.tls.ai
+      - external_ip=proc-b.tls.ai
+      - storage_ip=nginx-b.tls.ai
+      - frame_store_storage_ip=nginx-b.tls.ai
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
-      - reid_service_ip=reid-${node_name:-localnode}.tls.ai
-      - collate_service_ip=coll-${node_name:-localnode}.tls.ai
-      - track_archive_service_ip=arch-${node_name:-localnode}.tls.ai
+      - reid_service_ip=reid-b.tls.ai
+      - collate_service_ip=coll-b.tls.ai
+      - track_archive_service_ip=arch-b.tls.ai
+      - ENABLE_FRAMESTORE_CLEANER=false
+      - ENABLE_PROCESS_SERVICE=false
+      - ENABLE_XPRA_SERVICE=false
+      - ENABLE_CRON_PIPE_IMG_TEMPORARY=false
     env_file:
-      - env/backend.env
-      - env/global.env
+      - ../../env/backend.env
+      - ../../env/global.env
     logging:
       options:
         max-size: 1g
@@ -351,17 +363,21 @@ services:
   #     - /storage/share/anyvision-exports:/root/anyvision-exports:rw
   #     #- /home/anyvision:/mnt                                                ### mount your home directory to the container
   #     #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container
+  #   extra_hosts:
+  #     - nginx-a01.tls.ai:<ip of a01 server>
+  #     #- nginx-a02.tls.ai:<ip of a02 server>
+  #     #- nginx-a03.tls.ai:<ip of a03 server>
+  #     #- nginx-a04.tls.ai:<ip of a04 server>
   #   environment:
-  #     - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+  #     - DISPLAY=${DISPLAY:-1}                                                ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
   #     - ssl=true
   #     - GATEWAY_HOST=apigateway.tls.ai
-  #     - RUN_AS_USER=root
-  #     - ENABLE_CHOWN=true
-  #     - isPersonEnabled=false
+  #     - RUN_AS_USER=user
+  #     #- ENABLE_CHOWN=true
   #   env_file:
-  #     - env/global.env
-  #     - env/api-gateway.env
-  #     - env/dashboard.env
+  #     - ../../env/global.env
+  #     - ../../env/api-gateway.env
+  #     - ../../env/dashboard.env
   #   logging:
   #     options:
   #       max-size: 1g
@@ -393,61 +409,3 @@ services:
     logging:
       options:
         max-size: 1g
-
-
-
-#  dashboard-master:
-#    image: gcr.io/anyvision-training/dashboard-master:development
-#    restart: always
-#    networks:
-#      anyvision:
-#        aliases:
-#          - dashboard-master-${node_name:-localnode}.tls.ai
-#    ports:
-#    #  - "443:443"
-#      - "80:80"
-#    volumes:
-#      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-#      - /etc/localtime:/etc/localtime:ro
-#      - /etc/timezone:/etc/timezone:ro
-#    environment:
-#      - limit_rate_speed=0
-#      - master_api_ip=api-master.tls.ai
-#      - master_api_username=admin
-#      - master_api_password=admin
-#    env_file:
-#      - env/global.env
-#    logging:
-#      options:
-#        max-size: 1g
-
-
-
-# api-master:
-#   image: gcr.io/anyvision-training/api-master:development
-#    restart: always
-#    networks:
-#      anyvision:
-#        aliases:
-#          - api-master.tls.ai
-#    ports:
-#      - "27183:27183"
-#    volumes:
-#      - /storage:/var/www/html
-#      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-#      - /etc/localtime:/etc/localtime:ro
-#      - /etc/timezone:/etc/timezone:ro
-#    environment:
-#      - api_service_ip=api.tls.ai
-#      - api_service_port=3000
-#      - MONGO_DB_IP=mongodb.tls.ai
-#      - MONGO_DB_PORT=27017
-#      - RUN_AS_USER=user
-#      - ENABLE_CHOWN=false
-#    env_file:
-#      - env/global.env
-#      - env/api-master.env
-#      - env/api.env
-#    logging:
-#      options:
-#        max-size: 1g
