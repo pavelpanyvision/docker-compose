@@ -316,6 +316,7 @@ services:
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
+      - frame_store_rtmp_url=srs-${node_name:-localnode}.tls.ai
       ########################################################################## use the configuration below to configure localhost services
       - reid_service_ip=reid-${node_name:-localnode}.tls.ai
       - collate_service_ip=coll-${node_name:-localnode}.tls.ai
@@ -397,23 +398,22 @@ services:
 
 
 
-simple-rtmp-server:
-  image: gcr.io/anyvision-production/srs
-  restart: always
-  networks:
-    anyvision:
-      aliases:
-        - srs-${node_name:-localnode}.tls.ai
-        - srs
-  ports:
-    - "9080:8080"
-    - "1935:1935"
-    - "1985:1985"
-  volumes:
-    - /etc/localtime:/etc/localtime:ro
-  logging:
-    options:
-      max-size: 1g
+  simple-rtmp-server:
+    image: gcr.io/anyvision-production/srs
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - srs-${node_name:-localnode}.tls.ai
+    ports:
+      - "9080:8080"
+      - "1935:1935"
+      - "1985:1985"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: 1g
 
 
 
