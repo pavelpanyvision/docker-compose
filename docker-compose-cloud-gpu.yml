@@ -418,7 +418,7 @@ services:
    # xorg:
    #    image: gcr.io/anyvision-production/xorg
    #    restart: always
-   #    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+   #    privileged: true
    #    networks:
    #      - anyvision
    #    volumes:
