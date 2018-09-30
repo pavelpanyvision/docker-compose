@@ -428,7 +428,7 @@ services:
    #      - /usr/lib/nvidia-396/xorg:/usr/lib/nvidia/xorg:ro
    #    environment:
    #      - DISPLAY=:0
-   #      - VT=8
+   #      #- VT=vt8
    #      #- ENABLE_CHVT=true
    #      #- ORIGINAL_VT=7
    #      - NVIDIA_DRIVER_CAPABILITIES=all
