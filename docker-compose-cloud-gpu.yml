@@ -416,7 +416,7 @@ services:
 
 
    # xorg:
-   #    image: gcr.io/anyvision-production/xorg
+   #    image: gcr.io/anyvision-training/xorg
    #    restart: always
    #    privileged: true
    #    networks:
