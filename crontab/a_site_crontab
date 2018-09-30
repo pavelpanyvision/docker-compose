@@ -1,0 +1,4 @@
+0 0 * * * find /var/www/html/pipe_store/pipe_img/ -not -path '/var/www/html/pipe_store/pipe_img/' -delete
+0 1 * * * find /var/www/html/pipe_store/mass_import/ -not -path '/var/www/html/pipe_store/mass_import/' -mmin +1440 -delete
+0 2 * * * find /var/www/html/pipe_store/video -mtime +${TO_DATE_TRACK_DELETE} -type f -name "*.mp4" -delete
+0 3 * * * find /var/www/html/frame_store -mtime +${TO_DATE_TRACK_DELETE} -type f -delete
