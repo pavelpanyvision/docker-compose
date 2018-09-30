@@ -412,3 +412,30 @@ services:
     logging:
       options:
         max-size: 1g
+
+
+
+   # xorg:
+   #    image: gcr.io/anyvision-production/xorg
+   #    restart: always
+   #    privileged: true
+   #    networks:
+   #      - anyvision
+   #    volumes:
+   #      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+   #      - /etc/localtime:/etc/localtime:ro
+   #      #- /usr/lib/nvidia-390/xorg:/usr/lib/nvidia/xorg:ro
+   #      - /usr/lib/nvidia-396/xorg:/usr/lib/nvidia/xorg:ro
+   #    environment:
+   #      - DISPLAY=:10
+   #      - VT=8
+   #      #- ENABLE_CHVT=true
+   #      #- ORIGINAL_VT=7
+   #      - NVIDIA_DRIVER_CAPABILITIES=all
+   #      - NVIDIA_VISIBLE_DEVICES=all
+   #    env_file:
+   #      - env/global.env
+   #    logging:
+   #      options:
+   #        max-size: 1g
+   #    ipc: host
