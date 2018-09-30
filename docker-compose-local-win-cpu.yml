@@ -26,7 +26,7 @@ services:
     ports:
       - "1935:1935"
       - "443:443"
-      - "80:80"
+      #- "80:80"
     volumes:
       - c:/anv/storage:/opt/nginx/html:ro
       - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates

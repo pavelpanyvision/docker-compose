@@ -65,7 +65,7 @@ services:
     ports:
       - "1935:1935"
       - "443:443"
-      - "80:80"
+      #- "80:80"
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -393,61 +393,3 @@ services:
     logging:
       options:
         max-size: 1g
-
-
-
-#  dashboard-master:
-#    image: gcr.io/anyvision-training/dashboard-master:development
-#    restart: always
-#    networks:
-#      anyvision:
-#        aliases:
-#          - dashboard-master-${node_name:-localnode}.tls.ai
-#    ports:
-#    #  - "443:443"
-#      - "80:80"
-#    volumes:
-#      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-#      - /etc/localtime:/etc/localtime:ro
-#      - /etc/timezone:/etc/timezone:ro
-#    environment:
-#      - limit_rate_speed=0
-#      - master_api_ip=api-master.tls.ai
-#      - master_api_username=admin
-#      - master_api_password=admin
-#    env_file:
-#      - env/global.env
-#    logging:
-#      options:
-#        max-size: 1g
-
-
-
-# api-master:
-#   image: gcr.io/anyvision-training/api-master:development
-#    restart: always
-#    networks:
-#      anyvision:
-#        aliases:
-#          - api-master.tls.ai
-#    ports:
-#      - "27183:27183"
-#    volumes:
-#      - /storage:/var/www/html
-#      - /usr/local/share/ca-certificates/anyvision:/usr/local/share/ca-certificates/anyvision
-#      - /etc/localtime:/etc/localtime:ro
-#      - /etc/timezone:/etc/timezone:ro
-#    environment:
-#      - api_service_ip=api.tls.ai
-#      - api_service_port=3000
-#      - MONGO_DB_IP=mongodb.tls.ai
-#      - MONGO_DB_PORT=27017
-#      - RUN_AS_USER=user
-#      - ENABLE_CHOWN=false
-#    env_file:
-#      - env/global.env
-#      - env/api-master.env
-#      - env/api.env
-#    logging:
-#      options:
-#        max-size: 1g
