@@ -49,7 +49,7 @@ services:
           - cron-${node_name:-localnode}.tls.ai
     volumes:
       - c:/anv/storage:/var/www/html
-      - ./crontab/site_crontab:/etc/crontab
+      - ./crontab/site_crontab:/etc/crontabs/crontab
     environment:
       - TO_DATE_TRACK_DELETE=30
     env_file:

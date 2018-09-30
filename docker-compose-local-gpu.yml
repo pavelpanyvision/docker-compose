@@ -90,7 +90,7 @@ services:
           - cron-${node_name:-localnode}.tls.ai
     volumes:
       - /storage:/var/www/html
-      - ./crontab/site_crontab:/etc/crontab
+      - ./crontab/site_crontab:/etc/crontabs/crontab
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
