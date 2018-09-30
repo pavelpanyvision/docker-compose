@@ -1,0 +1,118 @@
+#filename: docker-compose-local-b.yml
+version: '3.3'
+
+
+volumes:
+  backend_data:
+
+
+networks:
+  anyvision:
+
+
+services:
+
+
+  nginx:
+    image: gcr.io/anyvision-production/nginx:tls.ai
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - nginx-a<XX>.tls.ai
+    ports:
+      - "1935:1935"
+      - "443:443"
+      - "80:80"
+    volumes:
+      - /storage:/opt/nginx/html:ro
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - limit_rate_speed=0
+    env_file:
+      - ../../env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  cron:
+    image: gcr.io/anyvision-production/supercronic:latest
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+        - cron-a<XX>.tls.ai
+    volumes:
+      - /storage:/var/www/html
+      - ../../crontab/a_site_crontab:/etc/crontabs/crontab
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  backend:
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.19.5-rc.1
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      anyvision:
+        aliases:
+          - proc-a<XX>.tls.ai
+    extra_hosts:
+      - "api.tls.ai:<ip of b server>"
+      - "apigateway.tls.ai:<ip of b server>"
+      - "mongodb.tls.ai:<ip of b server>"
+      - "reid-b.tls.ai:<ip of b server>"
+      - "coll-b.tls.ai:<ip of b server>"
+      - "arch-b.tls.ai:<ip of b server>"
+      - "nginx-b.tls.ai:<ip of b server>"
+    ports:
+      - "4005:4005"
+      - "9067:9067"
+      - "9068:9068"
+      - "9069:9069"
+      #- "9022:9022" #ssh
+      - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
+    volumes:
+      - /home/user/license:/home/user/license:ro
+      - backend_data:/root/pipe_data
+      - /storage:/var/www/html
+      #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+    environment:
+      #- ENABLE_OPENSSH_SERVICE=true
+      - BACKEND_OPENSSH_PORT=9022
+      - DISPLAY=${DISPLAY:-1}                                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - external_ip=proc-a<XX>.tls.ai
+      - storage_ip=nginx-b.tls.ai
+      - frame_store_storage_ip=nginx-a<XX>.tls.ai
+      - redis_host=127.0.0.1
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      - reid_service_ip=reid-b.tls.ai
+      - collate_service_ip=coll-b.tls.ai
+      - track_archive_service_ip=arch-b.tls.ai
+      - ENABLE_DOCKERIZE=false
+      - ENABLE_REID_SERVICE=false
+      - ENABLE_TRACK_ARCHIVE_SERVICE=false
+      - ENABLE_COLLATE_SERVICE=false
+      - ENABLE_XPRA_SERVICE=false
+      - ENABLE_CRON_PIPE_IMG_TEMPORARY=false
+    env_file:
+      - ../../env/backend.env
+      - ../../env/global.env
+    logging:
+      options:
+        max-size: 1g
+    ipc: host
