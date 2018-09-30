@@ -392,20 +392,13 @@ services:
       - anyvision
     ports:
       - "1080:1080"
+    extra_hosts:
+      - nginx-a01.tls.ai:<ip of a01 server>
+      #- nginx-a02.tls.ai:<ip of a02 server>
+      #- nginx-a03.tls.ai:<ip of a03 server>
+      #- nginx-a04.tls.ai:<ip of a04 server>
     volumes:
       - /etc/localtime:/etc/localtime:ro
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  docker-hoster:
-    image: gcr.io/anyvision-training/docker-hoster
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock
-      - /etc/hosts:/tmp/hosts
     logging:
       options:
         max-size: 1g
