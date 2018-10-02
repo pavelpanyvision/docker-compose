@@ -110,7 +110,7 @@ services:
       anyvision:
         aliases:
           - rabbitmq.tls.ai
-    # those port should be opened only development mode 
+    # those port should be opened only development mode
     #ports:
       #- "5671:5671"
       #- "5672:5672"
@@ -240,7 +240,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.19.5-rc.1
+    image: gcr.io/anyvision-production/api:1.19.5-rc.2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -330,7 +330,7 @@ services:
 
 
   # dashboard:
-  #   image: gcr.io/anyvision-production/dashboard:1.19.5-rc.1
+  #   image: gcr.io/anyvision-production/dashboard:1.19.5-rc.2
   #   restart: always
   #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
   #   privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
