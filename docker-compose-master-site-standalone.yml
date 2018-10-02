@@ -153,7 +153,7 @@ services:
   backend:
     image: gcr.io/anyvision-production/backend-pyconcrete:1.19.5-rc.1
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.5-rc.1 mode - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
