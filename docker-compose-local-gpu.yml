@@ -110,7 +110,7 @@ services:
       anyvision:
         aliases:
           - rabbitmq.tls.ai
-    # those port should be opened only development
+    # those port should be opened only 1.19.5-rc.1
     #ports:
       #- "5671:5671"
       #- "5672:5672"
@@ -169,11 +169,11 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:1.19.5
+    image: gcr.io/anyvision-production/broadcaster:1.19.5-rc.1
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.5-rc.1 mode - disable chaperone init
     networks:
       anyvision:
         aliases:
@@ -201,9 +201,9 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
+    image: gcr.io/anyvision-production/api-gateway:1.19.5-rc.1
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.5-rc.1 mode - disable chaperone init
     networks:
       anyvision:
         aliases:
@@ -240,7 +240,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-production/api:1.19.5-rc.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -277,7 +277,7 @@ services:
   backend:
     image: gcr.io/anyvision-production/backend-pyconcrete:1.19.5-rc.1
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.5-rc.1 mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
@@ -330,9 +330,9 @@ services:
 
 
   # dashboard:
-  #   image: gcr.io/anyvision-production/dashboard:development
+  #   image: gcr.io/anyvision-production/dashboard:1.19.5-rc.1
   #   restart: always
-  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### 1.19.5-rc.1 mode - disable chaperone init
   #   privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
   #   networks:
   #     - anyvision

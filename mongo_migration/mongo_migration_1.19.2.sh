@@ -15,7 +15,7 @@ display_usage() {
 #SCRIPT_DIR="Dash-API/scripts"
 SCRIPT_DIR=$1
 SCRIPT_NAME=$(echo $SCRIPT_DIR| awk -F/ '{print $NF}')
-MONGO_IMAGE="gcr.io/anyvision-training/mongo:3.6-jessie"
+MONGO_IMAGE="gcr.io/anyvision-production/mongo:3.6-jessie"
 HOSTNAME=127.0.0.1
 PORT=27017
 echo "Starting the Mongo Container Image and change its name to Mongo"
