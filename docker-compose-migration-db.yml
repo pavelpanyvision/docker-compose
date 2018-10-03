@@ -42,6 +42,7 @@ services:
           - apigateway.tls.ai
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - /storage/migration_db_data:/var/tmp
     depends_on:
       - mongodb
     environment:
