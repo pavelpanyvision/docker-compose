@@ -274,6 +274,22 @@ services:
 
 
 
+  certificator:
+    image: gcr.io/anyvision-training/certificator:latest
+    restart: on-failure
+    #command: --disable-services --no-exitkills --debug sleep infinity
+    volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - ENABLE_COPY_CERT=true
+    logging:
+      options:
+        max-size: 1g
+
+
+
   backend:
     image: gcr.io/anyvision-development/backend:development
     restart: always
