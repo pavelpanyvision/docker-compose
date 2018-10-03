@@ -97,7 +97,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.19.5-rc.2
+    image: gcr.io/anyvision-production/api:1.19.5-rc.3
     restart: always
     networks:
       anyvision:
