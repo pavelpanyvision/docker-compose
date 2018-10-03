@@ -5,13 +5,10 @@ version: '3.3'
 volumes:
   mongo_db_data:
 
-
 networks:
   anyvision:
 
-
 services:
-
 
   mongodb:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
@@ -42,6 +39,7 @@ services:
           - apigateway.tls.ai
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - /storage/migration_db_data:/var/tmp
     depends_on:
       - mongodb
     environment:
