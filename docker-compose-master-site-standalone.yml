@@ -99,6 +99,7 @@ services:
   api:
     image: gcr.io/anyvision-production/api:1.19.5-rc.3
     restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
       anyvision:
         aliases:
@@ -106,6 +107,7 @@ services:
     ports:
       - "5443:5443"
       #- "38389:38389"
+      #- "3000:3000"
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -150,10 +152,26 @@ services:
 
 
 
+  certificator:
+    image: gcr.io/anyvision-production/certificator:latest
+    restart: on-failure
+    #command: --disable-services --no-exitkills --debug sleep infinity
+    volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - ENABLE_COPY_CERT=true
+    logging:
+      options:
+        max-size: 1g
+
+
+
   backend:
     image: gcr.io/anyvision-production/backend-pyconcrete:1.19.5-rc.1
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
@@ -167,25 +185,28 @@ services:
       #- "9067:9067"
       #- "9068:9068"
       #- "9069:9069"
+      #- "9022:9022" #ssh
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
+      #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
-      - DISPLAY=:0
+      #- ENABLE_OPENSSH_SERVICE=true
+      - BACKEND_OPENSSH_PORT=9022
+      - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - external_ip=proc-${node_name:-localnode}.tls.ai
       - storage_ip=nginx-master-${node_name:-localnode}.tls.ai
       - frame_store_storage_ip=nginx-master-${node_name:-localnode}.tls.ai
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
-      #- ENABLE_CRON_PIPE_IMG_TEMPORARY=false
       - reid_service_ip=reid-${node_name:-localnode}.tls.ai
       - collate_service_ip=coll-${node_name:-localnode}.tls.ai
       - track_archive_service_ip=arch-${node_name:-localnode}.tls.ai
