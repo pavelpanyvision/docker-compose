@@ -1,4 +1,4 @@
-30 3 * * * track_delete=$(date --iso-8601=seconds  -d "$TO_DATE_TRACK_DELETE day ago") && curl -X "DELETE" http://api:3000/detections?toDate=$track_delete
+30 3 * * * track_delete=$(date --iso-8601=seconds  -d "$TO_DATE_TRACK_DELETE day ago") && curl -X "DELETE" --data-urlencode "toDate=$track_delete" http://api:3000/detections
 0 0 * * * find /var/www/html/pipe_store/pipe_img/ -not -path '/var/www/html/pipe_store/pipe_img/' -delete
 0 1 * * * find /var/www/html/pipe_store/mass_import/ -not -path '/var/www/html/pipe_store/mass_import/' -mmin +1440 -delete
 0 2 * * * find /var/www/html/pipe_store/video -mtime +${TO_DATE_TRACK_DELETE} -type f -name "*.mp4" -delete
