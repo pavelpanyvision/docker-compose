@@ -1,4 +1,4 @@
-#filename: docker-compose-local-gpu.yml
+#filename: docker-compose-migration-db.yml
 version: '3.3'
 
 
@@ -36,7 +36,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - apigateway.tls.ai
+          - migration-manager.tls.ai
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /storage/migration_db_data:/var/tmp
@@ -45,8 +45,9 @@ services:
     environment:
       - MONGO_DB_IP=mongodb.tls.ai
       - MONGO_DB_NAME=anyVision2
-      - API_IP=api.tls.ai
+      - API_IP=api.tls.ai:3000
       - RUN_AS_USER=user
+      - ENABLE_MIGRATION_MANAGER=true
       #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
