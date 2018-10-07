@@ -35,7 +35,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.19.5-rc.3
+    image: gcr.io/anyvision-production/api:1.19.5-rc.5
     restart: always
     networks:
       anyvision:
