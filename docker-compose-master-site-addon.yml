@@ -3,7 +3,6 @@ version: '3.3'
 
 
 volumes:
-  /ssd/mongo_db_data:
   backend_data:
 
 

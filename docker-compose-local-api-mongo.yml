@@ -2,10 +2,6 @@
 version: '3'
 
 
-volumes:
-  /ssd/mongo_db_data:
-
-
 networks:
   anyvision:
 
