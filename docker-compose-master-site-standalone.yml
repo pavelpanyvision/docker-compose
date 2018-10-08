@@ -55,6 +55,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
+      # this parameter is refferenced to expose port
+      - API_MASTER_PORT=27183
       - api_service_ip=api.tls.ai
       - api_service_port=3000
       - MONGO_DB_IP=mongodb.tls.ai
