@@ -14,7 +14,7 @@ services:
 
 
   dashboard-master:
-    image: gcr.io/anyvision-production/dashboard-master:1.0.1
+    image: gcr.io/anyvision-production/dashboard-master:1.0.2
     restart: always
     networks:
       anyvision:
@@ -41,7 +41,7 @@ services:
 
 
   api-master:
-    image: gcr.io/anyvision-production/api-master:1.0.0
+    image: gcr.io/anyvision-production/api-master:1.0.2
     restart: always
     networks:
       anyvision:
