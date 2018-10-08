@@ -3,7 +3,6 @@ version: '3.3'
 
 
 volumes:
-  mongo_db_data:
   redis_db_data:
   backend_data:
   api_gateway_keys:
@@ -93,7 +92,7 @@ services:
     #ports:
       #- "27017:27017"
     volumes:
-      - mongo_db_data:/data/db
+      - /ssd/mongo_db_data:/data/db
     env_file:
       - env/global.env
     logging:
