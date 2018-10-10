@@ -2,10 +2,6 @@
 version: '3.3'
 
 
-volumes:
-  backend_data:
-
-
 networks:
   anyvision:
 

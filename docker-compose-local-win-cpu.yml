@@ -4,7 +4,6 @@ version: '3.3'
 
 volumes:
   redis_db_data:
-  backend_data:
   api_gateway_keys:
 
 
@@ -251,7 +250,7 @@ services:
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - c:/anv/home/user/license:/home/user/license:ro
-      - backend_data:/root/pipe_data
+      - /ssd/backend_data:/root/pipe_data
       - c:/anv/storage:/var/www/html
       - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
