@@ -12,12 +12,12 @@ timeout(time: 120, unit: 'MINUTES') {
             checkout changelog: false, poll: false, scm: [
                     $class: 'GitSCM',
                     branches: [[name: '*/master']],
-                    extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'jenkins/jenkins-pipeline/Jenkinsfile_airgap']]]],
+                    extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'jenkins/jenkins-pipeline/Jenkinsfile_installation']]]],
                     userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/devops.git"]]
             ]
 
             //load remote jenkins_pipeline
-            def generic_pipeline = load "jenkins/jenkins-pipeline/Jenkinsfile_airgap"
+            def generic_pipeline = load "jenkins/jenkins-pipeline/Jenkinsfile_installation"
             //start remote jenkins_pipeline
             generic_pipeline.generic_pipeline_method()
 
