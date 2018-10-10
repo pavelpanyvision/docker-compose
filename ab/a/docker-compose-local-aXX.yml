@@ -2,10 +2,6 @@
 version: '3.3'
 
 
-volumes:
-  backend_data:
-
-
 networks:
   anyvision:
 
@@ -98,7 +94,7 @@ services:
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro
-      - backend_data:/root/pipe_data
+      - /ssd/backend_data:/root/pipe_data
       - /storage:/var/www/html
       #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates

@@ -4,7 +4,6 @@ version: '3.3'
 
 volumes:
   redis_db_data:
-  backend_data:
   api_gateway_keys:
 
 
@@ -123,7 +122,7 @@ services:
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
       anyvision:
         aliases:
@@ -150,7 +149,7 @@ services:
   apigateway:
     image: gcr.io/anyvision-training/api-gateway:development
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
       anyvision:
         aliases:
@@ -229,7 +228,7 @@ services:
   backend:
     image: gcr.io/anyvision-training/backend-cpu:development
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
@@ -250,7 +249,7 @@ services:
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - c:/anv/home/user/license:/home/user/license:ro
-      - backend_data:/root/pipe_data
+      - /ssd/backend_data:/root/pipe_data
       - c:/anv/storage:/var/www/html
       - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
@@ -282,7 +281,7 @@ services:
   # dashboard:
   #   image: gcr.io/anyvision-training/dashboard:development
   #   restart: always
-  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
   #   privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
   #   networks:
   #     - anyvision

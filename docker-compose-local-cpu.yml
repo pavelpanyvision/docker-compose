@@ -4,7 +4,6 @@ version: '3.3'
 
 volumes:
   redis_db_data:
-  backend_data:
   api_gateway_keys:
 
 
@@ -109,7 +108,7 @@ services:
       anyvision:
         aliases:
           - rabbitmq.tls.ai
-    # those port should be opened only development
+    # these ports should be opened only in development mode
     ports:
       - "5671:5671"
       - "5672:5672"
@@ -172,7 +171,7 @@ services:
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
       anyvision:
         aliases:
@@ -202,7 +201,7 @@ services:
   apigateway:
     image: gcr.io/anyvision-training/api-gateway:development
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
       anyvision:
         aliases:
@@ -292,7 +291,7 @@ services:
   backend:
     image: gcr.io/anyvision-training/backend-cpu:development
     restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
       anyvision:
@@ -313,7 +312,7 @@ services:
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro
-      - backend_data:/root/pipe_data
+      - /ssd/backend_data:/root/pipe_data
       - /storage:/var/www/html
       #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -350,7 +349,7 @@ services:
   # dashboard:
   #   image: gcr.io/anyvision-training/dashboard:development
   #   restart: always
-  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
   #   privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
   #   networks:
   #     - anyvision
