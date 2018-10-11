@@ -418,7 +418,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(node_filesystem_free_bytes{fstype=\"ext4\",device!~\".*loop.*\",mountpoint!~\".*docker.*\"}) by (instance,device)",
+          "expr": "sum(node_filesystem_free_bytes{fstype=~\"ext4|xfs\",device!~\".*loop.*\",mountpoint!~\".*docker.*\"}) by (instance,device)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{instance}}",
