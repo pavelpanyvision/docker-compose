@@ -66,6 +66,28 @@ services:
       options:
         max-size: 1g
 
+  rabbitmq-master:
+    image: gcr.io/anyvision-training/rabbitmq:latest
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - rabbitmq-master.tls.ai
+    # those port should be opened only development mode
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "15672:15672"
+      - "15671:15671"
+    volumes:
+      - /storage/rabbitmq:/var/lib/rabbitmq
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
 
 
   nginx-master:
