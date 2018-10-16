@@ -87,12 +87,13 @@ services:
       - anyvision
     volumes:
       - /storage/sftp_data:/sftp:ro
+      - /ssd/dashboards:/ssd/dashboards:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - DISPLAY=:0
-      - VNC_OPTIONS=-auth /home/user/.Xauthority -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
+      - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
     env_file:
       - env/global.env
     ipc: host
@@ -238,7 +239,7 @@ services:
       - api
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
-      # this FQDN should be updated accrodingly to rabbitmq-master  
+      # this FQDN should be updated accrodingly to rabbitmq-master
       - rabbitmq_server_ip=rabbitmq-master.tls.ai
       - rabbitmq_server_port=5672
       #- ENABLE_DOCKERIZE=false
