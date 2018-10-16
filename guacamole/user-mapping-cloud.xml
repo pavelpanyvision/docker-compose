@@ -1,7 +1,7 @@
 <user-mapping>
     <authorize username="anyvision" password="C64D8D20BEE9394CEEFED8164FF2910A" encoding="md5">
         <protocol>vnc</protocol>
-        <param name="hostname">desktop</param>
+        <param name="hostname">x11vnc</param>
         <param name="port">5900</param>
         <param name="password">123456</param>
         <param name="autoretry">100</param>
@@ -17,7 +17,7 @@
     </authorize>
     <authorize username="demo" password="FE01CE2A7FBAC8FAFAED7C982A04E229" encoding="md5">
         <protocol>vnc</protocol>
-        <param name="hostname">desktop</param>
+        <param name="hostname">x11vnc</param>
         <param name="port">5900</param>
         <param name="password">123456</param>
         <param name="autoretry">100</param>

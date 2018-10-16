@@ -79,6 +79,28 @@ services:
 
 
 
+  x11vnc:
+    image: gcr.io/anyvision-production/x11vnc
+    restart: always
+    networks:
+      - anyvision
+    #ports:
+      #- "5900:5900"
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      #- /dev/shm:/dev/shm:rw
+    environment:
+      - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -find -findauth
+      #- VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    ipc: host
+    logging:
+      options:
+        max-size: 1g
+
+
+
   cron:
     image: gcr.io/anyvision-production/supercronic:alpine
     restart: always
