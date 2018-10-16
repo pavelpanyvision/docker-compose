@@ -349,24 +349,24 @@ services:
 
 
 
-  dashboard-updater:
-    image: gcr.io/anyvision-training/dashboard-updater:latest
-    restart: always
-    networks:
-      - anyvision
-    ports:
-      - "8888:8888"
-    volumes:
-      - c:/anv/storage/dashboards:/opt/nginx/html:rw
-      #- /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    environment:
-      - limit_rate_speed=0
-      - DASHBOARD_VERSION=1.20.0
-      - ENABLE_FETCHER=true
-      - ENABLE_NGINX=true
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
+  # dashboard-updater:
+  #   image: gcr.io/anyvision-training/dashboard-updater:latest
+  #   restart: always
+  #   networks:
+  #     - anyvision
+  #   ports:
+  #     - "8888:8888"
+  #   volumes:
+  #     - c:/anv/storage/dashboards:/opt/nginx/html:rw
+  #     #- /etc/localtime:/etc/localtime:ro
+  #     #- /etc/timezone:/etc/timezone:ro
+  #   environment:
+  #     - limit_rate_speed=0
+  #     - DASHBOARD_VERSION=1.20.0
+  #     - ENABLE_FETCHER=false
+  #     - ENABLE_NGINX=true
+  #   env_file:
+  #     - env/global.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
