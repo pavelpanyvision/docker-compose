@@ -90,7 +90,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       #- /dev/shm:/dev/shm:rw
     environment:
-      - VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
+      - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
       #- VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display :0
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
