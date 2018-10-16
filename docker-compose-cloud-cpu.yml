@@ -84,8 +84,8 @@ services:
     restart: always
     networks:
       - anyvision
-    ports:
-      - "5900:5900"
+    #ports:
+      #- "5900:5900"
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       #- /dev/shm:/dev/shm:rw
