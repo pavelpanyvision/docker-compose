@@ -23,9 +23,9 @@ timeout(time: 120, unit: 'MINUTES') {
             generic_pipeline.generic_pipeline_method()
             
             //load remote Jenkinsfile_airgap
-            def generic_pipeline_airgap = load "jenkins/jenkins-pipeline/Jenkinsfile_airgap"
+            //def generic_pipeline_airgap = load "jenkins/jenkins-pipeline/Jenkinsfile_airgap"
             //start remote Jenkinsfile_airgap
-            generic_pipeline_airgap.generic_pipeline_method()
+            //generic_pipeline_airgap.generic_pipeline_method()
 
         } //end catch
         catch(err){
