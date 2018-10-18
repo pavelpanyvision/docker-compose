@@ -15,7 +15,7 @@ services:
 
 
   guacamole:
-    image: gcr.io/anyvision-training/guacamole:0.9.14
+    image: gcr.io/anyvision-production/guacamole:0.9.14
     restart: always
     networks:
       - anyvision
@@ -36,7 +36,7 @@ services:
 
 
   sftp:
-    image: gcr.io/anyvision-training/sftp:alpine
+    image: gcr.io/anyvision-production/sftp:alpine
     restart: always
     networks:
       - anyvision
@@ -54,7 +54,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx:tls.ai
+    image: gcr.io/anyvision-production/nginx:tls.ai
     restart: always
     networks:
       anyvision:
@@ -80,7 +80,7 @@ services:
 
 
   x11vnc:
-    image: gcr.io/anyvision-training/x11vnc
+    image: gcr.io/anyvision-production/x11vnc
     restart: always
     networks:
       - anyvision
@@ -102,7 +102,7 @@ services:
 
 
   desktop:
-    image: gcr.io/anyvision-training/desktop
+    image: gcr.io/anyvision-production/desktop
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
@@ -125,7 +125,7 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:alpine
+    image: gcr.io/anyvision-production/supercronic:alpine
     restart: always
     networks:
       anyvision:
@@ -147,7 +147,7 @@ services:
 
 
   rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
+    image: gcr.io/anyvision-production/rabbitmq:latest
     restart: always
     networks:
       anyvision:
@@ -155,10 +155,10 @@ services:
           - rabbitmq.tls.ai
     # these ports should be opened only in development mode
     #ports:
-      - "5671:5671"
-      - "5672:5672"
-      - "15672:15672"
-      - "15671:15671"
+      #- "5671:5671"
+      #- "5672:5672"
+      #- "15672:15672"
+      #- "15671:15671"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
@@ -172,7 +172,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     restart: always
     networks:
       anyvision:
@@ -193,7 +193,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:latest
+    image: gcr.io/anyvision-production/redis:latest
     restart: always
     networks:
       anyvision:
@@ -212,7 +212,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:development
+    image: gcr.io/anyvision-production/broadcaster:1.20.1-rc2
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -228,12 +228,11 @@ services:
     depends_on:
       - api
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - api_service_ip=api.tls.ai
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
       - RUN_AS_USER=user
       #- ENABLE_DOCKERIZE=false
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/broadcaster.env
@@ -244,7 +243,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
+    image: gcr.io/anyvision-production/api-gateway:1.20.1-rc2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -264,7 +263,6 @@ services:
     depends_on:
       - redis
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - GATEWAY_HOST=apigateway.tls.ai
       - API_HOST=api.tls.ai
       - DASH_API_URL=https://api.tls.ai:5443
@@ -272,7 +270,7 @@ services:
       - GATEWAY_URL=http://apigateway.tls.ai:8080
       - REDIS_HOST=redis.tls.ai
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/api-gateway.env
       - env/global.env
@@ -283,7 +281,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-production/api:1.20.1-rc2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -301,13 +299,12 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.tls.ai
       - MONGO_DB_IP=mongodb.tls.ai
       - CA_HOST=apigateway.tls.ai
       - MASS_IMPORT_IP=reid-${node_name:-localnode}.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/api.env
@@ -318,7 +315,7 @@ services:
 
 
   certificator:
-    image: gcr.io/anyvision-training/certificator:latest
+    image: gcr.io/anyvision-production/certificator:latest
     restart: on-failure
     #command: --disable-services --no-exitkills --debug sleep infinity
     volumes:
@@ -334,7 +331,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-cpu-pyconcrete:development
+    image: gcr.io/anyvision-production/backend-cpu-pyconcrete:1.20.1-rc2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -392,7 +389,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-training/dashboard:development
+    image: gcr.io/anyvision-production/dashboard:1.20.1-rc2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -415,7 +412,7 @@ services:
       - ssl=true
       - GATEWAY_HOST=apigateway.tls.ai
       - RUN_AS_USER=root
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
       - isPersonEnabled=false
     env_file:
       - env/global.env
@@ -429,7 +426,7 @@ services:
 
 
   dante-proxy:
-    image: gcr.io/anyvision-training/dante-proxy
+    image: gcr.io/anyvision-production/dante-proxy
     restart: always
     networks:
       - anyvision
@@ -444,7 +441,7 @@ services:
 
 
   docker-hoster:
-    image: gcr.io/anyvision-training/docker-hoster
+    image: gcr.io/anyvision-production/docker-hoster
     restart: always
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock
@@ -456,7 +453,7 @@ services:
 
 
   dashboard-updater:
-    image: gcr.io/anyvision-training/dashboard-updater:latest
+    image: gcr.io/anyvision-production/dashboard-updater:latest
     restart: always
     networks:
       - anyvision

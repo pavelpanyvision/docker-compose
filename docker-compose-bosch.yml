@@ -112,10 +112,10 @@ services:
           - rabbitmq.anyvision.local
     # those port should be opened only development
     ports:
-      - "5671:5671"
-      - "5672:5672"
-      - "15672:15672"
-      - "15671:15671"
+      #- "5671:5671"
+      #- "5672:5672"
+      #- "15672:15672"
+      #- "15671:15671"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
@@ -169,7 +169,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-development/broadcaster:development
+    image: gcr.io/anyvision-development/broadcaster:1.20.1-rc2
     restart: always
     hostname: broadcaster
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
@@ -184,11 +184,10 @@ services:
     depends_on:
       - api
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - api_service_ip=api.anyvision.local
       - BCAST_SOCKETIO_API_URL=https://api.anyvision.local:5443
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/broadcaster.env
@@ -199,7 +198,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-development/api-gateway:development
+    image: gcr.io/anyvision-development/api-gateway:1.20.1-rc2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     networks:
@@ -220,7 +219,6 @@ services:
     depends_on:
       - redis
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - GATEWAY_HOST=apigateway.anyvision.local
       - API_HOST=api.anyvision.local
       - DASH_API_URL=https://api.anyvision.local:5443
@@ -228,7 +226,7 @@ services:
       - GATEWAY_URL=http://apigateway.anyvision.local:8080
       - REDIS_HOST=redis.anyvision.local
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/api-gateway.env
       - env/global.env
@@ -239,7 +237,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-development/api:development
+    image: gcr.io/anyvision-development/api:1.20.1-rc2
     restart: always
     networks:
       anyvision:
@@ -257,13 +255,12 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
       - CA_HOST=apigateway.anyvision.local
       - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/api.env
@@ -274,7 +271,7 @@ services:
 
 
   certificator:
-    image: gcr.io/anyvision-training/certificator:latest
+    image: gcr.io/anyvision-production/certificator:latest
     restart: on-failure
     #command: --disable-services --no-exitkills --debug sleep infinity
     volumes:
@@ -290,7 +287,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-development/backend:development
+    image: gcr.io/anyvision-development/backend:1.20.1-rc2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -345,7 +342,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-development/dashboard:development
+    image: gcr.io/anyvision-development/dashboard:1.20.1-rc2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -369,7 +366,7 @@ services:
       - ssl=true
       - GATEWAY_HOST=apigateway.anyvision.local
       - RUN_AS_USER=root
-      - ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/api-gateway.env

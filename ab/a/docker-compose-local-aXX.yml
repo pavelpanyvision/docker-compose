@@ -10,7 +10,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx:tls.ai
+    image: gcr.io/anyvision-production/nginx:tls.ai
     restart: always
     networks:
       anyvision:
@@ -36,7 +36,7 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:alpine
+    image: gcr.io/anyvision-production/supercronic:alpine
     restart: always
     networks:
       anyvision:
@@ -53,7 +53,7 @@ services:
 
 
   certificator:
-    image: gcr.io/anyvision-training/certificator:latest
+    image: gcr.io/anyvision-production/certificator:latest
     restart: on-failure
     #command: --disable-services --no-exitkills --debug sleep infinity
     volumes:
@@ -69,7 +69,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:development
+    image: gcr.io/anyvision-production/backend:1.20.1-rc2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
