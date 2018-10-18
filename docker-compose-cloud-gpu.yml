@@ -154,7 +154,7 @@ services:
         aliases:
           - rabbitmq.tls.ai
     # those port should be opened only development
-    ports:
+    #ports:
       #- "5671:5671"
       #- "5672:5672"
       #- "15672:15672"
