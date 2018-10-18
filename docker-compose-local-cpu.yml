@@ -189,7 +189,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:1.20.1-rc2
+    image: gcr.io/anyvision-production/broadcaster:1.20.1-rc.2
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -219,7 +219,7 @@ services:
 
 
   # master-sync-service:
-  #   image: gcr.io/anyvision-production/master-sync-service:1.20.1-rc2
+  #   image: gcr.io/anyvision-production/master-sync-service:1.20.1-rc.2
   #   restart: always
   #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
   #   hostname: master-sync-service
@@ -246,7 +246,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:1.20.1-rc2
+    image: gcr.io/anyvision-production/api-gateway:1.20.1-rc.2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -284,7 +284,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.20.1-rc2
+    image: gcr.io/anyvision-production/api:1.20.1-rc.2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -392,7 +392,7 @@ services:
 
 
   # dashboard:
-  #   image: gcr.io/anyvision-production/dashboard:1.20.1-rc2
+  #   image: gcr.io/anyvision-production/dashboard:1.20.1-rc.2
   #   restart: always
   #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
   #   privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE

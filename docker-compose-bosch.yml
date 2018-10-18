@@ -169,7 +169,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-development/broadcaster:1.20.1-rc2
+    image: gcr.io/anyvision-development/broadcaster:1.20.1-rc.2
     restart: always
     hostname: broadcaster
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
@@ -198,7 +198,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-development/api-gateway:1.20.1-rc2
+    image: gcr.io/anyvision-development/api-gateway:1.20.1-rc.2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     networks:
@@ -237,7 +237,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-development/api:1.20.1-rc2
+    image: gcr.io/anyvision-development/api:1.20.1-rc.2
     restart: always
     networks:
       anyvision:
@@ -342,7 +342,7 @@ services:
 
 
   dashboard:
-    image: gcr.io/anyvision-development/dashboard:1.20.1-rc2
+    image: gcr.io/anyvision-development/dashboard:1.20.1-rc.2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
