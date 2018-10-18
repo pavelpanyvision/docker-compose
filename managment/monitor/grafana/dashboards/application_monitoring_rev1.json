@@ -46,13 +46,13 @@
   "gnetId": 894,
   "graphTooltip": 1,
   "id": null,
-  "iteration": 1534772501713,
+  "iteration": 1539768729029,
   "links": [],
   "panels": [
     {
       "cacheTimeout": null,
-      "colorBackground": true,
-      "colorValue": false,
+      "colorBackground": false,
+      "colorValue": true,
       "colors": [
         "rgba(245, 54, 54, 0.9)",
         "rgba(237, 129, 40, 0.89)",
@@ -115,7 +115,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "probe_success{instance=~\".*api.*\", instance!~\".*apigateway.*\"}",
+          "expr": "probe_success{instance=~\".*api.*\", instance!~\".*apigateway.*\",instance=~\".*$server.*\"}",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
@@ -151,8 +151,8 @@
     },
     {
       "cacheTimeout": null,
-      "colorBackground": true,
-      "colorValue": false,
+      "colorBackground": false,
+      "colorValue": true,
       "colors": [
         "rgba(245, 54, 54, 0.9)",
         "rgba(237, 129, 40, 0.89)",
@@ -215,7 +215,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "probe_success{instance=~\".*apigateway.*\"}",
+          "expr": "probe_success{instance=~\".*apigateway.*\",instance=~\".*$server.*\"}",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
@@ -251,8 +251,8 @@
     },
     {
       "cacheTimeout": null,
-      "colorBackground": true,
-      "colorValue": false,
+      "colorBackground": false,
+      "colorValue": true,
       "colors": [
         "rgba(245, 54, 54, 0.9)",
         "rgba(237, 129, 40, 0.89)",
@@ -315,7 +315,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "probe_success{instance=~\".*nginx.*\"}",
+          "expr": "probe_success{instance=~\".*nginx.*\",instance=~\".*$server.*\"}",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
@@ -351,8 +351,8 @@
     },
     {
       "cacheTimeout": null,
-      "colorBackground": true,
-      "colorValue": false,
+      "colorBackground": false,
+      "colorValue": true,
       "colors": [
         "rgba(245, 54, 54, 0.9)",
         "rgba(237, 129, 40, 0.89)",
@@ -415,7 +415,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "probe_success{instance=~\".*proc.*\"}",
+          "expr": "probe_success{instance=~\".*proc.*\",instance=~\".*$server.*\"}",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
@@ -468,7 +468,7 @@
         "options": [],
         "query": "label_values(instance)",
         "refresh": 2,
-        "regex": "/^(?!http.*)([^:]+):.*/",
+        "regex": "/(?<=\\-)(.*?)(?=\\.)/",
         "sort": 3,
         "tagValuesQuery": "",
         "tags": [],
@@ -479,7 +479,7 @@
     ]
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
