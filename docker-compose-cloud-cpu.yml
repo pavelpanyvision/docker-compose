@@ -109,7 +109,7 @@ services:
       - anyvision
     volumes:
       - /storage/sftp_data:/sftp:ro
-      - /ssd/dashboards:/ssd/dashboards:ro
+      - /ssd/dashboards:/ssd/dashboards:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
