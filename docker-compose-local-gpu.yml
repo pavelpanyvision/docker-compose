@@ -59,7 +59,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - nginx-${node_name:-localnode}.tls.ai
+          - nginx-localnode.tls.ai
     ports:
       - "1935:1935"
       - "443:443"
@@ -107,7 +107,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - cron-${node_name:-localnode}.tls.ai
+          - cron-localnode.tls.ai
     volumes:
       - /storage:/var/www/html
       - ./crontab/site_crontab:/etc/crontabs/crontab
@@ -256,6 +256,7 @@ services:
       anyvision:
         aliases:
           - apigateway.tls.ai
+          - apigateway-localnode.tls.ai          
     ports:
       - "9443:9443"
       - "38391:38391"
@@ -295,6 +296,7 @@ services:
       anyvision:
         aliases:
           - api.tls.ai
+          - api-localnode.tls.ai          
     ports:
       - "5443:5443"
       - "38389:38389"
@@ -310,7 +312,7 @@ services:
       - API_IP=api.tls.ai
       - MONGO_DB_IP=mongodb.tls.ai
       - CA_HOST=apigateway.tls.ai
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.tls.ai          ### use this configuration to configure localhost reid service
+      - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
       - ENABLE_CHOWN=true
     env_file:
@@ -346,13 +348,13 @@ services:
     networks:
       anyvision:
         aliases:
-          - proc-${node_name:-localnode}.tls.ai
-          - reid-${node_name:-localnode}.tls.ai
-          - coll-${node_name:-localnode}.tls.ai
-          - arch-${node_name:-localnode}.tls.ai
+          - proc-localnode.tls.ai
+          - reid-localnode.tls.ai
+          - coll-localnode.tls.ai
+          - arch-localnode.tls.ai
     extra_hosts:
     #The IP here should point to nginx of the master API
-      - "nginx-master-${node_name:-localnode}.tls.ai:1.1.1.1"
+      - "nginx-master-localnode.tls.ai:1.1.1.1"
     ports:
       - "4005:4005"
       - "9067:9067"
@@ -374,15 +376,15 @@ services:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
-      - external_ip=proc-${node_name:-localnode}.tls.ai
-      - storage_ip=nginx-${node_name:-localnode}.tls.ai
-      - frame_store_storage_ip=nginx-${node_name:-localnode}.tls.ai
+      - external_ip=proc-localnode.tls.ai
+      - storage_ip=nginx-localnode.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
-      - reid_service_ip=reid-${node_name:-localnode}.tls.ai
-      - collate_service_ip=coll-${node_name:-localnode}.tls.ai
-      - track_archive_service_ip=arch-${node_name:-localnode}.tls.ai
+      - reid_service_ip=reid-localnode.tls.ai
+      - collate_service_ip=coll-localnode.tls.ai
+      - track_archive_service_ip=arch-localnode.tls.ai
     env_file:
       - env/backend.env
       - env/global.env

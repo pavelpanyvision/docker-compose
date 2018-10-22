@@ -61,7 +61,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - nginx-${node_name:-localnode}.anyvision.local
+          - nginx-localnode.anyvision.local
     ports:
       - "1935:1935"
       - "443:443"
@@ -87,7 +87,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - cron-${node_name:-localnode}.anyvision.local
+          - cron-localnode.anyvision.local
     volumes:
       - /storage:/var/www/html
       - ./crontab/site_crontab:/etc/crontabs/crontab
@@ -206,6 +206,7 @@ services:
       anyvision:
         aliases:
           - apigateway.anyvision.local
+          - apigateway-localnode.anyvision.local
     ports:
       - "9443:9443"
       - "38391:38391"
@@ -245,6 +246,7 @@ services:
       anyvision:
         aliases:
           - api.anyvision.local
+          - api-localnode.anyvision.local         
     ports:
       - "5443:5443"
       - "38389:38389"
@@ -261,7 +263,7 @@ services:
       - API_IP=api.anyvision.local
       - MONGO_DB_IP=mongodb.anyvision.local
       - CA_HOST=apigateway.anyvision.local
-      - MASS_IMPORT_IP=reid-${node_name:-localnode}.anyvision.local          ### use this configuration to configure localhost reid service
+      - MASS_IMPORT_IP=reid-localnode.anyvision.local          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
       - ENABLE_CHOWN=true
     env_file:
@@ -297,13 +299,13 @@ services:
     networks:
       anyvision:
         aliases:
-          - proc-${node_name:-localnode}.anyvision.local
-          - reid-${node_name:-localnode}.anyvision.local
-          - coll-${node_name:-localnode}.anyvision.local
-          - arch-${node_name:-localnode}.anyvision.local
+          - proc-localnode.anyvision.local
+          - reid-localnode.anyvision.local
+          - coll-localnode.anyvision.local
+          - arch-localnode.anyvision.local
     extra_hosts:
     #The IP here should point to nginx of the master API
-      - "nginx-master-${node_name:-localnode}.anyvision.local:1.1.1.1"
+      - "nginx-master-localnode.anyvision.local:1.1.1.1"
     ports:
       - "4005:4005"
       - "9067:9067"
@@ -323,17 +325,17 @@ services:
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
-      - external_ip=proc-${node_name:-localnode}.anyvision.local
-      - storage_ip=nginx-${node_name:-localnode}.anyvision.local
-      - frame_store_storage_ip=nginx-${node_name:-localnode}.anyvision.local
+      - external_ip=proc-localnode.anyvision.local
+      - storage_ip=nginx-localnode.anyvision.local
+      - frame_store_storage_ip=nginx-localnode.anyvision.local
       - redis_host=127.0.0.1
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - api_service_ip=api.anyvision.local
       - mongodb_host=mongodb.anyvision.local
-      - reid_service_ip=reid-${node_name:-localnode}.anyvision.local
-      - collate_service_ip=coll-${node_name:-localnode}.anyvision.local
-      - track_archive_service_ip=arch-${node_name:-localnode}.anyvision.local
+      - reid_service_ip=reid-localnode.anyvision.local
+      - collate_service_ip=coll-localnode.anyvision.local
+      - track_archive_service_ip=arch-localnode.anyvision.local
     env_file:
       - env/backend.env
       - env/global.env
