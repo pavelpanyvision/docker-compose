@@ -15,7 +15,7 @@ services:
     networks:
       anyvision:
         aliases:
-          - dashboard-master-${node_name:-localnode}.tls.ai
+          - dashboard-master-localnode.tls.ai
     ports:
       #- "443:443"
       - "80:80"
