@@ -115,6 +115,8 @@ services:
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - DISPLAY=:0
+      - UPDATER_URL=dashboard-updater:8888
+      - ENABLE_DASHBOARD_WGET=true      
     env_file:
       - env/global.env
     ipc: host
