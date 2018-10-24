@@ -37,14 +37,21 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /storage/migration_db_data:/var/tmp
+      - /ssd/mongo_db_backups:/data/db_backups
     depends_on:
       - mongodb
     environment:
       - MONGO_DB_IP=mongodb.tls.ai
       - MONGO_DB_NAME=anyVision2
-      - API_IP=api.tls.ai:3000
+      - MONGO_DB_PORT=27017
+      - API_IP=api.tls.ai
+      - API_PORT=3000
+      - API_PROTOCOL=http
       - RUN_AS_USER=user
       - ENABLE_MIGRATION_MANAGER=true
+      - MONGO_DB_DUMP_PATH=/data/db_backups/
+      - MONGO_DB_RESTORE_PATH=/data/db_backups/
+      - BULK_AMOUNT=5000
       - LIMIT_VERSION=1.20.0
       #- ENABLE_CHOWN=true
     env_file:
