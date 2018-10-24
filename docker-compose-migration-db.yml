@@ -52,6 +52,7 @@ services:
       - MONGO_DB_DUMP_PATH=/data/db_backups/
       - MONGO_DB_RESTORE_PATH=/data/db_backups/
       - BULK_AMOUNT=5000
+      - LIMIT_VERSION=1.20.1
       #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
