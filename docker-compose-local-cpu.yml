@@ -347,7 +347,7 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=
       - ENABLE_OPENSSH_SERVICE=false
       - BACKEND_OPENSSH_PORT=9022
-      - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - external_ip=proc-localnode.tls.ai
       - storage_ip=nginx-localnode.tls.ai
       - frame_store_storage_ip=nginx-localnode.tls.ai
