@@ -215,8 +215,8 @@ services:
     restart: on-failure
     #command: --disable-services --no-exitkills --debug sleep infinity
     volumes:
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-      - /etc/localtime:/etc/localtime:ro
+      - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      #- /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - ENABLE_COPY_CERT=true
