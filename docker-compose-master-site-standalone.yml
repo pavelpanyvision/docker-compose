@@ -10,7 +10,7 @@ services:
 
 
   dashboard-master:
-    image: gcr.io/anyvision-production/dashboard-master:1.20.1
+    image: gcr.io/anyvision-production/dashboard-master:1.0.2
     restart: always
     networks:
       anyvision:
@@ -37,7 +37,7 @@ services:
 
 
   api-master:
-    image: gcr.io/anyvision-production/api-master:1.20.1
+    image: gcr.io/anyvision-production/api-master:1.0.2
     restart: always
     networks:
       anyvision:
@@ -57,7 +57,7 @@ services:
       - MONGO_DB_IP=mongodb.tls.ai
       - MONGO_DB_PORT=27017
       - RUN_AS_USER=user
-      ##- ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/api-master.env
@@ -65,6 +65,8 @@ services:
     logging:
       options:
         max-size: 1g
+
+
 
   rabbitmq-master:
     image: gcr.io/anyvision-production/rabbitmq:latest
@@ -88,6 +90,7 @@ services:
     logging:
       options:
         max-size: 1g
+
 
 
   nginx-master:
@@ -124,8 +127,8 @@ services:
           - api.tls.ai
     ports:
       - "5443:5443"
-      - "38389:38389"
-      - "3000:3000"
+      #- "38389:38389"
+      #- "3000:3000"
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -198,11 +201,11 @@ services:
           - coll-localnode.tls.ai
           - arch-localnode.tls.ai
     ports:
-      - "4005:4005"
-      - "9067:9067"
-      - "9068:9068"
-      - "9069:9069"
-      - "9022:9022" #ssh
+      #- "4005:4005"
+      #- "9067:9067"
+      #- "9068:9068"
+      #- "9069:9069"
+      #- "9022:9022" #ssh
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /home/user/license:/home/user/license:ro

@@ -65,12 +65,12 @@ services:
       anyvision:
         aliases:
           - rabbitmq.tls.ai
-    # those port should be opened only development
+    # these ports should be opened only in development mode
     #ports:
-      ##- "5671:5671"
-      ##- "5672:5672"
-      ##- "15672:15672"
-      ##- "15671:15671"
+      #- "5671:5671"
+      #- "5672:5672"
+      #- "15672:15672"
+      #- "15671:15671"
     volumes:
       - c:/anv/storage/rabbitmq:/var/lib/rabbitmq
     env_file:
@@ -182,6 +182,7 @@ services:
           - apigateway-localnode.tls.ai          
     ports:
       - "9443:9443"
+      #- "38391:38391"
     volumes:
       - c:/anv/storage:/var/www/html
       - api_gateway_keys:/home/user/api-gateway/config/keys
@@ -196,7 +197,7 @@ services:
       - GATEWAY_URL=http://apigateway.tls.ai:8080
       - REDIS_HOST=redis.tls.ai
       - RUN_AS_USER=user
-      ##- ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/api-gateway.env
       - env/global.env
@@ -226,7 +227,7 @@ services:
       - CA_HOST=apigateway.tls.ai
       - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
-      ##- ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
       - env/api.env
@@ -276,7 +277,7 @@ services:
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - c:/anv/home/user/license:/home/user/license:ro
-      - /ssd/backend_data:/root/pipe_data
+      - c:/anv/storage/backend_data:/root/pipe_data
       - c:/anv/storage:/var/www/html
       - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
@@ -302,36 +303,6 @@ services:
       options:
         max-size: 1g
     ipc: host
-
-
-
-  # dashboard:
-  #   image: gcr.io/anyvision-production/dashboard:1.20.1
-  #   restart: always
-  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-  #   privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
-  #   networks:
-  #     - anyvision
-  #   shm_size: 1024M
-  #   volumes:
-  #     - c:/anv/storage/sftp_data:/sftp:rw
-  #     - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro
-  #     - c:/anv/storage/share:/home/user/share:rw
-  #   environment:
-  #     - DISPLAY=10.0.75.1:0.0
-  #     - ssl=true
-  #     - GATEWAY_HOST=apigateway.tls.ai
-  #     - RUN_AS_USER=root
-  #     ##- ENABLE_CHOWN=true
-  #     - isPersonEnabled=false
-  #   env_file:
-  #     - env/global.env
-  #     - env/api-gateway.env
-  #     - env/dashboard.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-  #   ipc: host
 
 
 
