@@ -279,36 +279,6 @@ services:
 
 
 
-  # dashboard:
-  #   image: gcr.io/anyvision-production/dashboard:1.20.0
-  #   restart: always
-  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-  #   privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
-  #   networks:
-  #     - anyvision
-  #   shm_size: 1024M
-  #   volumes:
-  #     - c:/anv/storage/sftp_data:/sftp:rw
-  #     - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro
-  #     - c:/anv/storage/share:/home/user/share:rw
-  #   environment:
-  #     - DISPLAY=10.0.75.1:0.0
-  #     - ssl=true
-  #     - GATEWAY_HOST=apigateway.tls.ai
-  #     - RUN_AS_USER=root
-  #     #- ENABLE_CHOWN=true
-  #     - isPersonEnabled=false
-  #   env_file:
-  #     - env/global.env
-  #     - env/api-gateway.env
-  #     - env/dashboard.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-  #   ipc: host
-
-
-
   dante-proxy:
     image: gcr.io/anyvision-production/dante-proxy
     restart: always

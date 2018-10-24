@@ -345,7 +345,7 @@ services:
     environment:
       #- ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
-      - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - external_ip=proc-${node_name:-localnode}.tls.ai
       - storage_ip=nginx-${node_name:-localnode}.tls.ai
       - frame_store_storage_ip=nginx-${node_name:-localnode}.tls.ai
@@ -362,42 +362,6 @@ services:
       options:
         max-size: 1g
     ipc: host
-
-
-
-  # dashboard:
-  #   image: gcr.io/anyvision-production/dashboard:1.20.0
-  #   restart: always
-  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-  #   privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
-  #   networks:
-  #     - anyvision
-  #   shm_size: 1024M
-  #   volumes:
-  #     - /storage/sftp_data:/sftp:rw
-  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro
-  #     - /tmp/.X11-unix:/tmp/.X11-unix:rw
-  #     - /media:/home/user/media:ro
-  #     - /storage/share:/home/user/share:rw
-  #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
-  #     - /storage/share/anyvision-exports:/root/anyvision-exports:rw
-  #     #- /home/anyvision:/mnt                                                ### mount your home directory to the container
-  #     #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container
-  #   environment:
-  #     - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
-  #     - ssl=true
-  #     - GATEWAY_HOST=apigateway.tls.ai
-  #     - RUN_AS_USER=root
-  #     #- ENABLE_CHOWN=true
-  #   env_file:
-  #     - env/global.env
-  #     - env/api-gateway.env
-  #     - env/dashboard.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-  #   ipc: host
 
 
 
