@@ -10,7 +10,7 @@ services:
 
 
   dashboard-master:
-    image: gcr.io/anyvision-production/dashboard-master:1.20.1-rc.2
+    image: gcr.io/anyvision-production/dashboard-master:1.20.1
     restart: always
     networks:
       anyvision:
@@ -37,7 +37,7 @@ services:
 
 
   api-master:
-    image: gcr.io/anyvision-production/api-master:1.20.1-rc.2
+    image: gcr.io/anyvision-production/api-master:1.20.1
     restart: always
     networks:
       anyvision:
@@ -115,7 +115,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.20.1-rc.3
+    image: gcr.io/anyvision-production/api:1.20.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -186,7 +186,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-pyconcrete:1.20.1-rc.6
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.20.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
