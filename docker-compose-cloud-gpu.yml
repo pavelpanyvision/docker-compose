@@ -155,7 +155,7 @@ services:
       anyvision:
         aliases:
           - rabbitmq.tls.ai
-    # those port should be opened only development
+    # these ports should be opened only in development mode
     ports:
       - "5671:5671"
       - "5672:5672"
@@ -273,6 +273,7 @@ services:
     logging:
       options:
         max-size: 1g
+
 
 
   apigateway:
