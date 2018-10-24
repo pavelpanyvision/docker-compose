@@ -28,7 +28,7 @@ services:
 
 
   migration_manager:
-    image: gcr.io/anyvision-production/migration_manager:1.20.0
+    image: gcr.io/anyvision-production/migration_manager:1.20.1
     #restart: always
     networks:
       anyvision:
@@ -45,6 +45,7 @@ services:
       - API_IP=api.tls.ai:3000
       - RUN_AS_USER=user
       - ENABLE_MIGRATION_MANAGER=true
+      - LIMIT_VERSION=1.20.0
       #- ENABLE_CHOWN=true
     env_file:
       - env/global.env
