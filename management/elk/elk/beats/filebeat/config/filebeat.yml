@@ -1,0 +1,108 @@
+#==========================  Modules configuration =============================
+logging.level: debug
+
+filebeat.modules:
+
+#------------------------------- System Module -------------------------------
+- module: system
+  # Syslog
+  syslog:
+    enabled: true
+    var.paths: ["/var/log/syslog*"]
+  auth:
+    enabled: true
+    var.paths: ["/var/log/auth.log*"]
+
+#------------------------------- Auditd Module -------------------------------
+# Does not look like Auditd is supported in Alpine linux:
+# https://github.com/linuxkit/linuxkit/issues/52
+- module: auditd
+  log:
+    enabled: false
+
+#========================== Filebeat autodiscover ==============================
+# Autodiscover allows you to detect changes in the system and spawn new modules or inputs as they happen.
+filebeat.autodiscover:
+# Autodiscover docker containers and parse logs
+  providers:
+    - type: docker
+      templates:
+          config:
+            - type: docker
+              containers.ids:
+                - "${data.docker.container.id}"
+
+#=========================== Filebeat inputs ==============================
+filebeat.inputs:
+#------------------------------ Docker input --------------------------------
+#- type: docker
+#  enabled: true
+#  containers.ids:
+#    - "*"
+#  paths:
+#    - /var/lib/docker/containers/${data.docker.container.id}/*.log
+  # json.message_key: log
+  # json.add_error_key: true
+  # json.keys_under_root: true
+  #  exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
+  #  multiline.pattern: "^\t|^[[:space:]]+(at|...)|^Caused by:"
+  #  multiline.match: after
+  #  processors:
+  #    - add_docker_metadata: ~
+  #    - add_cloud_metadata: ~
+  #    - add_locale: ~
+
+#------------------------------ Log input --------------------------------
+# - type: log
+#   enabled: true
+#   paths:
+#     - '/var/lib/docker/containers/*/*.log'
+#   json.message_key: log
+#   json.add_error_key: true
+#   json.keys_under_root: true
+#   processors:
+#     - add_docker_metadata: ~
+#     - add_cloud_metadata: ~
+#     - add_locale: ~
+#   multiline.pattern: "^\t|^[[:space:]]+(at|...)|^Caused by:"
+#   multiline.match: after
+#
+- type: log
+  enabled: true
+  paths:
+    - /opt/api-logs/*.log
+    - /opt/pipe-logs/*/*.log 
+
+  fields:
+    anyvision: true
+#   json.message_key: log
+#   json.add_error_key: true
+#   json.keys_under_root: true
+#  multiline.pattern: '^[[:space:]]+|^Caused by:'
+#  multiline.negate: false
+#  amultiline.match: after
+#  recursive_glob.enabled: true
+
+      #filebeat.prospectors:
+      #- type: log
+      #  paths:
+      #    - /storage/api-logs/*.log
+
+#========================== Elasticsearch output ===============================
+     #ths path to jenkins build logs
+output.elasticsearch:
+  hosts: ["${ELASTICSEARCH_HOST}:9200"]
+  username: elastic
+  password: changeme
+
+xpack.monitoring:
+  enabled: true
+  elasticsearch:
+
+#============================== Dashboards =====================================
+setup.dashboards:
+  enabled: true
+setup.kibana:
+  host: "${KIBANA_HOST}:5601"
+  username: elastic
+  password: changeme

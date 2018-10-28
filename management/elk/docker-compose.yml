@@ -1,86 +1,147 @@
-version: "2"
+version: "3.6"
+
+# 10 Things to Consider When Planning Your Elasticsearch Project: https://ecmarchitect.com/archives/2015/07/27/4031
+# Using Apache JMeter to Test Elasticsearch: https://ecmarchitect.com/archives/2014/09/02/3915
 
 services:
-  # brocker
-  redis:
-    image: redis:3.2.6
-    restart: always
-    container_name: redis
-    volumes:
-      - redis-data:/data
-    networks:
-      - logging
 
-  # index, search & agregation
+#  swarm-listener:
+#    image: dockerflow/docker-flow-swarm-listener:latest
+#    hostname: swarm-listener
+#    networks:
+#      - elastic
+#    volumes:
+#      - "/var/run/docker.sock:/var/run/docker.sock"
+#    environment:
+#      - DF_NOTIFY_CREATE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/reconfigure
+#      - DF_NOTIFY_REMOVE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/remove
+#    deploy:
+#      placement:
+#        constraints: [node.role == manager]
+#
+#  proxy:
+#    image: dockerflow/docker-flow-proxy:latest
+#    hostname: proxy
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#      - "9200:9200"
+#    networks:
+#      - elastic
+#    environment:
+#      - LISTENER_ADDRESS=swarm-listener
+#      - MODE=swarm
+#      - BIND_PORTS=9200
+
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.2
-    restart: always
-    container_name: elastic
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-6.3.2}
+    # https://github.com/docker/swarmkit/issues/1951
+    #hostname: "{{.Node.Hostname}}-elasticsearch"
     environment:
-      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
-    ports:
+      - discovery.zen.ping.unicast.hosts=elasticsearch
+      - discovery.zen.minimum_master_nodes=1
+      - ELASTIC_PASSWORD=changeme
+      - xpack.security.enabled=true
+      - xpack.monitoring.collection.enabled=true
+      - xpack.license.self_generated.type=trial
+      - cluster.name=DevOps
+      - node.name={{.Node.Hostname}}-elasticsearch
+      - network.host=0.0.0.0
+#    networks:
+#      - elastic
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports: 
       - 9200:9200
       - 9300:9300
-    volumes:
-      - $PWD/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - "es-data:/usr/share/elasticsearch/data"
-    networks:
-      - logging
+#    deploy:
+#      mode: 'global'
+#      endpoint_mode: dnsrr
+#      labels:
+#        - com.df.notify=true
+#        - com.df.distribute=true
+#        - com.df.servicePath=/
+#        - com.df.port=9200
+#        - com.df.srcPort=9200
 
-  # UI
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${ELASTIC_VERSION:-6.3.2}
+    #hostname: "{{.Node.Hostname}}-logstash"
+    environment:
+      - XPACK_MONITORING_ELASTICSEARCH_URL=http://elasticsearch:9200
+      - XPACK_MONITORING_ELASTICSEARCH_USERNAME=elastic
+      - XPACK_MONITORING_ELASTICSEARCH_PASSWORD=changeme
+    ports:
+      - "12201:12201/udp"
+#    networks:
+#      - elastic
+    volumes:
+      - $PWD/elk/logstash/config/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+#    configs:
+#      - source: ls_config
+#        target: /usr/share/logstash/pipeline/logstash.conf
+
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:6.3.2
-    restart: always
-    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION:-6.3.2}
+    #hostname: "{{.Node.Hostname}}-kibana"
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=changeme
+      - SERVER_NAME="{{.Node.Hostname}}-kibana"
+#   networks:
+#     - elastic
+    volumes:
+      - kibana:/usr/share/kibana/data
     ports:
       - 5601:5601
-    volumes:
-      - $PWD/kibana/config/kibana.yml:/etc/kibana/kibana.yml
-    networks:
-      - logging
-    depends_on:
-      - elasticsearch
-
-  # indexer
-  logstash:
-    image: docker.elastic.co/logstash/logstash-oss:6.3.2
-    restart: always
-    container_name: logstash
-    command: logstash -f /config/
-    environment:
-      - LS_JAVA_OPTS=-Xms1g -Xmx1g
-    volumes:
-      - $PWD/logstash/config:/config
-    networks:
-      - logging
-    depends_on:
-      - elasticsearch
-      - redis
+#    deploy:
+#      labels:
+#        - com.df.notify=true
+#        - com.df.distribute=true
+#        - com.df.servicePath=/
+#        - com.df.port=5601
+#        - com.df.srcPort=80
 
   filebeat:
-    image: docker.elastic.co/beats/filebeat:6.3.2
+    image: docker.elastic.co/beats/filebeat:${ELASTIC_VERSION:-6.3.2}
     restart: always
-    container_name: filebeat
+    # https://github.com/docker/swarmkit/issues/1951
+    #hostname: ""
+    # Need to override user so we can access the log files, and docker.sock
+    user: root
+#   networks:
+#     - elastic
     volumes:
-      - $PWD/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - /storage/logs:/usr/share/filebeat/logs
-      - /storage/api-logs/anyvision.2018-08-26.log:/usr/share/filebeat/api-logs/anyvision.2018-08-26.log
-      - /storage/gateway-logs:/usr/share/filebeat/gateway-logs
-      - /storage/pipe-logs:/usr/share/filebeat/pipe-logs
-      - /storage/api-logs:/usr/share/filebeat/api-logs
+      - $PWD/elk/beats/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - filebeat:/usr/share/filebeat/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      # This is needed for filebeat to load container log path as specified in filebeat.yml
+      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
 
+      # # This is needed for filebeat to load jenkins build log path as specified in filebeat.yml
+      # - /var/lib/docker/volumes/jenkins_home/_data/jobs/:/var/lib/docker/volumes/jenkins_home/_data/jobs/:ro
 
-    networks:
-      - logging
-    depends_on:
-      - logstash
+      # This is needed for filebeat to load logs for system and auth modules
+      - /var/log/:/var/log/:ro
+      - /storage:/opt
+      # This is needed for filebeat to load logs for auditd module
+      # - /var/log/audit/:/var/log/audit/:ro
+    environment:
+      - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-elasticsearch}
+      - KIBANA_HOST=${KIBANA_HOST:-kibana}
+    # disable strict permission checks
+    command: ["--strict.perms=false"]
+
+#networks:
+#    elastic:
+#      external: true
 
 volumes:
-  es-data:
-    driver: local
-  redis-data:
-    driver: local
+  elasticsearch:
+  kibana:
+  filebeat:
 
-networks:
-  logging:
-    driver: bridge
+#configs:
+#  ls_config:
+#    file: $PWD/elk/logstash/config/pipeline/logstash.conf
