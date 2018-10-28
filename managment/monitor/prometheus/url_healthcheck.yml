@@ -1,0 +1,5 @@
+- targets:
+  - https://apigateway-localnode.tls.ai:9443
+  - https://api-localnode.tls.ai:5443
+  - https://proc-localnode.tls.ai:4005
+  - https://nginx-localnode.tls.ai:443
