@@ -54,9 +54,6 @@ scrape_configs:
         replacement:   'cadvisor:9101'
 
   # - job_name: 'nodeexporter'
-  #   #static_configs:
-  #   #  - targets:
-  #   #      - 'nodeexporter:9100'
   #   file_sd_configs:
   #     - files:
   #       - all_nodes.yml
@@ -70,9 +67,6 @@ scrape_configs:
 
 
   # - job_name: 'cadvisor'
-  #   #static_configs:
-  #   #- targets:
-  #   #    - 'cadvisor:9101'
   #   file_sd_configs:
   #     - files:
   #       - all_nodes.yml
