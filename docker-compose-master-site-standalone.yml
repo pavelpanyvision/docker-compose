@@ -3,7 +3,7 @@ version: '3.3'
 
 
 networks:
-  anyvision:
+  prod:
 
 
 services:
@@ -13,7 +13,7 @@ services:
     image: gcr.io/anyvision-training/dashboard-master:development
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - dashboard-master-localnode.tls.ai
     ports:
@@ -40,7 +40,7 @@ services:
     image: gcr.io/anyvision-training/api-master:development
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - api-master.tls.ai
     ports:
@@ -70,7 +70,7 @@ services:
     image: gcr.io/anyvision-training/rabbitmq:latest
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - rabbitmq-master.tls.ai
     # those port should be opened only development mode
@@ -94,7 +94,7 @@ services:
     image: gcr.io/anyvision-training/nginx:tls.ai
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - nginx-master-localnode.tls.ai
     ports:
@@ -119,7 +119,7 @@ services:
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
-      anyvision:
+      prod:
         aliases:
           - api.tls.ai
           - api-localnode.tls.ai           
@@ -154,7 +154,7 @@ services:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - mongodb.tls.ai
     ports:
@@ -193,7 +193,7 @@ services:
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
-      anyvision:
+      prod:
         aliases:
           - proc-localnode.tls.ai
           - reid-localnode.tls.ai

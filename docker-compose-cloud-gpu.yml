@@ -8,7 +8,7 @@ volumes:
 
 
 networks:
-  anyvision:
+  prod:
 
 
 services:
@@ -18,7 +18,7 @@ services:
     image: gcr.io/anyvision-training/guacamole:0.9.14
     restart: always
     networks:
-      - anyvision
+      - prod
     ports:
       - "8080:8080"
     volumes:
@@ -39,7 +39,7 @@ services:
     image: gcr.io/anyvision-training/sftp:alpine
     restart: always
     networks:
-      - anyvision
+      - prod
     volumes:
       - /storage/sftp_data:/home/user
       - /etc/localtime:/etc/localtime:ro
@@ -57,7 +57,7 @@ services:
     image: gcr.io/anyvision-training/nginx:tls.ai
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - nginx-localnode.tls.ai
     ports:
@@ -83,7 +83,7 @@ services:
     image: gcr.io/anyvision-training/x11vnc
     restart: always
     networks:
-      - anyvision
+      - prod
     #ports:
       #- "5900:5900"
     volumes:
@@ -106,7 +106,7 @@ services:
     restart: always
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
-      - anyvision
+      - prod
     volumes:
       - /storage/sftp_data:/sftp:ro
       - /ssd/dashboards:/ssd/dashboards:rw
@@ -130,7 +130,7 @@ services:
     image: gcr.io/anyvision-training/supercronic:alpine
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - cron-localnode.tls.ai
     volumes:
@@ -152,7 +152,7 @@ services:
     image: gcr.io/anyvision-training/rabbitmq:latest
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - rabbitmq.tls.ai
     # these ports should be opened only in development mode
@@ -177,7 +177,7 @@ services:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - mongodb.tls.ai
     #ports:
@@ -198,7 +198,7 @@ services:
     image: gcr.io/anyvision-training/redis:latest
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - redis.tls.ai
     sysctls:
@@ -220,7 +220,7 @@ services:
     hostname: broadcaster
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
-      anyvision:
+      prod:
         aliases:
           - broadcaster.tls.ai
     volumes:
@@ -251,7 +251,7 @@ services:
     hostname: master-sync-service
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
-      anyvision:
+      prod:
         aliases:
           - master-sync-service.tls.ai
     volumes:
@@ -281,7 +281,7 @@ services:
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
-      anyvision:
+      prod:
         aliases:
           - apigateway.tls.ai
           - apigateway-localnode.tls.ai
@@ -321,7 +321,7 @@ services:
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
-      anyvision:
+      prod:
         aliases:
           - api.tls.ai
           - api-localnode.tls.ai          
@@ -374,7 +374,7 @@ services:
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
-      anyvision:
+      prod:
         aliases:
           - proc-localnode.tls.ai
           - reid-localnode.tls.ai
@@ -429,7 +429,7 @@ services:
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
-      - anyvision
+      - prod
     shm_size: 1024M
     volumes:
       - /storage/sftp_data:/sftp:rw
@@ -463,7 +463,7 @@ services:
     image: gcr.io/anyvision-training/dante-proxy
     restart: always
     networks:
-      - anyvision
+      - prod
     ports:
       - "1080:1080"
     volumes:
@@ -491,7 +491,7 @@ services:
   #   restart: always
   #   privileged: true
   #   networks:
-  #     - anyvision
+  #     - prod
   #   volumes:
   #     - /tmp/.X11-unix:/tmp/.X11-unix:rw
   #     - /etc/localtime:/etc/localtime:ro
@@ -517,7 +517,7 @@ services:
     image: gcr.io/anyvision-training/dashboard-updater:latest
     restart: always
     networks:
-      - anyvision
+      - prod
     ports:
       - "8888:8888"
     volumes:

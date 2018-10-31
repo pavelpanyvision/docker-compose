@@ -3,7 +3,7 @@ version: '3.3'
 
 
 networks:
-  anyvision:
+  prod:
 
 services:
 
@@ -11,7 +11,7 @@ services:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - mongodb.tls.ai
     #ports:
@@ -31,7 +31,7 @@ services:
     image: gcr.io/anyvision-training/migration_manager:development
     #restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - migration-manager.tls.ai
     volumes:
