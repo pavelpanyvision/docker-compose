@@ -339,7 +339,6 @@ services:
   backend:
     image: gcr.io/anyvision-training/backend:on-demand-1.20.1-webrtc-stream
     restart: always
-    depends_on: webrtc-streamer
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     networks:
@@ -369,7 +368,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
-      - /ssd/webrtc-streamer/config.json:/webrtc-streamer/config.json:rw
+      - /ssd/webrtc-streamer:/webrtc-streamer/config.json:rw
     environment:
       - ENABLE_OPENSSH_SERVICE=false
       - BACKEND_OPENSSH_PORT=9022
@@ -465,7 +464,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - /ssd/webrtc-streamer/config.json:/webrtc-streamer/config.json:ro
+      - /ssd/webrtc-streamer:/webrtc-streamer/config/config.json:ro
     logging:
       options:
         max-size: 1g
