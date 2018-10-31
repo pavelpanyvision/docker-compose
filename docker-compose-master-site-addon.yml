@@ -3,7 +3,7 @@ version: '3.3'
 
 
 networks:
-  anyvision:
+  prod:
 
 
 services:
@@ -13,7 +13,7 @@ services:
     image: gcr.io/anyvision-training/dashboard-master:development
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - dashboard-master-localnode.tls.ai
     ports:
@@ -40,7 +40,7 @@ services:
     image: gcr.io/anyvision-training/api-master:development
     restart: always
     networks:
-      anyvision:
+      prod:
         aliases:
           - api-master.tls.ai
     ports:
