@@ -14,42 +14,42 @@ networks:
 services:
 
 
-  guacamole:
-    image: gcr.io/anyvision-production/guacamole:0.9.14
-    restart: always
-    networks:
-      - anyvision
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    environment:
-      - GUACD_LOGLEVEL=info
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  sftp:
-    image: gcr.io/anyvision-production/sftp:alpine
-    restart: always
-    networks:
-      - anyvision
-    volumes:
-      - /storage/sftp_data:/home/user
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    command: user:pass:2000:2000:files
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
+  # guacamole:
+  #   image: gcr.io/anyvision-production/guacamole:0.9.14
+  #   restart: always
+  #   networks:
+  #     - anyvision
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
+  #     - /etc/localtime:/etc/localtime:ro
+  #     #- /etc/timezone:/etc/timezone:ro
+  #   environment:
+  #     - GUACD_LOGLEVEL=info
+  #   env_file:
+  #     - env/global.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
+  #
+  #
+  #
+  # sftp:
+  #   image: gcr.io/anyvision-production/sftp:alpine
+  #   restart: always
+  #   networks:
+  #     - anyvision
+  #   volumes:
+  #     - /storage/sftp_data:/home/user
+  #     - /etc/localtime:/etc/localtime:ro
+  #     #- /etc/timezone:/etc/timezone:ro
+  #   command: user:pass:2000:2000:files
+  #   env_file:
+  #     - env/global.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
 
@@ -79,25 +79,25 @@ services:
 
 
 
-  x11vnc:
-    image: gcr.io/anyvision-production/x11vnc
-    restart: always
-    networks:
-      - anyvision
-    #ports:
-      #- "5900:5900"
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      #- /dev/shm:/dev/shm:rw
-    environment:
-      - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
-      #- VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    ipc: host
-    logging:
-      options:
-        max-size: 1g
+  # x11vnc:
+  #   image: gcr.io/anyvision-production/x11vnc
+  #   restart: always
+  #   networks:
+  #     - anyvision
+  #   #ports:
+  #     #- "5900:5900"
+  #   volumes:
+  #     - /tmp/.X11-unix:/tmp/.X11-unix:rw
+  #     #- /dev/shm:/dev/shm:rw
+  #   environment:
+  #     - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
+  #     #- VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
+  #     - /etc/localtime:/etc/localtime:ro
+  #     #- /etc/timezone:/etc/timezone:ro
+  #   ipc: host
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
 
@@ -254,7 +254,7 @@ services:
       anyvision:
         aliases:
           - apigateway.tls.ai
-          - apigateway-localnode.tls.ai          
+          - apigateway-localnode.tls.ai
     ports:
       - "9443:9443"
       #- "38391:38391"
@@ -293,7 +293,7 @@ services:
       anyvision:
         aliases:
           - api.tls.ai
-          - api-localnode.tls.ai          
+          - api-localnode.tls.ai
     ports:
       - "5443:5443"
       #- "38389:38389"
@@ -381,6 +381,8 @@ services:
       - reid_service_ip=reid-localnode.tls.ai
       - collate_service_ip=coll-localnode.tls.ai
       - track_archive_service_ip=arch-localnode.tls.ai
+      - frame_store_rtmp_url=node-rtsp-rtmp-server
+      - frame_store_rtmp_port=80
     env_file:
       - env/backend.env
       - env/global.env
@@ -439,3 +441,27 @@ services:
   #   logging:
   #     options:
   #       max-size: 1g
+
+
+
+  node-rtsp-rtmp-server:
+    image: gcr.io/anyvision-production/node-rtsp-rtmp-server
+    restart: always
+    networks:
+      - anyvision
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  webrtc-streamer:
+    image: gcr.io/anyvision-production/webrtc-streamer:08bcc55
+    restart: always
+    networks:
+      - anyvision
+    ports:
+      - "8080:8080"
+    logging:
+      options:
+        max-size: 1g
