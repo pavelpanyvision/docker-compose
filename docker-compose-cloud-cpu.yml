@@ -411,9 +411,9 @@ services:
       - /storage/share:/home/user/share:rw
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
-      - /storage/share/prod-exports:/root/prod-exports:rw
-      #- /home/prod:/mnt                                                ### mount your home directory to the container
-      #- /home/prod/Projects/prod-dashboard:/home/user/dashboard   ### mount your local project directory to the container
+      - /storage/share/anyvision-exports:/root/anyvision-exports:rw
+      #- /home/anyvision:/mnt                                                ### mount your home directory to the container
+      #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container
     environment:
       - DISPLAY=:0
       - ssl=true
