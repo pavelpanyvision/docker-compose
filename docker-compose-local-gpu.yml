@@ -412,7 +412,7 @@ services:
   #     - /etc/localtime:/etc/localtime:ro
   #     #- /etc/timezone:/etc/timezone:ro
   #     - /storage/share/anyvision-exports:/root/anyvision-exports:rw
-  #     #- /home/prod:/mnt                                                ### mount your home directory to the container
+  #     #- /home/anyvision:/mnt                                                ### mount your home directory to the container
   #     #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container
   #   environment:
   #     - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
