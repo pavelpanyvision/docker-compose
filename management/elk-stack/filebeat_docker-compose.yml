@@ -1,0 +1,36 @@
+version: "3.6"
+  
+# 10 Things to Consider When Planning Your Elasticsearch Project: https://ecmarchitect.com/archives/2015/07/27/4031
+# Using Apache JMeter to Test Elasticsearch: https://ecmarchitect.com/archives/2014/09/02/3915
+
+services:
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${ELASTIC_VERSION:-6.3.2}
+    restart: always
+    # https://github.com/docker/swarmkit/issues/1951
+    #hostname: ""
+    # Need to override user so we can access the log files, and docker.sock
+    user: root
+#   networks:
+#     - elastic
+    volumes:
+      - $PWD/elk/beats/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - filebeat:/usr/share/filebeat/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      # This is needed for filebeat to load logs for system and auth modules
+      - /var/log/:/var/log/:ro
+      - /storage:/opt
+      # This is needed for filebeat to load logs for auditd module
+      - /var/log/audit/:/var/log/audit/:ro
+    environment:
+      - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-elasticsearch}
+      - KIBANA_HOST=${KIBANA_HOST:-kibana}
+        #- HOST_HOSTNAME=`cat /etc/hostname`
+    # disable strict permission checks
+    command: ["--strict.perms=false"]
+
+volumes:
+  filebeat:
+
+                

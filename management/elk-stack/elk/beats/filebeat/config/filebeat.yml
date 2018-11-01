@@ -1,12 +1,14 @@
+
 #==========================  Modules configuration =============================
 logging.level: debug
-name: "ELK-Stack"
-tags: ["Master"]
+#name: "filebeat-1-d-us-west1-b-2"
+name: 
+tags: ["ELK-Master"]
 exclude_files: ['\.gz$']
 
-processors:
-- add_host_metadata: ~
-    netinfo.enabled: true
+#processors:
+#- add_host_metadata: ~
+#    netinfo.enabled: true
 
     #  - add_cloud_metadata: ~
 filebeat.config.prospectors:
@@ -44,6 +46,16 @@ filebeat.autodiscover:
             - type: docker
               containers.ids:
                 - "${data.docker.container.id}"
+      processors:
+       - add_docker_metadata: ~
+    - type: docker
+      containers:
+        ids:
+        - "${data.docker.container.id}"
+########  Hagay          ##########
+filebeat.message:
+- type: detections
+  enabled: true
 
 #=========================== Filebeat inputs ==============================
 filebeat.inputs:
@@ -55,17 +67,26 @@ filebeat.inputs:
 #    - "*"
 #  paths:
 #    - /var/lib/docker/containers/${data.docker.container.id}/*.log
-  # json.message_key: log
-  # json.add_error_key: true
-  # json.keys_under_root: true
+#   json.message_key: log
+#   json.add_error_key: true
+#   json.keys_under_root: true
   #  exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
   #  multiline.pattern: "^\t|^[[:space:]]+(at|...)|^Caused by:"
   #  multiline.match: after
-  #  processors:
-  #    - add_docker_metadata: ~
+  #    processors:
+  #      - add_docker_metadata: ~
   #    - add_cloud_metadata: ~
   #    - add_locale: ~
 
+- type: log
+  enabled: true
+  paths:
+    - '/var/lib/docker/containers/*/*.log'
+  document_type: docker
+  json.message_key: log
+  json.keys_under_root: true
+  processors:
+  - add_docker_metadata: ~
 #------------------------------ Log input --------------------------------
 # - type: log
 #   enabled: true
@@ -82,22 +103,29 @@ filebeat.inputs:
 #   multiline.match: after
 #
 - type: log
+  document_type: apache
   enabled: true
   paths:
     - /opt/api-logs/*.log
   scan_frequency: 5s
   fields:
-    api: "anyvision"    
+    api: "anyvision"
       #  include_lines: ['^ERROR', '^WARN']    
       #  fields_under_root: true
+      #  multiline.pattern: '^[^\[]|$'
+  multiline.pattern: '^[[:space:]]|^}'
+  multiline.negate: false
+  multiline.match: after
+
 
 - type: log
+  document_type: apache
   enabled: true
   paths:
     - /opt/gateway-logs/*.log
   scan_frequency: 5s
   fields:
-    gateway: "anyvision"    
+    gateway: "anyvision"
       #  include_lines: ['^ERROR', '^WARN']    
       #  fields_under_root: true
 
@@ -106,7 +134,7 @@ filebeat.inputs:
   paths:
     - /opt/pipe-logs/*.log
     - /opt/pipe-logs/*/*.log
-  scan_frequency: 5s    
+  scan_frequency: 5s
   fields:
     pipe: "anyvision"
     #  fields_under_root: true  
@@ -127,7 +155,7 @@ filebeat.inputs:
 #========================== Elasticsearch output ===============================
      #ths path to jenkins build logs
 output.elasticsearch:
-  hosts: ["${ELASTICSEARCH_HOST}:9200"]
+  hosts: ["http://elk-server:9200"]
   username: elastic
   password: changeme
 
@@ -136,9 +164,9 @@ xpack.monitoring:
   elasticsearch:
 
 #============================== Dashboards =====================================
-setup.dashboards:
-  enabled: true
+#setup.dashboards:
+#  enabled: true
 setup.kibana:
-  host: "${KIBANA_HOST}:5601"
+  host: ["http://elk-server:5601"]
   username: elastic
-  password: changeme
+  password: changeme#
