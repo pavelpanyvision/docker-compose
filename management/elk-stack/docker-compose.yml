@@ -120,5 +120,4 @@ volumes:
   elasticsearch:
   kibana:
   filebeat:
-          #  logstash:        
 
