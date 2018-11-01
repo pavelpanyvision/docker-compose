@@ -1,0 +1,70 @@
+#filename: docker-compose-cloud-gpu.yml
+version: '3.3'
+
+
+volumes:
+  redis_ifttt_data:
+
+networks:
+  prod:
+
+
+services:
+
+  mongodb:
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - mongo-ifttt.tls.ai
+    volumes:
+      - /ssd/mongo_ifttt_data:/data/db
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    logging:
+      options:
+        max-size: 1g
+
+  redis:
+    image: gcr.io/anyvision-training/redis:latest
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - redis-ifttt.tls.ai
+    sysctls:
+      - net.core.somaxconn=511
+    volumes:
+      - redis_ifttt_data:/data:rw
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    logging:
+      options:
+        max-size: 1g
+
+  ifttt:
+    image: gcr.io/anyvision-training/ifttt:development
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - ifttt.tls.ai
+    volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - MONGO_DB_ADDRESS=mongo-ifttt.tls.ai
+      - MONGO_DB_PORT=27017
+      - MONGO_DB_NAME=
+      - REDIS_ADDRESS=redis-ifttt.tls.ai
+      - REDIS_PORT=6379
+      - WEB_APP_PORT=3005
+      - WEB_API_PORT=4200
+      - RUN_AS_USER=user
+      - ENABLE_DOCKERIZE=false
+      - ENABLE_CHOWN=false
+    logging:
+      options:
+        max-size: 1g
