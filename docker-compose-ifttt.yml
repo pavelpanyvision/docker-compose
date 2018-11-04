@@ -48,7 +48,7 @@ services:
 
 
   ifttt:
-    image: gcr.io/anyvision-training/ifttt:development
+    image: gcr.io/anyvision-training/ifttt:dev-kluren
     restart: always
     networks:
       prod:
@@ -59,9 +59,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
-      - MONGO_DB_ADDRESS=mongo-ifttt.tls.ai
-      - MONGO_DB_PORT=27017
-      - MONGO_DB_NAME=
+      - MONGO_DB=mongodb://mongo-ifttt.tls.ai:27017/third_party_db
       - REDIS_ADDRESS=redis-ifttt.tls.ai
       - REDIS_PORT=6379
       - WEB_APP_PORT=3005
