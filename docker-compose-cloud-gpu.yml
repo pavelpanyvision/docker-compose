@@ -280,7 +280,7 @@ services:
       anyvision:
         aliases:
           - apigateway.tls.ai
-          - apigateway-localnode.tls.ai          
+          - apigateway-localnode.tls.ai
     ports:
       - "9443:9443"
       #- "38391:38391"
@@ -319,7 +319,7 @@ services:
       anyvision:
         aliases:
           - api.tls.ai
-          - api-localnode.tls.ai           
+          - api-localnode.tls.ai
     ports:
       - "5443:5443"
       #- "38389:38389"
@@ -387,6 +387,7 @@ services:
     volumes:
       - /home/user/license:/home/user/license:ro
       - /ssd/backend_data:/root/pipe_data
+      - /ssd/track_archive_service_data:/root/track_archive_service_data
       - /storage:/var/www/html
       #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
