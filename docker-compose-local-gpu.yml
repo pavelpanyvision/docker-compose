@@ -302,6 +302,7 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
+      - /ssd/webrtc-streamer:/webrtc-streamer:rw
       #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
@@ -368,7 +369,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
-      - /ssd/webrtc-streamer:/webrtc-streamer/config.json:rw
     environment:
       - ENABLE_OPENSSH_SERVICE=false
       - BACKEND_OPENSSH_PORT=9022
@@ -450,6 +450,9 @@ services:
     restart: always
     networks:
       - anyvision
+    #ports:
+      #- "80:80"
+      #- "1935:1935"
     logging:
       options:
         max-size: 1g
@@ -462,9 +465,9 @@ services:
     networks:
       - anyvision
     ports:
-      - "8080:8080"
+      - "8000:8000"
     volumes:
-      - /ssd/webrtc-streamer:/webrtc-streamer/config/config.json:ro
+      - /ssd/webrtc-streamer:/webrtc-streamer/config:ro
     logging:
       options:
         max-size: 1g
