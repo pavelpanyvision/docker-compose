@@ -2,7 +2,7 @@
 #==========================  Modules configuration =============================
 logging.level: debug
 #name: "filebeat-1-d-us-west1-b-2"
-name: "${host_name}"
+name: '${host_name}'
 tags: ["${install_type}"]
 exclude_files: ['\.gz$']
 
@@ -153,24 +153,20 @@ filebeat.inputs:
       #    - /storage/api-logs/*.log
 
 #========================== Elasticsearch output ===============================
-output.logstash:
-  hosts: ["logstash:5044"]
+     #ths path to jenkins build logs
+output.elasticsearch:
+  hosts: ["http://elk-server:9200"]
+  username: elastic
+  password: changeme
 
-#========================== logstash output ===============================
-#output.elasticsearch:
-#  hosts: ["http://elk-server:9200"]
-#  username: elastic
-#  password: changeme
-
-    #xpack.monitoring:
-    #  enabled: true
-    #  elasticsearch:
+xpack.monitoring:
+  enabled: true
+  elasticsearch:
 
 #============================== Dashboards =====================================
 #setup.dashboards:
 #  enabled: true
 setup.kibana:
-        #  host: ["http://elk-server:5601"]
-  host: ["http://elasticsearch:5601"]
+  host: ["http://elk-server:5601"]
   username: elastic
-  password: changeme
+  password: changeme#

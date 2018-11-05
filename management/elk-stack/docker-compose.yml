@@ -109,6 +109,8 @@ services:
     environment:
       - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-elasticsearch}
       - KIBANA_HOST=${KIBANA_HOST:-kibana}
+      - host_name=${host_hostname}
+      - install_type=${install_type} 
     # disable strict permission checks
     command: ["--strict.perms=false"]
     logging:
@@ -120,4 +122,5 @@ volumes:
   elasticsearch:
   kibana:
   filebeat:
+  logstash:        
 
