@@ -62,6 +62,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
+      - REDIS_HOST=${REDIS_HOST:-http://redis-ifttt.tls.ai:6379}
       - MONGO_DB=mongodb://mongo-ifttt.tls.ai:27017/third_party_db
       - MONGO_DB_IP=mongo-ifttt.tls.ai
       - MONGO_DB_PORT=27017
