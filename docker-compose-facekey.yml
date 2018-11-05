@@ -24,7 +24,7 @@ services:
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
-      - face-key-be_ip=api-master.tls.ai
+      - face-key-be_ip=face-key-fe-localnode.tls.ai
       - face-key-be_username=admin
       - face-key-be_password=admin
     env_file:
