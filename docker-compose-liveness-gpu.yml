@@ -14,7 +14,7 @@ services:
     networks:
       prod:
         aliases:
-          - liveness-service-gpu-localnode.tls.ai
+          - liveness-service.tls.ai
     ports:
       - "50051:50051"
     volumes:
@@ -22,7 +22,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
-      - HOST_IP=liveness-service-gpu-localnode.tls.ai
+      - HOST_IP=liveness-service.tls.ai
       #- HOST_PORT=50051
       - WORKERS=2
       #- LIVENESS_RGB_MODEL_PATH=
