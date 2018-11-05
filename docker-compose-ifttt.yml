@@ -54,12 +54,18 @@ services:
       prod:
         aliases:
           - ifttt.tls.ai
+    ports:
+      - 3005:3005
+      - 4200:4200
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - MONGO_DB=mongodb://mongo-ifttt.tls.ai:27017/third_party_db
+      - MONGO_DB_IP=mongo-ifttt.tls.ai
+      - MONGO_DB_PORT=27017
+      - MONGO_DB_NAME=third_party_db
       - REDIS_ADDRESS=redis-ifttt.tls.ai
       - REDIS_PORT=6379
       - WEB_APP_PORT=3005
