@@ -2,12 +2,6 @@ version: '3.3'
 
 networks:
   monitor-net:
-#    driver: bridge
-#    ipam:
-#      driver: default
-#      config:
-#        - subnet: 172.15.0.0/16
-#          gateway: 172.15.0.1
 
 volumes:
   nvidia_dcgm_exporter_date:
@@ -35,8 +29,6 @@ services:
       - 9100:9100
     networks:
       - monitor-net
-    #labels:
-    #  org.label-schema.group: "monitoring"
     deploy:
       resources:
         limits:
@@ -65,15 +57,6 @@ services:
       - monitor-net
     command:
       - '--port=9101'
-    #labels:
-    #  org.label-schema.group: "monitoring"
-#    environment:
-#      - LD_LIBRARY_PATH=<path-where-nvml-is-present>
-#    device_cgroup_rules:
-#      - 'c 195:* mrw'
-#    devices:
-#     - /dev/nvidiactl:/dev/nvidiactl
-#     - /dev/nvidia0:/dev/nvidia0
     deploy:
       resources:
         limits:
@@ -91,8 +74,6 @@ services:
     - monitor-net
     volumes:
       - nvidia_dcgm_exporter_date:/run/prometheus
-    #labels:
-    #  org.label-schema.group: "monitoring"
     deploy:
       resources:
         limits:
@@ -101,71 +82,3 @@ services:
     logging:
       options:
         max-size: 1g
-#  nvidia-smi-exporter:
-#    image: petrgrishin/nvidia-smi-exporter
-#    restart: always
-#    ports:
-#      - "9102:9102"
-#    networks:
-#      - monitor-net
-#    labels:
-#      org.label-schema.group: "monitoring"
-#    cpu_percent: 10
-#    mem_limit: 1gb
-#    logging:
-#      options:
-#        max-size: 1g
-
-#  blackbox:
-#    image: prom/blackbox-exporter:v0.12.0
-#    restart: always
-#    ports:
-#      - "9115:9115"
-#    networks:
-#      - monitor-net
-#    volumes:
-#      - ./blackbox-exporter:/config
-#    command:
-#      - '--config.file=/config/blackbox.yml'
-#    labels:
-#      org.label-schema.group: "monitoring"
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: '0.1'
-#          memory: '1gb'
-#    logging:
-#      options:
-#        max-size: 1g
-#
-
-
-#  snmpexporter:
-#    image: prom/snmp-exporter:v0.11.0
-#    restart: always
-#    ports:
-#      - "9116:9116"
-#    networks:
-#      - monitor-net
-#    labels:
-#      org.label-schema.group: "monitoring"
-#    cpu_percent: 10
-#    mem_limit: 1gb
-#    memswap_limit: 1gb
-#    logging:
-#      options:
-#        max-size: 1g
-
-#  netdata:
-#    image: firehol/netdata:latest
-#    cap_add:
-#      - SYS_PTRACE
-#    volumes:
-#      - /proc:/host/proc:ro
-#      - /sys:/host/sys:ro
-#      - /var/run/docker.sock:/var/run/docker.sock:ro
-#    environment:
-#      NETDATA_PORT: "19999"
-#    ports:
-#      - "19999:19999"
-

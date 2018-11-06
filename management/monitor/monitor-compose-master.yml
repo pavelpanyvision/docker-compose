@@ -4,7 +4,7 @@ networks:
   monitor-net:
   anyvision:
     external:
-      name: docker-compose_anyvision
+      name: docker-compose_prod
 
 
 volumes:
@@ -33,16 +33,15 @@ services:
       - 9090:9090
     networks:
       - monitor-net
-    #extra_hosts:
-    #  - nginx-site01.tls.ai:<ip of site01 server>
-    #  - proc-site01.tls.ai:<ip of site01 server>
-    #  - api-site01.tls.ai:<ip of site01 server>
-    #  - apigateway-site01.tls.ai:<ip of site01 server>
-    #labels:
-    #  org.label-schema.group: "monitoring"
     logging:
       options:
         max-size: 1g
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '1gb'
+
 
   alertmanager:
     image: prom/alertmanager:v0.15.2
@@ -63,11 +62,15 @@ services:
     environment:
       - ADMIN_USER=${ADMIN_USER:-admin}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-    #labels:
-    #  org.label-schema.group: "monitoring"
     logging:
       options:
         max-size: 1g
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '1gb'
+
 
   grafana:
     image: grafana/grafana:5.2.2
@@ -92,12 +95,17 @@ services:
       - monitor-net
     depends_on:
       - prometheus
-    #labels:
-    #  org.label-schema.group: "monitoring"
     logging:
       options:
         max-size: 1g
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '1gb'
 
+
+          
   blackbox:
     image: prom/blackbox-exporter:v0.12.0
     restart: always
@@ -111,14 +119,11 @@ services:
     command:
       - '--config.file=/config/blackbox.yml'
       - '--log.level=debug'
-    #labels:
-    #  org.label-schema.group: "monitoring"
+    logging:
+      options:
+        max-size: 1g
     deploy:
       resources:
         limits:
           cpus: '0.1'
           memory: '1gb'
-    logging:
-      options:
-        max-size: 1g
-
