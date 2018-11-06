@@ -14,19 +14,17 @@ services:
     networks:
       prod:
         aliases:
-          - face-key-fe-localnode.tls.ai
+          - face-key-fe.tls.ai
     ports:
-      - "443:443"
-      - "80:80"
+      - "3002:3002"
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
-      - limit_rate_speed=0
-      - face-key-be_ip=face-key-fe-localnode.tls.ai
-      - face-key-be_username=admin
-      - face-key-be_password=admin
+      - face-key-be_ip=face-key-be.tls.ai
+      #- face-key-be_username=admin
+      #- face-key-be_password=admin
     env_file:
       - env/global.env
     logging:
@@ -42,9 +40,6 @@ services:
       prod:
         aliases:
           - face-key-be.tls.ai
-    ports:
-      - "27183:27183"
-      - "5672:5672"
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
