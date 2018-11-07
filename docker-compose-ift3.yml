@@ -48,7 +48,7 @@ services:
 
 
   if3t-be:
-    image: ift3-be
+    image: gcr.io/anyvision-training/ift3-be:development
     restart: always
     networks:
       prod:
