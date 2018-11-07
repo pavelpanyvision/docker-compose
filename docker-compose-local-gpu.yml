@@ -467,7 +467,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - /ssd/webrtc-streamer:/webrtc-streamer/config:ro
+      - /ssd/webrtc-streamer:/webrtc-streamer/config:rw
     logging:
       options:
         max-size: 1g
