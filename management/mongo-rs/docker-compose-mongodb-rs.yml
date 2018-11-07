@@ -12,7 +12,6 @@ services:
 
   mongodb1:
     image: mongo:4.0.3
-    #entrypoint: sleep 1d
     networks:
       prod:
         aliases:
