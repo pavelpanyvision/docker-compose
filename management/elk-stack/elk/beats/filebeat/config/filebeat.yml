@@ -2,8 +2,8 @@
 #==========================  Modules configuration =============================
 logging.level: debug
 #name: "filebeat-1-d-us-west1-b-2"
-name: "${host_name}"
-tags: ["${install_type}"]
+name: "${SERVER_NAME}"
+#tags: ["${install_type}"]
 exclude_files: ['\.gz$']
 
 #processors:

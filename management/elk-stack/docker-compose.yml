@@ -65,7 +65,6 @@ services:
         limits: 
           cpus: '0.25'
           memory: 2G
-    #hostname: "{{.Node.Hostname}}-kibana"
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=elastic
@@ -109,8 +108,10 @@ services:
     environment:
       - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-elasticsearch}
       - KIBANA_HOST=${KIBANA_HOST:-kibana}
-      - host_name=${host_hostname}
-      - install_type=${install_type} 
+      - SERVER_NAME=${FILEBEAT_HOST:-filebeat}
+        #- SERVER_NAME="{{.Node.Hostname}}-filebeat"  
+        #- SERVER_NAME="{{.Node.Hostname}}"  
+        #     - install_type=${install_type} 
     # disable strict permission checks
     command: ["--strict.perms=false"]
     logging:

@@ -7,6 +7,12 @@ services:
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:${ELASTIC_VERSION:-6.3.2}
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 2G
+
+
     restart: always
     # https://github.com/docker/swarmkit/issues/1951
     #hostname: ""
@@ -26,10 +32,13 @@ services:
     environment:
       - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-elasticsearch}
       - KIBANA_HOST=${KIBANA_HOST:-kibana}
-      - host_name=${host_hostname}
-      - install_type=${install_type}
+        # - host_name=${host_hostname}
+        # - install_type=${install_type}
     # disable strict permission checks
     command: ["--strict.perms=false"]
+    logging:
+      options:
+        max-size: 1g
 
 volumes:
   filebeat:
