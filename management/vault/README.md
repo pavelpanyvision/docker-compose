@@ -8,20 +8,20 @@ key share 5
 ```
 download the file and *seal* the vault
 
-
+```
 export VAULT_ADDR="https://vault.tls.ai:8200"  
 export VAULT_TOKEN="Huh0AGo9Q7IpFks5bF84wMQB"
+```
 
-
-#enable audit log
+# enable audit log
 vault audit enable file file_path=/vault/vault_audit.log
 
 
-#create user and pass
+# create user and pass
 vault list auth/userpass/users/
 vault write auth/userpass/users/dors password=dors policies=admins
 
-#write key value secretes (kv)
+# write key value secretes (kv)
 ```
 vault secrets enable -version=2 kv
 #write secret
@@ -35,7 +35,7 @@ vault kv get secret/my-secret
 
  
  
- #encrypt data for you (Transit)
+ # encrypt data for you (Transit)
  ```
  vault secrets enable transit
  
@@ -117,7 +117,7 @@ policies                ["default"]
 token_meta_role_name    my-role
 ```
 
-##example use approle
+## example use approle
 curl --header "X-Vault-Token: 6o2CdweiG3O8H8kCjYNMvSEB" --request GET https://vault.tls.ai:8200/v1/database/creds/my-role
 
 
