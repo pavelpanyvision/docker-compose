@@ -2,49 +2,11 @@
 version: '3.3'
 
 
-volumes:
-  redis_ifttt_data:
-
 networks:
   prod:
 
 
 services:
-
-
-  mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
-    restart: always
-    networks:
-      prod:
-        aliases:
-          - mongo-ifttt.tls.ai
-    volumes:
-      - /ssd/mongo_ifttt_data:/data/db
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    logging:
-      options:
-        max-size: 1g
-
-
-  redis:
-    image: gcr.io/anyvision-training/redis:latest
-    restart: always
-    networks:
-      prod:
-        aliases:
-          - redis-ifttt.tls.ai
-    sysctls:
-      - net.core.somaxconn=511
-    volumes:
-      - redis_ifttt_data:/data:rw
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    logging:
-      options:
-        max-size: 1g
-
 
 
   if3t-be:
@@ -61,10 +23,11 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
-      - MONGO_DB_IP=mongodb://mongo-ifttt.tls.ai
+      - MONGO_DB_IP=mongodb://mongodb.tls.ai
       - MONGO_DB_PORT=27017
+      - PORT=3005
       - MONGO_DB_NAME=third_party_db
-      - REDIS_HOST=redis-ifttt.tls.ai
+      - REDIS_HOST=redis.tls.ai
       - REDIS_PORT=6379
       - WEB_APP_PORT=3005
       - WEB_API_PORT=4200
@@ -91,7 +54,6 @@ services:
     #- /etc/timezone:/etc/timezone:ro
     environment:
     - API_PORT=3005
-
     logging:
       options:
         max-size: 1g
