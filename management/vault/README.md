@@ -121,6 +121,16 @@ token_meta_role_name    my-role
 curl --header "X-Vault-Token: 6o2CdweiG3O8H8kCjYNMvSEB" --request GET https://vault.tls.ai:8200/v1/database/creds/my-role
 
 
+# policies
+you need to create or add policy to the auth users to get the relevant secrets . you can add also too the default policy.
+
+For example
+```
+path "database/creds/my-role" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
+```
+
 # delete identeties
 example:
 ```
