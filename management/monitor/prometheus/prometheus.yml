@@ -53,6 +53,8 @@ scrape_configs:
         target_label:  '__address__'
         replacement:   'cadvisor:9101'
 
+  # remove the following comments to monitor remote targets
+
   # - job_name: 'nodeexporter'
   #   file_sd_configs:
   #     - files:
@@ -93,98 +95,3 @@ scrape_configs:
       target_label: instance
     - target_label: __address__
       replacement: blackbox:9115  # The blackbox exporter's real hostname:port.
-
-
-
-
-
-
-#Black box in each node
-#  - job_name: 'blackbox'
-#    metrics_path: /probe
-#    params:
-#      module: [http_2xx]  # Look for a HTTP 200 response.
-#    file_sd_configs:
-#    - files:
-#      - all_nodes.yml
-#        static_configs:
-#          - targets:
-#              - 192.168.59.147
-#        relabel_configs:
-#          - source_labels: ['__address__']
-#            target_label:  '__param_target'
-#            replacement:   'http://${1}:3000'
-#          - source_labels: [__param_target]
-#            regex: (.*)
-#            target_label: instance
-#            replacement: ${1}
-#          - source_labels: ['__address__']
-#            regex: (.*)
-#            target_label: __address__
-#            replacement: ${1}:9115
-#
-#  - job_name: 'nvidiasmiexporter'
-#    file_sd_configs:
-#      - files:
-#        - all_nodes.yml
-#    relabel_configs:
-#      - source_labels: ['__address__']
-#        target_label:  '__address__'
-#        replacement:   '${1}:9102'
-#
-#  - job_name: 'blackbox-api-3000'
-#    metrics_path: /probe
-#    params:
-#      module: [http_2xx]  # Look for a HTTP 200 response.
-#    file_sd_configs:
-#    - files:
-#      - workers.yml
-#    relabel_configs:
-#    - source_labels: ['__address__'] # Ensure new port , pass as URL parameter
-#      regex: (.*)(:.*)?
-#      target_label:  '__param_target'
-#      replacement:   'http://${1}:3000'
-#    - source_labels: [__param_target] # Make instance label the target
-#      regex: (.*)
-#      target_label: instance
-#      replacement: ${1}
-#    - target_label: __address__ # Actually talk to the blackbox exporter though
-#      replacement: 127.0.0.1:9115  # The blackbox exporter's real hostname:port.
-#
-#  - job_name: 'blackbox-apigw-9443'
-#    metrics_path: /probe
-#    params:
-#      module: [http_2xx]  # Look for a HTTP 200 response.
-#    file_sd_configs:
-#    - files:
-#      - workers.yml
-#    relabel_configs:
-#    - source_labels: ['__address__'] # Ensure new port , pass as URL parameter
-#      regex: (.*)(:.*)?
-#      target_label:  '__param_target'
-#      replacement:   'https://${1}:9443'
-#    - source_labels: [__param_target] # Make instance label the target
-#      regex: (.*)
-#      target_label: instance
-#      replacement: ${1}
-#    - target_label: __address__ # Actually talk to the blackbox exporter though
-#      replacement: 127.0.0.1:9115  # The blackbox exporter's real hostname:port.
-#  - job_name: swarm-service-endpoints
-#    file_sd_configs:
-#      - files:
-#        - /etc/swarm-endpoints/swarm-endpoints.json
-#    relabel_configs:
-#      - source_labels: ['__address__']
-#        target_label:  '__address__'
-#        replacement:   '${1}:9101'
-  # - job_name: 'nodeexporter'
-  #   static_configs:
-  #     - targets:
-  #         - 'nodeexporter:9100'
-  #   #file_sd_configs:
-  #   #  - files:
-  #   #    - all_nodes.yml
-  #   #relabel_configs:
-  #   #  - source_labels: ['__address__']
-  #   #    target_label:  '__address__'
-  #   #    replacement:   '${1}:9100'

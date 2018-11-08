@@ -3,6 +3,9 @@ version: '3.3'
 
 networks:
   prod:
+    external:
+      name: docker-compose_prod
+
 
 secrets:
   vault_key:
@@ -23,8 +26,9 @@ services:
     ports:
       - "8200:8200"
     volumes:
-      - /storage/vault/file:/vault/file
       - /etc/localtime:/etc/localtime:ro
+      - /storage/vault/file:/vault/file
+      #- /storage/vault/audit/vault_audit.log:/vault/vault_audit.log
       #- ./tls:/vault/tls
       - type: bind
         source: ./tls
