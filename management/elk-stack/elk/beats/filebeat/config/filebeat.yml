@@ -2,7 +2,7 @@
 #==========================  Modules configuration =============================
 logging.level: debug
 #name: "filebeat-1-d-us-west1-b-2"
-name: "${SERVER_NAME}"
+#name: "${SERVER_NAME}"
 #tags: ["${install_type}"]
 exclude_files: ['\.gz$']
 
@@ -87,6 +87,11 @@ filebeat.inputs:
   json.keys_under_root: true
   processors:
   - add_docker_metadata: ~
+
+- type: syslog
+  enabled: true
+  protocol.tcp:
+    host: "localhost:9000"
 #------------------------------ Log input --------------------------------
 # - type: log
 #   enabled: true
