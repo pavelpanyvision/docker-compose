@@ -157,10 +157,10 @@ services:
           - rabbitmq.tls.ai
     # these ports should be opened only in development mode
     #ports:
-      - "5671:5671"
-      - "5672:5672"
-      - "15672:15672"
-      - "15671:15671"
+    #  - "5671:5671"
+    #  - "5672:5672"
+    #  - "15672:15672"
+    #  - "15671:15671"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
