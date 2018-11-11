@@ -424,42 +424,6 @@ services:
 
 
 
-  dashboard:
-    image: gcr.io/anyvision-training/dashboard:development
-    restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
-    privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
-    networks:
-      - prod
-    shm_size: 1024M
-    volumes:
-      - /storage/sftp_data:/sftp:rw
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /media:/home/user/media:ro
-      - /storage/share:/home/user/share:rw
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-      - /storage/share/anyvision-exports:/root/anyvision-exports:rw
-      #- /home/anyvision:/mnt                                                ### mount your home directory to the container
-      #- /home/anyvision/Projects/anyvision-dashboard:/home/user/dashboard   ### mount your local project directory to the container
-    environment:
-      - DISPLAY=:0
-      - ssl=true
-      - GATEWAY_HOST=apigateway.tls.ai
-      - RUN_AS_USER=root
-      - ENABLE_CHOWN=true
-    env_file:
-      - env/global.env
-      - env/api-gateway.env
-      - env/dashboard.env
-    logging:
-      options:
-        max-size: 1g
-    ipc: host
-
-
-
   dante-proxy:
     image: gcr.io/anyvision-training/dante-proxy
     restart: always
