@@ -5,37 +5,15 @@ version: "3.6"
 
 services:
 
-#  swarm-listener:
-#    image: dockerflow/docker-flow-swarm-listener:latest
-#    hostname: swarm-listener
-#    networks:
-#      - elastic
-#    volumes:
-#      - "/var/run/docker.sock:/var/run/docker.sock"
-#    environment:
-#      - DF_NOTIFY_CREATE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/reconfigure
-#      - DF_NOTIFY_REMOVE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/remove
-#    deploy:
-#      placement:
-#        constraints: [node.role == manager]
-#
-#  proxy:
-#    image: dockerflow/docker-flow-proxy:latest
-#    hostname: proxy
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#      - "9200:9200"
-#    networks:
-#      - elastic
-#    environment:
-#      - LISTENER_ADDRESS=swarm-listener
-#      - MODE=swarm
-#      - BIND_PORTS=9200
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-6.3.2}
-    # https://github.com/docker/swarmkit/issues/1951
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 2G
+
     #hostname: "{{.Node.Hostname}}-elasticsearch"
     environment:
       - discovery.zen.ping.unicast.hosts=elasticsearch
@@ -47,25 +25,23 @@ services:
       - cluster.name=DevOps
       - node.name={{.Node.Hostname}}-elasticsearch
       - network.host=0.0.0.0
-#    networks:
-#      - elastic
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data
     ports: 
       - 9200:9200
       - 9300:9300
-#    deploy:
-#      mode: 'global'
-#      endpoint_mode: dnsrr
-#      labels:
-#        - com.df.notify=true
-#        - com.df.distribute=true
-#        - com.df.servicePath=/
-#        - com.df.port=9200
-#        - com.df.srcPort=9200
+    logging:
+      options:
+        max-size: 1g
 
   logstash:
     image: docker.elastic.co/logstash/logstash:${ELASTIC_VERSION:-6.3.2}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 2G
+
     #hostname: "{{.Node.Hostname}}-logstash"
     environment:
       - XPACK_MONITORING_ELASTICSEARCH_URL=http://elasticsearch:9200
@@ -73,45 +49,47 @@ services:
       - XPACK_MONITORING_ELASTICSEARCH_PASSWORD=changeme
     ports:
       - "12201:12201/udp"
-#    networks:
-#      - elastic
     volumes:
       - $PWD/elk/logstash/config/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-#    configs:
-#      - source: ls_config
-#        target: /usr/share/logstash/pipeline/logstash.conf
+    logging:
+      options:
+        max-size: 1g
+
+        #  cpu_percent: 10
+    # mem_limit: 1gb
 
   kibana:
     image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION:-6.3.2}
-    #hostname: "{{.Node.Hostname}}-kibana"
+    deploy:
+      resources:
+        limits: 
+          cpus: '0.25'
+          memory: 2G
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=elastic
       - ELASTICSEARCH_PASSWORD=changeme
       - SERVER_NAME="{{.Node.Hostname}}-kibana"
-#   networks:
-#     - elastic
     volumes:
       - kibana:/usr/share/kibana/data
     ports:
       - 5601:5601
-#    deploy:
-#      labels:
-#        - com.df.notify=true
-#        - com.df.distribute=true
-#        - com.df.servicePath=/
-#        - com.df.port=5601
-#        - com.df.srcPort=80
+    logging:
+      options:
+        max-size: 1g
+
+
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:${ELASTIC_VERSION:-6.3.2}
+    deploy:
+      resources:
+        limits: 
+          cpus: '0.25'
+          memory: 2G
+         
     restart: always
-    # https://github.com/docker/swarmkit/issues/1951
-    #hostname: ""
-    # Need to override user so we can access the log files, and docker.sock
     user: root
-#   networks:
-#     - elastic
     volumes:
       - $PWD/elk/beats/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
       - filebeat:/usr/share/filebeat/data
@@ -132,16 +110,14 @@ services:
       - KIBANA_HOST=${KIBANA_HOST:-kibana}
     # disable strict permission checks
     command: ["--strict.perms=false"]
+    logging:
+      options:
+        max-size: 1g
 
-#networks:
-#    elastic:
-#      external: true
 
 volumes:
   elasticsearch:
   kibana:
   filebeat:
+  logstash:        
 
-#configs:
-#  ls_config:
-#    file: $PWD/elk/logstash/config/pipeline/logstash.conf
