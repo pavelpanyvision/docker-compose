@@ -241,36 +241,6 @@ services:
         max-size: 1g
 
 
-  master-sync-service:
-    image: gcr.io/anyvision-production/master-sync-service:1.20.1
-    restart: always
-    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
-    hostname: master-sync-service
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-    networks:
-      anyvision:
-        aliases:
-          - master-sync-service.tls.ai
-    volumes:
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    depends_on:
-      - api
-    environment:
-      # this FQDN should be updated accrodingly to rabbitmq-master
-      - rabbitmq_server_ip=rabbitmq-master.tls.ai
-      - rabbitmq_server_port=5672
-      #- ENABLE_DOCKERIZE=false
-      #- ENABLE_CHOWN=true
-    env_file:
-      - env/global.env
-      - env/master-sync-service.env
-    logging:
-      options:
-        max-size: 1g
-
-
 
   apigateway:
     image: gcr.io/anyvision-production/api-gateway:1.20.1
