@@ -10,7 +10,7 @@ services:
 
 
   dashboard-master:
-    image: gcr.io/anyvision-training/dashboard-master:development
+    image: gcr.io/anyvision-production/dashboard-master:development
     restart: always
     networks:
       prod:
@@ -37,7 +37,7 @@ services:
 
 
   api-master:
-    image: gcr.io/anyvision-training/api-master:development
+    image: gcr.io/anyvision-production/api-master:development
     restart: always
     networks:
       prod:
@@ -57,7 +57,7 @@ services:
       - MONGO_DB_IP=mongodb.tls.ai
       - MONGO_DB_PORT=27017
       - RUN_AS_USER=user
-      #- ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/api-master.env
@@ -67,7 +67,7 @@ services:
         max-size: 1g
 
   rabbitmq-master:
-    image: gcr.io/anyvision-training/rabbitmq:latest
+    image: gcr.io/anyvision-production/rabbitmq:latest
     restart: always
     networks:
       prod:
@@ -91,7 +91,7 @@ services:
 
 
   nginx-master:
-    image: gcr.io/anyvision-training/nginx:tls.ai
+    image: gcr.io/anyvision-production/nginx:tls.ai
     restart: always
     networks:
       prod:
@@ -115,7 +115,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-production/api:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -134,13 +134,12 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.tls.ai
       - MONGO_DB_IP=mongodb.tls.ai
       - CA_HOST=apigateway.tls.ai
       - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/api.env
@@ -151,7 +150,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     restart: always
     networks:
       prod:
@@ -172,7 +171,7 @@ services:
 
 
   certificator:
-    image: gcr.io/anyvision-training/certificator:latest
+    image: gcr.io/anyvision-production/certificator:latest
     restart: on-failure
     #command: --disable-services --no-exitkills --debug sleep infinity
     volumes:
@@ -188,7 +187,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:development
+    image: gcr.io/anyvision-production/backend:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -218,8 +217,6 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
-      - ENABLE_OPENSSH_SERVICE=true
-      - BACKEND_OPENSSH_PORT=9022
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - external_ip=proc-localnode.tls.ai
       - storage_ip=nginx-master-localnode.tls.ai
