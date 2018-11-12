@@ -15,7 +15,7 @@ services:
 
 
   guacamole:
-    image: gcr.io/anyvision-training/guacamole:0.9.14
+    image: gcr.io/anyvision-production/guacamole:0.9.14
     restart: always
     networks:
       - prod
@@ -36,7 +36,7 @@ services:
 
 
   sftp:
-    image: gcr.io/anyvision-training/sftp:alpine
+    image: gcr.io/anyvision-production/sftp:alpine
     restart: always
     networks:
       - prod
@@ -54,7 +54,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx:tls.ai
+    image: gcr.io/anyvision-production/nginx:tls.ai
     restart: always
     networks:
       prod:
@@ -80,7 +80,7 @@ services:
 
 
   x11vnc:
-    image: gcr.io/anyvision-training/x11vnc
+    image: gcr.io/anyvision-production/x11vnc
     restart: always
     networks:
       - prod
@@ -102,7 +102,7 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:alpine
+    image: gcr.io/anyvision-production/supercronic:alpine
     restart: always
     networks:
       prod:
@@ -124,7 +124,7 @@ services:
 
 
   rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
+    image: gcr.io/anyvision-production/rabbitmq:latest
     restart: always
     networks:
       prod:
@@ -149,7 +149,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     restart: always
     networks:
       prod:
@@ -170,7 +170,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:latest
+    image: gcr.io/anyvision-production/redis:latest
     restart: always
     networks:
       prod:
@@ -189,7 +189,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:development
+    image: gcr.io/anyvision-production/broadcaster:1.20.2-rc.1
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -205,12 +205,11 @@ services:
     depends_on:
       - api
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - api_service_ip=api.tls.ai
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
       - RUN_AS_USER=user
       #- ENABLE_DOCKERIZE=false
-      - ENABLE_CHOWN=true
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/broadcaster.env
@@ -220,7 +219,7 @@ services:
 
 
 #  master-sync-service:
-#    image: gcr.io/anyvision-training/master-sync-service:development
+#    image: gcr.io/anyvision-production/master-sync-service:development
 #    restart: always
 #    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
 #    hostname: master-sync-service
@@ -236,9 +235,8 @@ services:
 #    depends_on:
 #      - api
 #    environment:
-#      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
 #      #- ENABLE_DOCKERIZE=false
-#      - ENABLE_CHOWN=true
+#      - ENABLE_CHOWN=false
 #    env_file:
 #      - env/global.env
 #      - env/master-sync-service.env
@@ -249,7 +247,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
+    image: gcr.io/anyvision-production/api-gateway:1.20.2-rc.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -270,7 +268,6 @@ services:
     depends_on:
       - redis
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - GATEWAY_HOST=apigateway.tls.ai
       - API_HOST=api.tls.ai
       - DASH_API_URL=https://api.tls.ai:5443
@@ -278,7 +275,7 @@ services:
       - GATEWAY_URL=http://apigateway.tls.ai:8080
       - REDIS_HOST=redis.tls.ai
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      - ENABLE_CHOWN=false
     env_file:
       - env/api-gateway.env
       - env/global.env
@@ -289,7 +286,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-production/api:1.20.2-rc.2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -308,13 +305,12 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.tls.ai
       - MONGO_DB_IP=mongodb.tls.ai
       - CA_HOST=apigateway.tls.ai
       - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=true
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/api.env
@@ -325,7 +321,7 @@ services:
 
 
   certificator:
-    image: gcr.io/anyvision-training/certificator:latest
+    image: gcr.io/anyvision-production/certificator:latest
     restart: on-failure
     #command: --disable-services --no-exitkills --debug sleep infinity
     volumes:
@@ -340,8 +336,8 @@ services:
 
 
 
-  backend:
-    image: gcr.io/anyvision-training/backend:development
+  backend-pyconcrete:
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.20.2-rc.7
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -374,8 +370,6 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
-      - ENABLE_OPENSSH_SERVICE=true
-      - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - external_ip=proc-localnode.tls.ai
       - storage_ip=nginx-localnode.tls.ai
@@ -397,7 +391,7 @@ services:
 
 
   dante-proxy:
-    image: gcr.io/anyvision-training/dante-proxy
+    image: gcr.io/anyvision-production/dante-proxy
     restart: always
     networks:
       - prod
@@ -412,7 +406,7 @@ services:
 
 
   docker-hoster:
-    image: gcr.io/anyvision-training/docker-hoster
+    image: gcr.io/anyvision-production/docker-hoster
     restart: always
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock
@@ -424,7 +418,7 @@ services:
 
 
   # dashboard-updater:
-  #   image: gcr.io/anyvision-training/dashboard-updater:latest
+  #   image: gcr.io/anyvision-production/dashboard-updater:latest
   #   restart: always
   #   networks:
   #     - prod

@@ -8,7 +8,7 @@ networks:
 services:
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:3.6-jessie
     restart: always
     networks:
       prod:
@@ -28,7 +28,7 @@ services:
 
 
   migration_manager:
-    image: gcr.io/anyvision-training/migration_manager:development
+    image: gcr.io/anyvision-production/migration_manager:development
     #restart: always
     networks:
       prod:
@@ -53,7 +53,7 @@ services:
       - MONGO_DB_RESTORE_PATH=/data/db_backups/
       - BULK_AMOUNT=5000
       #- LIMIT_VERSION=
-      #- ENABLE_CHOWN=true
+      #- ENABLE_CHOWN=false
     env_file:
       - env/global.env
     logging:
