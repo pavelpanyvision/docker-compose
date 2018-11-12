@@ -260,11 +260,13 @@ services:
 #    depends_on:
 #      - api
 #    environment:
+#      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
 #      # this FQDN should be updated accrodingly to rabbitmq-master
 #      - rabbitmq_server_ip=rabbitmq-master.tls.ai
 #      - rabbitmq_server_port=5672
 #      #- ENABLE_DOCKERIZE=false
 #      - ENABLE_CHOWN=false
+#      - ENABLE_CHOWN=true
 #    env_file:
 #      - env/global.env
 #      - env/master-sync-service.env
