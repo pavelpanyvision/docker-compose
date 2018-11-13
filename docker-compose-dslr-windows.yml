@@ -10,7 +10,6 @@ services:
 
   dslr:
     restart: always
-    privileged: true
     networks:
       - anyvision
     image: gcr.io/anyvision-training/dslr
