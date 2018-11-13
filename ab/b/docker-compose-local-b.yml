@@ -386,7 +386,7 @@ services:
   #     #- /etc/timezone:/etc/timezone:ro
   #   environment:
   #     - limit_rate_speed=0
-  #     - DASHBOARD_VERSION=1.20.0
+  #     - DASHBOARD_VERSION=${TAG_NAME}
   #     - ENABLE_FETCHER=false
   #     - ENABLE_NGINX=true
   #   env_file:

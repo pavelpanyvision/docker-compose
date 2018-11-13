@@ -260,13 +260,12 @@ services:
 #    depends_on:
 #      - api
 #    environment:
-#      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
 #      # this FQDN should be updated accrodingly to rabbitmq-master
 #      - rabbitmq_server_ip=rabbitmq-master.tls.ai
 #      - rabbitmq_server_port=5672
 #      #- ENABLE_DOCKERIZE=false
 #      - ENABLE_CHOWN=false
-#      - ENABLE_CHOWN=true
+#      - ENABLE_CHOWN=false
 #    env_file:
 #      - env/global.env
 #      - env/master-sync-service.env
@@ -487,7 +486,7 @@ services:
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
-      - DASHBOARD_VERSION=1.20.0
+      - DASHBOARD_VERSION=${TAG_NAME}
       - ENABLE_FETCHER=true
       - ENABLE_NGINX=true
     env_file:
