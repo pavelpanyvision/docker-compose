@@ -10,23 +10,14 @@ services:
 
   dslr:
     restart: always
-    privileged: true
     networks:
       - anyvision
     image: gcr.io/anyvision-training/dslr
     volumes:
-      - type: volume
-        source: backend_data
-        target: /root/pipe_data
-      - type: bind
-        source: /storage
-        target: /var/www/html
-      - type: bind
-        source: /storage/logs
-        target: /var/www/html/logs
-      - type: bind
-        source: /storage/cameraMount
-        target: /root/mount
+      - backend_data:/root/pipe_data
+      - /storage:/var/www/html
+      - /storage/logs:/var/www/html/logs
+      - /storage/cameraMount:/root/mount
     environment:
       - pipe_cpu_mode=true
     env_file:
