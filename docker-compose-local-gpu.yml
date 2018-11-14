@@ -409,15 +409,15 @@ services:
 
 
 
-  docker-hoster:
-    image: gcr.io/anyvision-production/docker-hoster
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock
-      - /etc/hosts:/tmp/hosts
-    logging:
-      options:
-        max-size: 1g
+  # docker-hoster:
+  #   image: gcr.io/anyvision-production/docker-hoster
+  #   restart: always
+  #   volumes:
+  #     - /var/run/docker.sock:/tmp/docker.sock
+  #     - /etc/hosts:/tmp/hosts
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
 
@@ -472,7 +472,8 @@ services:
       - /ssd/webrtc-streamer:/webrtc-streamer/html/status
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
-            - WEBRTC_STREAMER_OPTIONS=-nDefault -urtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov -H0.0.0.0:8000s -scoturn:3478 -twebrtc:webrtc@coturn:3478 -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
+      - HOST_IP=${HOST_IP}
+      - WEBRTC_STREAMER_OPTIONS=-nDefault -urtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov -H0.0.0.0:8000s -scoturn-localnode.tls.ai -twebrtc:webrtc@coturn-localnode.tls.ai:3478 -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
     logging:
       options:
         max-size: 1g
