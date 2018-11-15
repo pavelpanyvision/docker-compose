@@ -8,7 +8,7 @@ networks:
 services:
 
   mongodb:
-    image: gcr.io/anyvision-production/mongo:3.6-jessie
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
     restart: always
     networks:
       prod:
@@ -28,7 +28,7 @@ services:
 
 
   migration_manager:
-    image: gcr.io/anyvision-production/migration_manager:development
+    image: gcr.io/anyvision-training/migration_manager:development
     #restart: always
     networks:
       prod:
@@ -41,6 +41,7 @@ services:
     depends_on:
       - mongodb
     environment:
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - MONGO_DB_IP=mongodb.tls.ai
       - MONGO_DB_NAME=anyVision2
       - MONGO_DB_PORT=27017

@@ -167,7 +167,7 @@ services:
 
 
   # broadcaster:
-  #   image: gcr.io/anyvision-production/broadcaster:1.20.2-rc.1
+  #   image: gcr.io/anyvision-production/broadcaster:development
   #   restart: always
   #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
   #   hostname: broadcaster
@@ -198,7 +198,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:1.20.2-rc.1
+    image: gcr.io/anyvision-production/api-gateway:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -236,7 +236,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.20.2-rc.2
+    image: gcr.io/anyvision-production/api:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -295,7 +295,7 @@ services:
 
 
   backend-pyconcrete:
-    image: gcr.io/anyvision-production/backend-pyconcrete:1.20.2-rc.7
+    image: gcr.io/anyvision-production/backend:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
