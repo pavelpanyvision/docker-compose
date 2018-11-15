@@ -1,0 +1,122 @@
+version: "3.6"
+
+# 10 Things to Consider When Planning Your Elasticsearch Project: https://ecmarchitect.com/archives/2015/07/27/4031
+# Using Apache JMeter to Test Elasticsearch: https://ecmarchitect.com/archives/2014/09/02/3915
+
+services:
+
+
+  elasticsearch:
+    image: gcr.io/anyvision-production/elasticsearch:6.3.2}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 2G
+
+    #hostname: "{{.Node.Hostname}}-elasticsearch"
+    environment:
+      - discovery.zen.ping.unicast.hosts=elasticsearch
+      - discovery.zen.minimum_master_nodes=1
+      - ELASTIC_PASSWORD=changeme
+      - xpack.security.enabled=true
+      - xpack.monitoring.collection.enabled=true
+      - xpack.license.self_generated.type=trial
+      - cluster.name=DevOps
+      - node.name={{.Node.Hostname}}-elasticsearch
+      - network.host=0.0.0.0
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports: 
+      - 9200:9200
+      - 9300:9300
+    logging:
+      options:
+        max-size: 1g
+
+  logstash:
+    image: gcr.io/anyvision-production/logstash:6.3.2
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 2G
+
+    #hostname: "{{.Node.Hostname}}-logstash"
+    environment:
+      - XPACK_MONITORING_ELASTICSEARCH_URL=http://elasticsearch:9200
+      - XPACK_MONITORING_ELASTICSEARCH_USERNAME=elastic
+      - XPACK_MONITORING_ELASTICSEARCH_PASSWORD=changeme
+    ports:
+      - "12201:12201/udp"
+    volumes:
+      - $PWD/elk/logstash/config/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    logging:
+      options:
+        max-size: 1g
+
+        #  cpu_percent: 10
+    # mem_limit: 1gb
+
+  kibana:
+    image: gcr.io/anyvision-production/kibana:6.3.2
+    deploy:
+      resources:
+        limits: 
+          cpus: '0.25'
+          memory: 2G
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=changeme
+      - SERVER_NAME="{{.Node.Hostname}}-kibana"
+    volumes:
+      - kibana:/usr/share/kibana/data
+    ports:
+      - 5601:5601
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  filebeat:
+    image: gcr.io/anyvision-production/filebeat:6.3.2}
+    deploy:
+      resources:
+        limits: 
+          cpus: '0.25'
+          memory: 2G
+         
+    restart: always
+    user: root
+    volumes:
+      - $PWD/elk/beats/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - filebeat:/usr/share/filebeat/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      # This is needed for filebeat to load container log path as specified in filebeat.yml
+      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
+
+      # # This is needed for filebeat to load jenkins build log path as specified in filebeat.yml
+      # - /var/lib/docker/volumes/jenkins_home/_data/jobs/:/var/lib/docker/volumes/jenkins_home/_data/jobs/:ro
+
+      # This is needed for filebeat to load logs for system and auth modules
+      - /var/log/:/var/log/:ro
+      - /storage:/opt
+      # This is needed for filebeat to load logs for auditd module
+      # - /var/log/audit/:/var/log/audit/:ro
+    environment:
+      - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-elasticsearch}
+      - KIBANA_HOST=${KIBANA_HOST:-kibana}
+    # disable strict permission checks
+    command: ["--strict.perms=false"]
+    logging:
+      options:
+        max-size: 1g
+
+
+volumes:
+  elasticsearch:
+  kibana:
+  filebeat:
+  logstash:        
