@@ -45,13 +45,14 @@ services:
           - api-master.tls.ai
     ports:
       - "27183:27183"
+      - "38383:38383"
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38383
       - API_MASTER_PORT=27183
       - SELF_API_HOST=api.tls.ai
       - SELF_API_PORT=3000

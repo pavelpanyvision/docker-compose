@@ -34,6 +34,8 @@ services:
       prod:
         aliases:
           - migration-manager.tls.ai
+    ports:
+      - "38394:38394"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /storage/migration_db_data:/var/tmp
@@ -41,7 +43,7 @@ services:
     depends_on:
       - mongodb
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38394
       - MONGO_DB_IP=mongodb.tls.ai
       - MONGO_DB_NAME=anyVision2
       - MONGO_DB_PORT=27017

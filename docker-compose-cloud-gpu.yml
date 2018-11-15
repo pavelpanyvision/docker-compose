@@ -223,6 +223,8 @@ services:
       prod:
         aliases:
           - broadcaster.tls.ai
+    ports:
+      - "38392:38392"
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
@@ -230,7 +232,7 @@ services:
     depends_on:
       - api
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38392
       - api_service_ip=api.tls.ai
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
       - RUN_AS_USER=user
@@ -254,6 +256,8 @@ services:
 #      prod:
 #        aliases:
 #          - master-sync-service.tls.ai
+#    ports:
+#      - "38395:38395"
 #    volumes:
 #      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
 #      - /etc/localtime:/etc/localtime:ro
@@ -261,7 +265,7 @@ services:
 #    depends_on:
 #      - api
 #    environment:
-#      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+#      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38395
 #      # this FQDN should be updated accrodingly to rabbitmq-master
 #      - rabbitmq_server_ip=rabbitmq-master.tls.ai
 #      - rabbitmq_server_port=5672
@@ -337,7 +341,7 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.tls.ai
       - MONGO_DB_IP=mongodb.tls.ai
       - CA_HOST=apigateway.tls.ai
