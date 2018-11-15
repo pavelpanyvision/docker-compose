@@ -9,7 +9,7 @@ services:
 
 
   liveness-service-gpu:
-    image: gcr.io/anyvision-production/liveness-service-gpu:1.0.0
+    image: gcr.io/anyvision-training/liveness-service-gpu:development
     restart: always
     networks:
       prod:

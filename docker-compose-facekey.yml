@@ -9,7 +9,7 @@ services:
 
 
   face-key-fe:
-    image: gcr.io/anyvision-production/face-key-fe:latest
+    image: gcr.io/anyvision-training/face-key-fe:development
     restart: always
     networks:
       prod:
@@ -34,7 +34,7 @@ services:
 
 
   face-key-be:
-    image: gcr.io/anyvision-production/face-key-be:latest
+    image: gcr.io/anyvision-training/face-key-fe:development
     restart: always
     networks:
       prod:

@@ -9,7 +9,7 @@ services:
 
 
   liveness-service-cpu:
-    image: gcr.io/anyvision-production/liveness-service-cpu:1.0.0
+    image: gcr.io/anyvision-training/liveness-service-cpu:development
     restart: always
     networks:
       prod:

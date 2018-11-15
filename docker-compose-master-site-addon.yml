@@ -10,7 +10,7 @@ services:
 
 
   dashboard-master:
-    image: gcr.io/anyvision-production/dashboard-master:development
+    image: gcr.io/anyvision-training/dashboard-master:development
     restart: always
     networks:
       prod:
@@ -37,7 +37,7 @@ services:
 
 
   api-master:
-    image: gcr.io/anyvision-production/api-master:development
+    image: gcr.io/anyvision-training/api-master:development
     restart: always
     networks:
       prod:
@@ -51,6 +51,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
       - API_MASTER_PORT=27183
       - SELF_API_HOST=api.tls.ai
       - SELF_API_PORT=3000
