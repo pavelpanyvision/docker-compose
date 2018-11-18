@@ -339,8 +339,6 @@ services:
     - /storage:/var/www/html
     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     - /etc/localtime:/etc/localtime:ro
-    #- /etc/timezone:/etc/timezone:ro
-    #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
     - API_IP=api.tls.ai
     - RUN_AS_USER=user
