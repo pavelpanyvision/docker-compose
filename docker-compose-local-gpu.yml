@@ -19,9 +19,7 @@ services:
     networks:
       - prod
     ports:
-      - "8080:8080"
       - "9333:9333"
-      - "18080:8080"
     volumes:
       - /storage/seaweed:/data:rw
       - /etc/localtime:/etc/localtime:ro
