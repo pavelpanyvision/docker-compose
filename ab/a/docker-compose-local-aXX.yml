@@ -16,11 +16,7 @@ services:
       anyvision:
         aliases:
           - nginx-a<XX>.tls.ai
-    extra_hosts:
-      - "nginx-a<01>.tls.ai:<ip of a01 server>"
-      - "nginx-a<02>.tls.ai:<ip of a02 server>"
-      - "nginx-a<03>.tls.ai:<ip of a03 server>"
-      - "nginx-a<04>.tls.ai:<ip of a04 server>"
+    #extra_hosts:
     ports:
       - "1935:1935"
       - "443:443"
@@ -90,6 +86,10 @@ services:
       - "coll-b.tls.ai:<ip of b server>"
       - "arch-b.tls.ai:<ip of b server>"
       - "nginx-b.tls.ai:<ip of b server>"
+      - "nginx-a<01>.tls.ai:<ip of a01 server>"
+      - "nginx-a<02>.tls.ai:<ip of a02 server>"
+      - "nginx-a<03>.tls.ai:<ip of a03 server>"
+      - "nginx-a<04>.tls.ai:<ip of a04 server>"      
     ports:
       - "4005:4005"
       - "9067:9067"
