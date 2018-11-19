@@ -339,7 +339,7 @@ services:
     - /etc/localtime:/etc/localtime:ro
     environment:
     - API_IP=api.tls.ai
-    - RUN_AS_USER=root
+    - RUN_AS_USER=user
     - ENABLE_CHOWN=false
     - REPORTS_SERVICE_HOST=reports.tls.ai
     - SERVER_PORT=443
