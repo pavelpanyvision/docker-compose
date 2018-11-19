@@ -334,8 +334,10 @@ services:
     #       - coll-${node_name:-localnode}.tls.ai
     #       - arch-${node_name:-localnode}.tls.ai
     extra_hosts:
-    #The IP here should point to nginx of the master API
-      - "nginx-master-${node_name:-localnode}.tls.ai:1.1.1.1"
+      - "proc-${node_name:-localnode}.tls.ai:127.0.0.1"
+      - "reid-${node_name:-localnode}.tls.ai:127.0.0.1"
+      - "coll-${node_name:-localnode}.tls.ai:127.0.0.1"
+      - "arch-${node_name:-localnode}.tls.ai:127.0.0.1"
     # ports:
     #   #- "4005:4005"
     #   #- "9067:9067"
