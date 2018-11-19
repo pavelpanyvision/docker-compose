@@ -115,7 +115,7 @@ services:
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - DISPLAY=:0
-      - UPDATER_URL=dashboard-updater:8888
+      - UPDATER_URL=dashboard-updater:8888      
       - ENABLE_DASHBOARD_WGET=true
       - APP_NAME=AnyVision #you can use also FaceSearch for whitelabel
     env_file:
@@ -439,7 +439,8 @@ services:
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
-      - DASHBOARD_VERSION=1.20.0
+      - DASHBOARD_VERSION=development
+      - S3_BUCKET=anyvision-dashboard #you can also choose facesearch-dashboard for whitelabel
       - ENABLE_FETCHER=true
       - ENABLE_NGINX=true
     env_file:
