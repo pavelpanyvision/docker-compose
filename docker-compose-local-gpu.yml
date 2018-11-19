@@ -276,7 +276,7 @@ services:
     restart: always
 
   api:
-    image: api
+    image: gcr.io/anyvision-training/api:con-pilot
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
