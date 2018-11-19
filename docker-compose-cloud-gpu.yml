@@ -117,6 +117,7 @@ services:
       - DISPLAY=:0
       - UPDATER_URL=dashboard-updater:8888
       - ENABLE_DASHBOARD_WGET=true
+      - APP_NAME=AnyVision #you can use also FaceSearch for whitelabel
     env_file:
       - env/global.env
     ipc: host
