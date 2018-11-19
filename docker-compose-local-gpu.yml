@@ -333,8 +333,6 @@ services:
       prod:
         aliases:
         - reports.tls.ai
-    ports:
-    - "3003:3003"
     volumes:
     - /storage:/var/www/html
     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -344,6 +342,7 @@ services:
     - RUN_AS_USER=user
     - ENABLE_CHOWN=false
     - REPORTS_SERVICE_HOST=reports.tls.ai
+    - SERVER_PORT=443
     logging:
       options:
         max-size: 1g
