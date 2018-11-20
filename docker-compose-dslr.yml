@@ -21,6 +21,7 @@ services:
       - /storage/cameraMount:/root/mount
       - /storage/dslr:/etc/dslr
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - /dev/bus/usb/:/dev/bus/usb
       - /etc/localtime:/etc/localtime:ro
     environment:
       - DISPLAY=${DISPLAY:-:1}
