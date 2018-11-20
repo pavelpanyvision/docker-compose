@@ -9,7 +9,7 @@ volumes:
 services:
 
   nodeexporter:
-    image: prom/node-exporter:v0.16.0
+    image: gcr.io/anyvision-production/node-exporter:v0.16.0
     user: root
     privileged: true
     volumes:
@@ -39,7 +39,7 @@ services:
         max-size: 1g
 
   cadvisor:
-    image: google/cadvisor:v0.30.2
+    image: gcr.io/anyvision-production/google-cadvisor:v0.30.2
     privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -67,7 +67,7 @@ services:
         max-size: 1g
 
   nvidia-dcgm-exporter:
-    image: nvidia/dcgm-exporter
+    image: gcr.io/anyvision-production/nvidia-dcgm-exporter
     restart: always
     privileged: true
     networks:
