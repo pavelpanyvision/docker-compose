@@ -10,16 +10,26 @@ services:
 
   dslr:
     restart: always
+    privileged: true
     networks:
       - anyvision
-    image: gcr.io/anyvision-training/dslr
+    image: gcr.io/anyvision-training/dslr:gphoto
     volumes:
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
       - /storage/logs:/var/www/html/logs
       - /storage/cameraMount:/root/mount
+      - /storage/dslr:/etc/dslr
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /etc/localtime:/etc/localtime:ro
     environment:
+      - DISPLAY=${DISPLAY:-:1}
       - pipe_cpu_mode=true
+      - ENABLE_CONFD=true
+      - ENABLE_WATCHER=true
+      - ENABLE_GPHOTO=true
+      - DISCONNECTION_SYNC_INTERVAL=300s
+      - PREVIEW_TIMEOUT_SECONDS=5
     env_file:
       - env/dslr.env
       - env/backend.env
