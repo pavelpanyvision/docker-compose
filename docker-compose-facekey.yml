@@ -47,6 +47,7 @@ services:
       #- /etc/timezone:/etc/timezone:ro
     env_file:
       - env/global.env
+      - env/facekey.env
     logging:
       options:
         max-size: 1g
