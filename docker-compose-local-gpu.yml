@@ -13,20 +13,20 @@ networks:
 
 services:
 
-  seaweed:
-    image: chrislusf/seaweedfs
-    restart: always
-    networks:
-      - prod
-    ports:
-      - "9333:9333"
-    volumes:
-      - /storage/seaweed:/data:rw
-      - /etc/localtime:/etc/localtime:ro
-    command: server -dir="/data" -volume.max=1 
-    logging:
-      options:
-        max-size: 1g
+  # seaweed:
+  #   image: chrislusf/seaweedfs
+  #   restart: always
+  #   networks:
+  #     - prod
+  #   ports:
+  #     - "9333:9333"
+  #   volumes:
+  #     - /storage/seaweed:/data:rw
+  #     - /etc/localtime:/etc/localtime:ro
+  #   command: server -dir="/data" -volume.max=1 
+  #   logging:
+  #     options:
+  #       max-size: 1g
         
         
         
