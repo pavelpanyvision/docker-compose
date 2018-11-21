@@ -29,7 +29,7 @@ services:
       - ENABLE_WATCHER=true
       - ENABLE_GPHOTO=true
       - DISCONNECTION_SYNC_INTERVAL=300s
-      - PREVIEW_TIMEOUT_SECONDS=5
+      #- PREVIEW_TIMEOUT_SECONDS=5
     env_file:
       - env/dslr.env
       - env/backend.env
