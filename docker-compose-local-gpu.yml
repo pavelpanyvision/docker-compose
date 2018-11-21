@@ -275,6 +275,14 @@ services:
     - consul_data:/data
     restart: always
 
+  consul-importer:
+    image: consul-importer
+    networks:
+      anyvision:
+    restart: always
+    depends_on:
+      - consul
+
   api:
     image: gcr.io/anyvision-training/api:con-pilot
     restart: always
@@ -293,14 +301,14 @@ services:
     - /etc/localtime:/etc/localtime:ro
     #- /etc/timezone:/etc/timezone:ro
     #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
-    environment:
+    #environment:
     #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
-    - API_IP=api.tls.ai
-    - MONGO_DB_IP=mongodb.tls.ai
-    - CA_HOST=apigateway.tls.ai
-    - MASS_IMPORT_IP=reid-${node_name:-localnode}.tls.ai          ### use this configuration to configure localhost reid service
-    - RUN_AS_USER=user
-    - CONSUL=consul.tls.ai
+#    - API_IP=api.tls.ai
+#    - MONGO_DB_IP=mongodb.tls.ai
+#    - CA_HOST=apigateway.tls.ai
+#    - MASS_IMPORT_IP=reid-${node_name:-localnode}.tls.ai          ### use this configuration to configure localhost reid service
+#    - RUN_AS_USER=user
+#    - CONSUL=consul.tls.ai
     #- ENABLE_CHOWN=true
     env_file:
     - env/global.env
@@ -308,6 +316,8 @@ services:
     logging:
       options:
         max-size: 1g
+    depends_on:
+      - consul-importer
 
 
   certificator:
