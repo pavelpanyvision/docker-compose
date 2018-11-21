@@ -8,8 +8,8 @@ networks:
 services:
 
 
-  liveness-service-gpu:
-    image: gcr.io/anyvision-training/liveness-service-gpu:development
+  liveness-service:
+    image: gcr.io/anyvision-training/liveness-service:development
     restart: always
     networks:
       prod:
