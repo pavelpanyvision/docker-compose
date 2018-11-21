@@ -16,7 +16,7 @@ services:
         aliases:
           - face-key-fe.tls.ai
     ports:
-      - "3002:3002"
+      - "3002:80"
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
@@ -45,6 +45,9 @@ services:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - REDIS_HOST=redis.tls.ai
+      - DATABASE_IP=mongodb.tls.ai
     env_file:
       - env/global.env
       - env/facekey.env
