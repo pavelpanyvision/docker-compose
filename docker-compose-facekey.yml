@@ -9,20 +9,21 @@ services:
 
 
   face-key-fe:
-    image: gcr.io/anyvision-production/face-key-fe:latest
+    image: gcr.io/anyvision-training/face-key-fe:development
     restart: always
     networks:
       prod:
         aliases:
           - face-key-fe.tls.ai
     ports:
-      - "3002:3002"
+      - "3002:80"
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
-      - face-key-be_ip=face-key-be.tls.ai
+      - face_key_be_host=face-key-be.tls.ai
+      - face_key_be_port=3005
       #- face-key-be_username=admin
       #- face-key-be_password=admin
     env_file:
@@ -34,7 +35,7 @@ services:
 
 
   face-key-be:
-    image: gcr.io/anyvision-production/face-key-be:latest
+    image: gcr.io/anyvision-training/face-key-fe:development
     restart: always
     networks:
       prod:
@@ -45,6 +46,9 @@ services:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - REDIS_HOST=redis.tls.ai
+      - DATABASE_IP=mongodb.tls.ai
     env_file:
       - env/global.env
       - env/facekey.env
