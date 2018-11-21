@@ -22,7 +22,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
-      - face-key-be_ip=face-key-be.tls.ai
+      - face_key_be_host=face-key-be.tls.ai
+      - face_key_be_port=3005
       #- face-key-be_username=admin
       #- face-key-be_password=admin
     env_file:
