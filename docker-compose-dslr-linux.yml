@@ -17,14 +17,15 @@ services:
     volumes:
       - backend_data:/root/pipe_data
       - /storage:/var/www/html
-      - /storage/cameraMount:/root/mount
       - /storage/dslr:/etc/dslr
+      - /storage/cameraMount:/root/mount
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /dev/bus/usb/:/dev/bus/usb
       - /etc/localtime:/etc/localtime:ro
     environment:
       - DISPLAY=${DISPLAY:-:1}
       - pipe_cpu_mode=true
+      - ENABLE_CHMOD=true
       - ENABLE_CONFD=true
       - ENABLE_WATCHER=true
       - ENABLE_GPHOTO=true
