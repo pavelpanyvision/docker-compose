@@ -275,11 +275,10 @@ services:
     - consul_data:/data
     restart: always
 
-  consul-importer:
+  consul-db:
     image: gcr.io/anyvision-training/consul-db:development
     networks:
       anyvision:
-    restart: always
     depends_on:
       - consul
 
@@ -293,11 +292,16 @@ services:
         - api.tls.ai
     ports:
     - "5443:5443"
+    #- "38389:38389"
     - "3000:3000"
     volumes:
     - /storage:/var/www/html
     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     - /etc/localtime:/etc/localtime:ro
+    #- /etc/timezone:/etc/timezone:ro
+    #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
+    #environment:
+    #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
     env_file:
     - env/global.env
     - env/api.env
@@ -305,7 +309,7 @@ services:
       options:
         max-size: 1g
     depends_on:
-      - consul-importer
+      - consul-db
 
 
   certificator:
