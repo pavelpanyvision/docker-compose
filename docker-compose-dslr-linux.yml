@@ -28,9 +28,7 @@ services:
       - ENABLE_CONFD=true
       - ENABLE_WATCHER=true
       - ENABLE_GPHOTO=true
-      - DISCONNECTION_SYNC_INTERVAL=300s
-      #- PREVIEW_TIMEOUT_SECONDS=5
+      - ENABLE_DOCKER_LOG=true
     env_file:
       - env/dslr.env
       - env/backend.env
-      - env/global.env
