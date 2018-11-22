@@ -49,6 +49,7 @@ services:
     environment:
       - REDIS_HOST=redis.tls.ai
       - DATABASE_IP=mongodb.tls.ai
+      - LOG_MAX_FILES=30mb
     env_file:
       - env/global.env
       - env/facekey.env
