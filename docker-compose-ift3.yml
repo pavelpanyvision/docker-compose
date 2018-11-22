@@ -15,7 +15,7 @@ services:
     networks:
       prod:
         aliases:
-          - ifttt.tls.ai
+          - ift3-be.tls.ai
     ports:
       - 3005:3005
     volumes:
@@ -44,7 +44,7 @@ services:
     networks:
       prod:
         aliases:
-        - ifttt.tls.ai
+        - ift3-fe.tls.ai
     ports:
     - 4200:4200
     volumes:
