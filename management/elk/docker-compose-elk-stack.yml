@@ -7,7 +7,7 @@ services:
 
 
   elasticsearch:
-    image: gcr.io/anyvision-production/elasticsearch:6.3.2}
+    image: gcr.io/anyvision-production/elasticsearch:6.3.2
     deploy:
       resources:
         limits:
@@ -81,7 +81,7 @@ services:
 
 
   filebeat:
-    image: gcr.io/anyvision-production/filebeat:6.3.2}
+    image: gcr.io/anyvision-production/filebeat:6.3.2
     deploy:
       resources:
         limits: 
