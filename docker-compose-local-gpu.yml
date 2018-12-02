@@ -260,7 +260,7 @@ services:
 
   consul:
     image: consul:latest
-    command: agent -server -client=0.0.0.0 -bootstrap -ui
+    command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE:-site1}
     networks:
       anyvision:
         aliases:
@@ -274,13 +274,6 @@ services:
     volumes:
     - consul_data:/data
     restart: always
-
-  consul-db:
-    image: gcr.io/anyvision-training/consul-db:development
-    networks:
-      anyvision:
-    depends_on:
-      - consul
 
   api:
     image: gcr.io/anyvision-training/api:con-pilot
@@ -300,16 +293,16 @@ services:
     - /etc/localtime:/etc/localtime:ro
     #- /etc/timezone:/etc/timezone:ro
     #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
-    #environment:
+    environment:
+    - MONGO_DB_IP=mongodb.tls.ai
     #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
+
     env_file:
     - env/global.env
     - env/api.env
     logging:
       options:
         max-size: 1g
-    depends_on:
-      - consul-db
 
 
   certificator:
@@ -329,7 +322,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-pyconcrete:1.20.1
+    image: gcr.io/anyvision-training/backend:con-pilot
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -362,6 +355,7 @@ services:
     #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
     #- ENABLE_OPENSSH_SERVICE=true
+    - ENABLE_CONFD=true
     - BACKEND_OPENSSH_PORT=9022
     - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
     - external_ip=proc-${node_name:-localnode}.tls.ai
@@ -373,6 +367,8 @@ services:
     - reid_service_ip=reid-${node_name:-localnode}.tls.ai
     - collate_service_ip=coll-${node_name:-localnode}.tls.ai
     - track_archive_service_ip=arch-${node_name:-localnode}.tls.ai
+    - CONSUL=consul.tls.ai
+    - CONSUL_PORT=8500
     env_file:
     - env/backend.env
     - env/global.env
