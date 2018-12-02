@@ -2030,7 +2030,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(container_cpu_usage_seconds_total{name=~\".+\",instance=~\"$server:.*\"}) by (name) * 100",
+          "expr": "sum(container_cpu_usage_seconds_total{name=~\".+\",instance=~\"$server:.*\"}) by (name) / 10",
           "format": "time_series",
           "hide": false,
           "interval": "",
