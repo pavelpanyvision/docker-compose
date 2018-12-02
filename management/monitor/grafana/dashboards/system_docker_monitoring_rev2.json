@@ -1451,7 +1451,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$server:.*\",mode!=\"idle\"}[2m])) * 100",
+          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$server:.*\",mode!=\"idle\"}[2m])) * 10",
           "format": "time_series",
           "instant": false,
           "intervalFactor": 1,
@@ -1459,7 +1459,7 @@
           "refId": "A"
         },
         {
-          "expr": "rate(node_cpu_seconds_total{instance=~\"$server:.*\", mode!=\"idle\"}[2m]) * 100",
+          "expr": "rate(node_cpu_seconds_total{instance=~\"$server:.*\", mode!=\"idle\"}[2m]) * 10",
           "format": "time_series",
           "instant": false,
           "interval": "",
