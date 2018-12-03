@@ -150,7 +150,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-production/mongo:3.6-jessie
+    image: gcr.io/anyvision-production/mongo:containerpilot
     restart: always
     networks:
       anyvision:
