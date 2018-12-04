@@ -1,0 +1,21 @@
+mongo: # mongo settings
+  ip: mongo
+  port: 27017
+api: # Api component (Dash-API) settings
+  port: 3000
+  ip: api
+  protocol: http
+bulkAmount: 5000    # bulk amount for each bulk operation on the collections
+plugins: # Please add the plugin configuration for this array and the node process will run them, one each time
+- apiPlugin:
+    checkApiStatus: True # Plugin pre check if the api need to be down
+    pluginPath: api # plugin folder path inside "plugins" folder
+    databaseName: anyVision2 # database name to make migration on
+    dumpFolderPath: /home/anyvision/tmp/backups/anyVision2 # dump folder for this specific migration
+    limitVersion: '' # limit version for this migration if you want to migrate to the last one Please set to ''
+- HQPlugin:
+    checkApiStatus: False
+    pluginPath: HQ
+    databaseName: mapi
+    dumpFolderPath: /home/anyvision/tmp/backups/mapi
+    limitVersion: ''
