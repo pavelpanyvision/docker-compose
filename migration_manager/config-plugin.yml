@@ -13,9 +13,11 @@ plugins: # Please add the plugin configuration for this array and the node proce
     databaseName: anyVision2 # database name to make migration on
     dumpFolderPath: /home/anyvision/tmp/backups/anyVision2 # dump folder for this specific migration
     limitVersion: '' # limit version for this migration if you want to migrate to the last one Please set to ''
+    enable: True
 - HQPlugin:
     checkApiStatus: False
     pluginPath: HQ
     databaseName: mapi
     dumpFolderPath: /home/anyvision/tmp/backups/mapi
     limitVersion: ''
+    enable: False
