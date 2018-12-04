@@ -303,6 +303,8 @@ services:
     logging:
       options:
         max-size: 1g
+    depends_on:
+      - consul
 
 
   certificator:
@@ -355,7 +357,6 @@ services:
     #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
     #- ENABLE_OPENSSH_SERVICE=true
-    - ENABLE_CONFD=true
     - BACKEND_OPENSSH_PORT=9022
     - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
     - external_ip=proc-${node_name:-localnode}.tls.ai
@@ -376,6 +377,8 @@ services:
       options:
         max-size: 1g
     ipc: host
+    depends_on:
+      - consul
 
 
 
