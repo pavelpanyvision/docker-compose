@@ -103,7 +103,7 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-production/supercronic:alpine
+    image: gcr.io/anyvision-production/supercronic:containerpilot
     restart: always
     networks:
       anyvision:
