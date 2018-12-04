@@ -11,13 +11,13 @@ plugins: # Please add the plugin configuration for this array and the node proce
     checkApiStatus: True # Plugin pre check if the api need to be down
     pluginPath: api # plugin folder path inside "plugins" folder
     databaseName: anyVision2 # database name to make migration on
-    dumpFolderPath: /home/anyvision/tmp/backups/anyVision2 # dump folder for this specific migration
+    dumpFolderPath: /data/db_backups/
     limitVersion: '' # limit version for this migration if you want to migrate to the last one Please set to ''
     enable: True
 - HQPlugin:
     checkApiStatus: False
     pluginPath: HQ
     databaseName: mapi
-    dumpFolderPath: /home/anyvision/tmp/backups/mapi
+    dumpFolderPath: /data/db_backups/
     limitVersion: ''
     enable: False
