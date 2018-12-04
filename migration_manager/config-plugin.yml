@@ -1,5 +1,5 @@
 mongo: # mongo settings
-  ip: mongo
+  ip: mongodb
   port: 27017
 api: # Api component (Dash-API) settings
   port: 3000
