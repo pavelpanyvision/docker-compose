@@ -6,6 +6,7 @@ volumes:
   redis_db_data:
   api_gateway_keys:
   consul_data:
+  consul_agent_data:
 
 
 networks:
@@ -242,7 +243,7 @@ services:
     depends_on:
     - redis
     environment:
-    #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+    - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
     - GATEWAY_HOST=apigateway.tls.ai
     - API_HOST=api.tls.ai
     - DASH_API_URL=https://api.tls.ai:5443
@@ -273,6 +274,17 @@ services:
     - "8302:8302"
     volumes:
     - consul_data:/data
+    restart: always
+
+  consul-agent:
+    image: consul:latest
+    command: agent -data-dir=/consul/data -config-dir=/consul/config  -log-level=${log_level_consul_agent:-info} -node=aharon-pc -datacenter=${SITE:-site1} -rejoin -retry-join ${CONSUL:-consul.tls.ai} -retry-max 10 -retry-interval 15s
+    #command: /usr/local/bin/consul agent -data-dir=/data -config-dir=/config -log-level=debug -log-level=${log_level_consul_agent:-info} -node=111 -datacenter=${SITE:-site1} -rejoin -retry-join ${CONSUL:-consul.tls.ai} -retry-max 10 -retry-interval 15s
+    networks:
+      anyvision:
+    volumes:
+    - consul_agent_data:/data
+    - /etc/hostname:/etc/hostname:ro
     restart: always
 
   api:
