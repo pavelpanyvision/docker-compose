@@ -72,7 +72,15 @@ services:
     - /etc/localtime:/etc/localtime:ro
     #- /etc/timezone:/etc/timezone:ro
     environment:
+    - aws_host=s3.tls.ai:8333
+    - aws_access_key=accessKey1
+    - aws_secret_key=verySecretKey1
+    - CRT_CA_BUNDLE=/usr/local/share/ca-certificates/tls.ai/tls.ai.full.pem
+    - CRT_PRIVATE_KEY=/usr/local/share/ca-certificates/tls.ai/tls.ai.key
     - limit_rate_speed=0
+    - error_log_level=warn
+    - access_log=off
+    - rewrite_log=off
     env_file:
     - env/global.env
     logging:
