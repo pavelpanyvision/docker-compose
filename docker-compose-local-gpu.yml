@@ -278,10 +278,12 @@ services:
 
   consul-agent:
     image: consul:latest
-    command: agent -data-dir=/consul/data -config-dir=/consul/config  -log-level=${log_level_consul_agent:-info} -node=aharon-pc -datacenter=${SITE:-site1} -rejoin -retry-join ${CONSUL:-consul.tls.ai} -retry-max 10 -retry-interval 15s
+    command: agent -data-dir=/consul/data -config-dir=/consul/config  -log-level=${log_level_consul_agent:-info} -node=aharon-pc -datacenter=${SITE:-site1} -client=0.0.0.0 -rejoin -retry-join ${CONSUL:-consul.tls.ai} -retry-max 10 -retry-interval 15s
     #command: /usr/local/bin/consul agent -data-dir=/data -config-dir=/config -log-level=debug -log-level=${log_level_consul_agent:-info} -node=111 -datacenter=${SITE:-site1} -rejoin -retry-join ${CONSUL:-consul.tls.ai} -retry-max 10 -retry-interval 15s
     networks:
       anyvision:
+        aliases:
+          - consul-agent.tls.ai
     volumes:
     - consul_agent_data:/data
     - /etc/hostname:/etc/hostname:ro
@@ -306,9 +308,10 @@ services:
     #- /etc/timezone:/etc/timezone:ro
     #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
-    - MONGO_DB_IP=mongodb.tls.ai
+      - MONGO_DB_IP=mongodb.tls.ai
+      - CONSUL_AGENT=consul-agent.tls.ai
+      - CONSUL_SERVER=consul.tls.ai
     #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
-
     env_file:
     - env/global.env
     - env/api.env
