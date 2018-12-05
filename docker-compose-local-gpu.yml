@@ -56,7 +56,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-production/nginx:tls.ai
+    image: gcr.io/anyvision-training/nginx:con-pilot
     restart: always
     networks:
       anyvision:
@@ -81,25 +81,25 @@ services:
 
 
 
-  x11vnc:
-    image: gcr.io/anyvision-production/x11vnc
-    restart: always
-    networks:
-    - anyvision
-    #ports:
-    #- "5900:5900"
-    volumes:
-    - /tmp/.X11-unix:/tmp/.X11-unix:rw
-    #- /dev/shm:/dev/shm:rw
-    environment:
-    - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
-    #- VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
-    - /etc/localtime:/etc/localtime:ro
-    #- /etc/timezone:/etc/timezone:ro
-    ipc: host
-    logging:
-      options:
-        max-size: 1g
+#  x11vnc:
+#    image: gcr.io/anyvision-production/x11vnc
+#    restart: always
+#    networks:
+#    - anyvision
+#    #ports:
+#    #- "5900:5900"
+#    volumes:
+#    - /tmp/.X11-unix:/tmp/.X11-unix:rw
+#    #- /dev/shm:/dev/shm:rw
+#    environment:
+#    - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
+#    #- VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
+#    - /etc/localtime:/etc/localtime:ro
+#    #- /etc/timezone:/etc/timezone:ro
+#    ipc: host
+#    logging:
+#      options:
+#        max-size: 1g
 
 
 
@@ -219,7 +219,6 @@ services:
     logging:
       options:
         max-size: 1g
-
 
 
   apigateway:
