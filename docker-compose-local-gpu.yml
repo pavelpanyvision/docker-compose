@@ -250,6 +250,7 @@ services:
     depends_on:
     - redis
     environment:
+    - APP_DIR=/home/user/api-gateway
     - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
     - GATEWAY_HOST=apigateway.tls.ai
     - API_HOST=api.tls.ai
@@ -310,8 +311,7 @@ services:
     #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
       - MONGO_DB_IP=mongodb.tls.ai
-      - CONSUL_AGENT=consul-agent.tls.ai
-      - CONSUL_SERVER=consul.tls.ai
+      - APP_DIR=/home/user/Dash-API/
     #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
     env_file:
     - env/global.env
