@@ -344,7 +344,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:con-pilot
+    image: gcr.io/anyvision-training/backend-pyconcrete:con-pilot
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
