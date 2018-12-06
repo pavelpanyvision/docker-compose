@@ -46,7 +46,7 @@ services:
     ports:
        - 8333:8333
     depends_on:
-      - server
+      - seaweed-server
     environment:
       - SEAWEEDFS_S3=1
       - SEAWEEDFS_SERVER_ADDRESS=seaweed-server-localnode.tls.ai
