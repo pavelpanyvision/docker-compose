@@ -310,8 +310,12 @@ services:
     #- /etc/timezone:/etc/timezone:ro
     #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
+      - API_IP=api.tls.ai
       - MONGO_DB_IP=mongodb.tls.ai
-      - APP_DIR=/home/user/Dash-API/
+      - CA_HOST=apigateway.tls.ai
+      - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
+      - RUN_AS_USER=user
+      #- ENABLE_CHOWN=true
     #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
     env_file:
     - env/global.env
