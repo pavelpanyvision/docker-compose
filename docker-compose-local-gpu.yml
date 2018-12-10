@@ -71,7 +71,8 @@ services:
     environment:
       - SEAWEEDFS_S3=1
       - SEAWEEDFS_S3_PORT=8333
-      - SEAWEEDFS_S3_CMD=-port=8333 -domainName=tls.ai -filer=seaweedfs-filer-localnode.tls.ai:8888 -filer.grpcPort=18888 -filer.dir.buckets=/buckets
+      #- SEAWEEDFS_S3_CMD=-port=8333 -domainName=tls.ai -filer=seaweedfs-filer-localnode.tls.ai:8888 -filer.grpcPort=18888 -filer.dir.buckets=/buckets
+      - SEAWEEDFS_S3_CMD=-port=8333 -filer=seaweedfs-filer-localnode.tls.ai:8888 -filer.grpcPort=18888 -filer.dir.buckets=/buckets
     networks:
       prod:
         aliases:
