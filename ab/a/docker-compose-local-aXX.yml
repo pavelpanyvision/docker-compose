@@ -10,7 +10,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-production/nginx:tls.ai
+    image: gcr.io/anyvision-production/nginx:s3
     restart: always
     networks:
       anyvision:
@@ -21,6 +21,7 @@ services:
       - "nginx-a<02>.tls.ai:<ip of a02 server>"
       - "nginx-a<03>.tls.ai:<ip of a03 server>"
       - "nginx-a<04>.tls.ai:<ip of a04 server>"
+      - "seaweedfs-s3.tls.ai:<ip of seaweedfs-s3 server>"
     ports:
       - "1935:1935"
       - "443:443"
@@ -32,6 +33,7 @@ services:
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
+      - aws_host="seaweedfs-s3.tls.ai:8333"
     env_file:
       - ../../env/global.env
     logging:
