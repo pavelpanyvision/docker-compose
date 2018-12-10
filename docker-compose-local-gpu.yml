@@ -268,7 +268,7 @@ services:
         max-size: 1g
 
   consul:
-    image: consul:latest
+    image: gcr.io/anyvision-training/consul:1.4.0
     command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE:-site1}
     networks:
       anyvision:
@@ -281,7 +281,7 @@ services:
     restart: always
 
   consul-agent:
-    image: gcr.io/anyvision-training/consul-agent:con-pilot
+    image: gcr.io/anyvision-training/consul-agent:1.4.0
     networks:
       anyvision:
         aliases:
@@ -293,7 +293,6 @@ services:
 
   api:
     image: gcr.io/anyvision-training/api:con-pilot
-    restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
       anyvision:
