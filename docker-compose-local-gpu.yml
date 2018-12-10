@@ -52,7 +52,7 @@ services:
 
 
   coturn:
-    image: instrumentisto/coturn
+    image: gcr.io/anyvision-training/coturn:latest
     restart: always
     networks:
       prod:
