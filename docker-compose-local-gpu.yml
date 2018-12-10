@@ -48,8 +48,8 @@ services:
 
   seaweedfs-filer:
     image: gcr.io/anyvision-training/seaweedfs:1.10
-#    ports:
-#       - 8888:8888
+    ports:
+       - 8888:8888
     depends_on:
       - seaweedfs-master
     environment:
@@ -150,7 +150,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx:tls.ai
+    image: gcr.io/anyvision-training/nginx:s3
     restart: always
     networks:
       prod:
@@ -167,6 +167,7 @@ services:
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
+      - aws_host="seaweedfs-s3-localnode.tls.ai:8333"
     env_file:
       - env/global.env
     logging:
