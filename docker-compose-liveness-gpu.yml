@@ -1,0 +1,33 @@
+#filename: docker-compose-liveness-gpu.yml
+version: '3.3'
+
+
+networks:
+  anyvision:
+
+services:
+
+
+  liveness-service:
+    image: gcr.io/anyvision-training/liveness-service:con-pilot
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - liveness-service.tls.ai
+    ports:
+      - "50051:50051"
+    volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - HOST_IP=liveness-service.tls.ai
+      - APP_DIR=/home/user/liveness_service/
+      #gpu on slot 0
+      - GPU_INSTANCE=0
+    env_file:
+      - env/liveness-service.env
+    logging:
+      options:
+        max-size: 1g

@@ -309,6 +309,7 @@ services:
     #- /etc/timezone:/etc/timezone:ro
     #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
+      - APP_DIR=/home/user/Dash-API/
       - API_IP=api.tls.ai
       - MONGO_DB_IP=mongodb.tls.ai
       - CA_HOST=apigateway.tls.ai
