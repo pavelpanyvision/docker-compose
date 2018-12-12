@@ -248,6 +248,40 @@ services:
 
 
 
+#  master-sync-service:
+#    image: gcr.io/anyvision-training/master-sync-service:development
+#    restart: always
+#    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
+#    hostname: master-sync-service
+#    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+#    networks:
+#      prod:
+#        aliases:
+#          - master-sync-service.tls.ai
+#    ports:
+#      - "38395:38395"
+#    volumes:
+#      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+#      - /etc/localtime:/etc/localtime:ro
+#      #- /etc/timezone:/etc/timezone:ro
+#    depends_on:
+#      - api
+#    environment:
+#      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38395
+#      # this FQDN should be updated accrodingly to rabbitmq-master
+#      - rabbitmq_server_ip=rabbitmq-master.tls.ai
+#      - rabbitmq_server_port=5672
+#      #- ENABLE_DOCKERIZE=false
+#      - ENABLE_CHOWN=false
+#    env_file:
+#      - env/global.env
+#      - env/master-sync-service.env
+#    logging:
+#      options:
+#        max-size: 1g
+
+
+
   apigateway:
     image: gcr.io/anyvision-training/api-gateway:development
     restart: always
