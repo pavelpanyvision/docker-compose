@@ -216,6 +216,7 @@ services:
     - api
     environment:
     #- NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
+    - APP_DIR=/home/user/Broadcaster/
     - api_service_ip=api.tls.ai
     - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
     - RUN_AS_USER=user
@@ -248,7 +249,7 @@ services:
     #- /etc/timezone:/etc/timezone:ro
     #- /home/anyvision/Projects/API-gateway:/home/user/api-gateway         ### mount your local project directory to the container
     depends_on:
-    - redis
+      - redis
     environment:
     - APP_DIR=/home/user/api-gateway
     - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38391
