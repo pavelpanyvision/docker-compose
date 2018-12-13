@@ -15,6 +15,63 @@ networks:
 
 services:
 
+  node-rtsp-rtmp-server:
+    image: gcr.io/anyvision-training/node-rtsp-rtmp-server:development
+    restart: always
+    networks:
+      - anyvision
+    #ports:
+      #- "80:80"
+      #- "1935:1935"
+    environment:
+      - APP_DIR=/app
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  webrtc-streamer:
+    image: gcr.io/anyvision-training/webrtc-streamer:con-pilot
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - webrtc-localnode.tls.ai
+    ports:
+      - "8000:8000"
+    volumes:
+      - /ssd/webrtc-streamer:/webrtc-streamer/html/status
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+    environment:
+      - HOST_IP=${HOST_IP}
+      - WEBRTC_STREAMER_OPTIONS=-nDefault -urtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov -H0.0.0.0:8000s -scoturn-localnode.tls.ai:3478 -twebrtc:webrtc@coturn-localnode.tls.ai:3478 -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  coturn:
+    image: gcr.io/anyvision-training/coturn:con-pilot
+    restart: always
+    networks:
+      anyvision:
+        aliases:
+          - coturn-localnode.tls.ai
+    ports:
+      - "3478:3478"
+      - "49160-49260:49160-49260/udp"
+    volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+    environment:
+      - HOST_IP=${HOST_IP}
+    command: -v -n --log-file=stdout --min-port=49160 --max-port=49260 --no-stun --no-multicast-peers --no-loopback-peers --fingerprint --external-ip=${HOST_IP} --user webrtc:webrtc --lt-cred-mech --realm tls.ai --cert /usr/local/share/ca-certificates/tls.ai/tls.ai.full.pem --pkey /usr/local/share/ca-certificates/tls.ai/tls.ai.key
+    logging:
+      options:
+        max-size: 1g
+
+
 
   guacamole:
     image: gcr.io/anyvision-production/guacamole:0.9.14
@@ -198,8 +255,9 @@ services:
 
 
 
+
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:con-pilot
+    image: gcr.io/anyvision-training/broadcaster:development
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -231,7 +289,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:con-pilot
+    image: gcr.io/anyvision-training/api-gateway:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -293,7 +351,7 @@ services:
     restart: always
 
   api:
-    image: gcr.io/anyvision-training/api:con-pilot
+    image: gcr.io/anyvision-training/api:development
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
       anyvision:
