@@ -131,11 +131,11 @@ services:
         aliases:
           - rabbitmq.tls.ai
     # those port should be opened only development mode
-    #ports:
-    #  - "5671:5671"
-    #  - "5672:5672"
-    #  - "15672:15672"
-    #  - "15671:15671"
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "15672:15672"
+      - "15671:15671"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
@@ -286,6 +286,7 @@ services:
 
 
   api:
+    entrypoint: npm run start-dev
     image: gcr.io/anyvision-production/api:1.20.2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
@@ -303,10 +304,11 @@ services:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
-      #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
+      - /home/anyvision/Projects/Dash-API:/home/user/Dash-API
     environment:
       - API_IP=api.tls.ai
       - MONGO_DB_IP=mongodb.tls.ai
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - CA_HOST=apigateway.tls.ai
       - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
