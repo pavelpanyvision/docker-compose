@@ -5,7 +5,9 @@ version: '3.3'
 networks:
   prod:
 
+
 services:
+
 
   mongodb:
     image: gcr.io/anyvision-training/mongo:3.6-jessie
@@ -40,7 +42,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /storage/migration_db_data:/var/tmp
       - /ssd/mongo_db_backups:/data/db_backups
-      - ./migration_manager/config-plugin.yml:/home/user/migration_manager/config-plugin.yml 
+      - ./migration_manager/config-plugin.yml:/home/user/migration_manager/config-plugin.yml
     depends_on:
       - mongodb
     environment:

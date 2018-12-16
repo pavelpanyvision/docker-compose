@@ -21,9 +21,9 @@ services:
     restart: always
     networks:
       - prod
-    #ports:
-      #- "80:80"
-      #- "1935:1935"
+    # ports:
+    #   - "80:80"
+    #   - "1935:1935"
     logging:
       options:
         max-size: 1g
@@ -40,7 +40,6 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - /ssd/webrtc-streamer:/webrtc-streamer/html/status
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
       - HOST_IP=${HOST_IP}
@@ -71,56 +70,77 @@ services:
         max-size: 1g
 
 
+
   seaweedfs-master:
     image: gcr.io/anyvision-training/seaweedfs:1.10
-#    ports:
-#      - 9333:9333
+    restart: always
+    networks:
+      prod:
+        aliases:
+         - seaweedfs-master-localnode.tls.ai
+   # ports:
+   #   - "9333:9333"
     environment:
       - SEAWEEDFS_MASTER=1
       - SEAWEEDFS_MASTER_PORT=9333
       - SEAWEEDFS_MASTER_CMD=-port=9333 -ip=seaweedfs-master-localnode.tls.ai -mdir=/data -peers=seaweedfs-master-localnode.tls.ai:9333
     volumes:
-      - /data:/data
-    networks:
-      prod:
-        aliases:
-         - seaweedfs-master-localnode.tls.ai
+      - /ssd/seaweed-master:/data
+    logging:
+      options:
+        max-size: 1g
+
 
 
   seaweedfs-volume:
     image: gcr.io/anyvision-training/seaweedfs:1.10
+    restart: always
+    networks:
+      prod:
+        aliases:
+         - seaweedfs-volume-localnode.tls.ai
     environment:
       - SEAWEEDFS_VOLUME=1
       - SEAWEEDFS_VOLUME_PORT=8080
       - SEAWEEDFS_VOLUME_CMD=-port=8080 -ip=seaweedfs-volume-localnode.tls.ai -index=memory -max=100000 -mserver=seaweedfs-master-localnode.tls.ai:9333 -dir=/data
     volumes:
-      - /data:/data
-    networks:
-      prod:
-        aliases:
-         - seaweedfs-volume-localnode.tls.ai
+      - /storage/seaweed:/data
+    logging:
+      options:
+        max-size: 1g
+
 
 
   seaweedfs-filer:
     image: gcr.io/anyvision-training/seaweedfs:1.10
+    restart: always
+    networks:
+      prod:
+        aliases:
+         - seaweedfs-filer-localnode.tls.ai
     ports:
-       - 8888:8888
+       - "8888:8888"
     depends_on:
       - seaweedfs-master
     environment:
       - SEAWEEDFS_FILER=1
       - SEAWEEDFS_FILER_PORT=8888
       - SEAWEEDFS_FILER_CMD=-ip=seaweedfs-filer-localnode.tls.ai -master=seaweedfs-master-localnode.tls.ai:9333
-    networks:
-      prod:
-        aliases:
-         - seaweedfs-filer-localnode.tls.ai
+    logging:
+      options:
+        max-size: 1g
+
 
 
   seaweedfs-s3:
     image: gcr.io/anyvision-training/seaweedfs:1.10
+    restart: always
+    networks:
+      prod:
+        aliases:
+         - seaweedfs-s3-localnode.tls.ai
     ports:
-       - 8333:8333
+       - "8333:8333"
     depends_on:
       - seaweedfs-master
     environment:
@@ -128,57 +148,44 @@ services:
       - SEAWEEDFS_S3_PORT=8333
       #- SEAWEEDFS_S3_CMD=-port=8333 -domainName=tls.ai -filer=seaweedfs-filer-localnode.tls.ai:8888 -filer.grpcPort=18888 -filer.dir.buckets=/buckets
       - SEAWEEDFS_S3_CMD=-port=8333 -filer=seaweedfs-filer-localnode.tls.ai:8888 -filer.grpcPort=18888 -filer.dir.buckets=/buckets
-    networks:
-      prod:
-        aliases:
-         - seaweedfs-s3-localnode.tls.ai
+    logging:
+      options:
+        max-size: 1g
+
 
 
   consul:
     image: gcr.io/anyvision-training/consul:1.4.0
+    restart: always
     command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE:-dc1}
     networks:
       prod:
         aliases:
         - consul.tls.ai
     ports:
-    - "8500:8500"
+      - "8500:8500"
     volumes:
-    - consul_data:/data
-    restart: always
+      - consul_data:/data
     env_file:
       - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
 
 
   consul-agent:
     image: gcr.io/anyvision-training/consul-agent:1.4.0
+    restart: always
     networks:
       prod:
         aliases:
           - consul-agent.tls.ai
     volumes:
-    - consul_agent_data:/data
-    - /etc/hostname:/etc/host_hostname:ro
-    restart: always
+      - consul_agent_data:/data
+      - /etc/hostname:/etc/host_hostname:ro
     environment:
-    - SITE=dc1
-    env_file:
-      - env/global.env
-
-        
-  guacamole:
-    image: gcr.io/anyvision-training/guacamole:0.9.14
-    restart: always
-    networks:
-      - prod
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    environment:
-      - GUACD_LOGLEVEL=info
+      - SITE=dc1
     env_file:
       - env/global.env
     logging:
@@ -187,21 +194,42 @@ services:
 
 
 
-  sftp:
-    image: gcr.io/anyvision-training/sftp:alpine
-    restart: always
-    networks:
-      - prod
-    volumes:
-      - /storage/sftp_data:/home/user
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    command: user:pass:2000:2000:files
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
+  # guacamole:
+  #   image: gcr.io/anyvision-training/guacamole:0.9.14
+  #   restart: always
+  #   networks:
+  #     - prod
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
+  #     - /etc/localtime:/etc/localtime:ro
+  #     #- /etc/timezone:/etc/timezone:ro
+  #   environment:
+  #     - GUACD_LOGLEVEL=info
+  #   env_file:
+  #     - env/global.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
+  #
+  #
+  #
+  # sftp:
+  #   image: gcr.io/anyvision-training/sftp:alpine
+  #   restart: always
+  #   networks:
+  #     - prod
+  #   volumes:
+  #     - /storage/sftp_data:/home/user
+  #     - /etc/localtime:/etc/localtime:ro
+  #     #- /etc/timezone:/etc/timezone:ro
+  #   command: user:pass:2000:2000:files
+  #   env_file:
+  #     - env/global.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
 
@@ -232,25 +260,25 @@ services:
 
 
 
-  x11vnc:
-    image: gcr.io/anyvision-training/x11vnc
-    restart: always
-    networks:
-      - prod
-    #ports:
-      #- "5900:5900"
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      #- /dev/shm:/dev/shm:rw
-    environment:
-      - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
-      #- VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    ipc: host
-    logging:
-      options:
-        max-size: 1g
+  # x11vnc:
+  #   image: gcr.io/anyvision-training/x11vnc
+  #   restart: always
+  #   networks:
+  #     - prod
+  #   #ports:
+  #     #- "5900:5900"
+  #   volumes:
+  #     - /tmp/.X11-unix:/tmp/.X11-unix:rw
+  #     #- /dev/shm:/dev/shm:rw
+  #   environment:
+  #     - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
+  #     #- VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
+  #     - /etc/localtime:/etc/localtime:ro
+  #     #- /etc/timezone:/etc/timezone:ro
+  #   ipc: host
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
 
@@ -372,6 +400,7 @@ services:
     logging:
       options:
         max-size: 1g
+
 
 
 #  master-sync-service:
