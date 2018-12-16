@@ -14,6 +14,184 @@ networks:
 services:
 
 
+  node-rtsp-rtmp-server:
+    image: gcr.io/anyvision-training/node-rtsp-rtmp-server
+    restart: always
+    networks:
+      - prod
+    # ports:
+    #   - "80:80"
+    #   - "1935:1935"
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  webrtc-streamer:
+    image: gcr.io/anyvision-training/webrtc-streamer:development
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - webrtc-localnode.tls.ai
+    ports:
+      - "8000:8000"
+    volumes:
+      - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+    environment:
+      - HOST_IP=${HOST_IP}
+      - WEBRTC_STREAMER_OPTIONS=-nDefault -urtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov -H0.0.0.0:8000s -scoturn-localnode.tls.ai:3478 -twebrtc:webrtc@coturn-localnode.tls.ai:3478 -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  coturn:
+    image: gcr.io/anyvision-training/coturn:latest
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - coturn-localnode.tls.ai
+    ports:
+      - "3478:3478"
+      - "49160-49260:49160-49260/udp"
+    volumes:
+      - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+    environment:
+      - HOST_IP=${HOST_IP}
+    command: -v -n --log-file=stdout --min-port=49160 --max-port=49260 --no-stun --no-multicast-peers --no-loopback-peers --fingerprint --external-ip=${HOST_IP} --user webrtc:webrtc --lt-cred-mech --realm tls.ai --cert /usr/local/share/ca-certificates/tls.ai/tls.ai.full.pem --pkey /usr/local/share/ca-certificates/tls.ai/tls.ai.key
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  seaweedfs-master:
+    image: gcr.io/anyvision-training/seaweedfs:1.10
+    restart: always
+    networks:
+      prod:
+        aliases:
+         - seaweedfs-master-localnode.tls.ai
+   # ports:
+   #   - 9333:9333
+    environment:
+      - SEAWEEDFS_MASTER=1
+      - SEAWEEDFS_MASTER_PORT=9333
+      - SEAWEEDFS_MASTER_CMD=-port=9333 -ip=seaweedfs-master-localnode.tls.ai -mdir=/data -peers=seaweedfs-master-localnode.tls.ai:9333
+    volumes:
+      - c:/anv/storage/seaweed-master:/data
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  seaweedfs-volume:
+    image: gcr.io/anyvision-training/seaweedfs:1.10
+    restart: always
+    networks:
+      prod:
+        aliases:
+         - seaweedfs-volume-localnode.tls.ai
+    environment:
+      - SEAWEEDFS_VOLUME=1
+      - SEAWEEDFS_VOLUME_PORT=8080
+      - SEAWEEDFS_VOLUME_CMD=-port=8080 -ip=seaweedfs-volume-localnode.tls.ai -index=memory -max=100000 -mserver=seaweedfs-master-localnode.tls.ai:9333 -dir=/data
+    volumes:
+      - c:/anv/storage/seaweed:/data
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  seaweedfs-filer:
+    image: gcr.io/anyvision-training/seaweedfs:1.10
+    restart: always
+    networks:
+      prod:
+        aliases:
+         - seaweedfs-filer-localnode.tls.ai
+    ports:
+       - 8888:8888
+    depends_on:
+      - seaweedfs-master
+    environment:
+      - SEAWEEDFS_FILER=1
+      - SEAWEEDFS_FILER_PORT=8888
+      - SEAWEEDFS_FILER_CMD=-ip=seaweedfs-filer-localnode.tls.ai -master=seaweedfs-master-localnode.tls.ai:9333
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  seaweedfs-s3:
+    image: gcr.io/anyvision-training/seaweedfs:1.10
+    restart: always
+    networks:
+      prod:
+        aliases:
+         - seaweedfs-s3-localnode.tls.ai
+    ports:
+       - 8333:8333
+    depends_on:
+      - seaweedfs-master
+    environment:
+      - SEAWEEDFS_S3=1
+      - SEAWEEDFS_S3_PORT=8333
+      #- SEAWEEDFS_S3_CMD=-port=8333 -domainName=tls.ai -filer=seaweedfs-filer-localnode.tls.ai:8888 -filer.grpcPort=18888 -filer.dir.buckets=/buckets
+      - SEAWEEDFS_S3_CMD=-port=8333 -filer=seaweedfs-filer-localnode.tls.ai:8888 -filer.grpcPort=18888 -filer.dir.buckets=/buckets
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  consul:
+    image: gcr.io/anyvision-training/consul:1.4.0
+    restart: always
+    command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE:-dc1}
+    networks:
+      prod:
+        aliases:
+        - consul.tls.ai
+    ports:
+      - "8500:8500"
+    volumes:
+      - consul_data:/data
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  consul-agent:
+    image: gcr.io/anyvision-training/consul-agent:1.4.0
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - consul-agent.tls.ai
+    volumes:
+      - consul_agent_data:/data
+      #- /etc/hostname:/etc/host_hostname:ro
+    environment:
+      - SITE=dc1
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
   nginx:
     image: gcr.io/anyvision-training/nginx:tls.ai
     restart: always
@@ -66,11 +244,11 @@ services:
         aliases:
           - rabbitmq.tls.ai
     # these ports should be opened only in development mode
-    #ports:
-      #- "5671:5671"
-      #- "5672:5672"
-      #- "15672:15672"
-      #- "15671:15671"
+    # ports:
+    #   - "5671:5671"
+    #   - "5672:5672"
+    #   - "15672:15672"
+    #   - "15671:15671"
     volumes:
       - c:/anv/storage/rabbitmq:/var/lib/rabbitmq
     env_file:
@@ -88,8 +266,8 @@ services:
       prod:
         aliases:
           - mongodb.tls.ai
-    #ports:
-      #- "27017:27017"
+    # ports:
+    #   - "27017:27017"
     volumes:
       - /ssd/mongo_db_data:/data/db
     env_file:
@@ -320,8 +498,8 @@ services:
       - prod
     ports:
       - "1080:1080"
-    #volumes:
-      #- /etc/localtime:/etc/localtime:ro
+    # volumes:
+    #   - /etc/localtime:/etc/localtime:ro
     logging:
       options:
         max-size: 1g
