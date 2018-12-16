@@ -1,17 +1,17 @@
-#filename: docker-compose-apimaster.yml
+#filename: docker-compose-local-gpu.yml
 version: '3.3'
 
-
-networks:
-  prod:
 
 volumes:
   consul_data:
   consul_agent_data:
 
 
-services:
+networks:
+  prod:
 
+
+services:
 
   dashboard-master:
     image: gcr.io/anyvision-training/dashboard-master:development
@@ -151,7 +151,7 @@ services:
         max-size: 1g
 
 
-consul:
+  consul:
     image: gcr.io/anyvision-training/consul:1.4.0
     command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE:-dc1}
     networks:
@@ -180,7 +180,7 @@ consul:
     environment:
     - SITE=dc1
     env_file:
-      - env/global.env
+        - env/global.env
 
 
   mongodb:
