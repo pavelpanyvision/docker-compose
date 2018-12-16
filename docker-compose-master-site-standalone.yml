@@ -5,6 +5,10 @@ version: '3.3'
 networks:
   prod:
 
+volumes:
+  consul_data:
+  consul_agent_data:
+
 
 services:
 
@@ -146,6 +150,37 @@ services:
       options:
         max-size: 1g
 
+
+consul:
+    image: gcr.io/anyvision-training/consul:1.4.0
+    command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE:-dc1}
+    networks:
+      prod:
+        aliases:
+        - consul.tls.ai
+    ports:
+    - "8500:8500"
+    volumes:
+    - consul_data:/data
+    restart: always
+    env_file:
+      - env/global.env
+
+
+  consul-agent:
+    image: gcr.io/anyvision-training/consul-agent:1.4.0
+    networks:
+      prod:
+        aliases:
+          - consul-agent.tls.ai
+    volumes:
+    - consul_agent_data:/data
+    - /etc/hostname:/etc/host_hostname:ro
+    restart: always
+    environment:
+    - SITE=dc1
+    env_file:
+      - env/global.env
 
 
   mongodb:
