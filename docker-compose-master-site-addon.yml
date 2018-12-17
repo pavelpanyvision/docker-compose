@@ -50,7 +50,7 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
+      - /ssd/apimaster/keys:/usr/local/share/keys
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38383
       - API_MASTER_PORT=27183
