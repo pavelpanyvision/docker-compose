@@ -463,6 +463,7 @@ services:
       #- nginx-a03.tls.ai:<ip of a03 server>
       #- nginx-a04.tls.ai:<ip of a04 server>
     volumes:
+      - ./socks/sockd.conf:/etc/sockd.conf
       - /etc/localtime:/etc/localtime:ro
     logging:
       options:

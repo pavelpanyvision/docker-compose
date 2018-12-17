@@ -593,6 +593,7 @@ services:
       - "1080:1080"
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - ./socks/sockd.conf:/etc/sockd.conf
     logging:
       options:
         max-size: 1g
