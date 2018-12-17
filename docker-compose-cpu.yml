@@ -1,4 +1,4 @@
-#filename: docker-compose-local-cpu.yml
+#filename: docker-compose-cpu.yml
 version: '3.3'
 
 

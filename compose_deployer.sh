@@ -115,12 +115,12 @@ if [ "$remove" == "true" ] ; then
 fi
 compose_string=""
 if [ "$deploy_gpu" = "true" ] ; then
-   compose_string+=" -f $BASEDIR/docker-compose-local-gpu.yml "
+   compose_string+=" -f $BASEDIR/docker-compose-gpu.yml "
    if [ "$deploy_liveness" = "true" ] ; then
       compose_string+=" -f $BASEDIR/docker-compose-liveness-gpu.yml "
    fi
 elif [ "$deploy_cpu" = "true" ] ; then
-   compose_string+=" -f $BASEDIR/docker-compose-local-cpu.yml "
+   compose_string+=" -f $BASEDIR/docker-compose-cpu.yml "
    if [ "$deploy_liveness" = "true" ] ; then
       compose_string+=" -f $BASEDIR/docker-compose-liveness-cpu.yml "
    fi

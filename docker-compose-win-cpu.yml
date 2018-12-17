@@ -1,4 +1,4 @@
-#filename: docker-compose-local-win-cpu.yml
+#filename: docker-compose-win-cpu.yml
 version: '3.3'
 
 
