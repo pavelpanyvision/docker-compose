@@ -409,6 +409,10 @@ services:
 #    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
 #    hostname: master-sync-service
 #    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+#    extra_hosts:
+#      - "rabbitmq-master.tls.ai:<hq server ip>"
+#    ports:
+#      - "16180:16180"
 #    networks:
 #      prod:
 #        aliases:
