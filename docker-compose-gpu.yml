@@ -157,7 +157,7 @@ services:
   consul:
     image: gcr.io/anyvision-training/consul:1.4.0
     restart: always
-    command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE:-dc1}
+    command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE_NAME:-dc1}
     networks:
       prod:
         aliases:
@@ -185,7 +185,7 @@ services:
       - consul_agent_data:/data
       - /etc/hostname:/etc/host_hostname:ro
     environment:
-      - SITE=dc1
+      - SITE_NAME=dc1
     env_file:
       - env/global.env
     logging:
