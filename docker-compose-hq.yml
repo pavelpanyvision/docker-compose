@@ -1,6 +1,10 @@
 #filename: docker-compose-apimaster.yml
 version: '3.3'
 
+volumes:
+  consul_data:
+  consul_agent_data:
+
 
 networks:
   prod:
