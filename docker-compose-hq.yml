@@ -1,0 +1,274 @@
+#filename: docker-compose-apimaster.yml
+version: '3.3'
+
+volumes:
+  consul_data:
+  consul_agent_data:
+
+
+networks:
+  prod:
+
+
+services:
+
+
+  consul:
+    image: gcr.io/anyvision-training/consul:1.4.0
+    command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE:-dc1}
+    networks:
+      prod:
+        aliases:
+        - consul.tls.ai
+    ports:
+    - "8500:8500"
+    volumes:
+    - consul_data:/data
+    restart: always
+    env_file:
+      - env/global.env
+
+
+  consul-agent:
+    image: gcr.io/anyvision-training/consul-agent:1.4.0
+    networks:
+      prod:
+        aliases:
+          - consul-agent.tls.ai
+    volumes:
+    - consul_agent_data:/data
+    - /etc/hostname:/etc/host_hostname:ro
+    restart: always
+    environment:
+    - SITE=dc1
+    env_file:
+        - env/global.env
+
+
+  dashboard-master:
+    image: gcr.io/anyvision-training/dashboard-master:development
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - dashboard-master-localnode.tls.ai
+    ports:
+      #- "443:443"
+      - "80:80"
+    volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - limit_rate_speed=0
+      - master_api_ip=api-master.tls.ai
+      - master_api_username=admin
+      - master_api_password=admin
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  api-master:
+    image: gcr.io/anyvision-training/api-master:development
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - api-master.tls.ai
+    ports:
+      - "27183:27183"
+      - "38383:38383"
+    volumes:
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      - /ssd/apimaster/keys:/usr/local/share/keys
+    environment:
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38383
+      - API_MASTER_PORT=27183
+      - SELF_API_HOST=api.tls.ai
+      - SELF_API_PORT=3000
+      - MONGO_DB_IP=mongodb-master.tls.ai
+      - MONGO_DB_PORT=27017
+      - RUN_AS_USER=user
+      #- ENABLE_CHOWN=false
+    env_file:
+      - env/global.env
+      - env/api-master.env
+    logging:
+      options:
+        max-size: 1g
+
+
+  rabbitmq-master:
+    image: gcr.io/anyvision-training/rabbitmq:latest
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - rabbitmq-master.tls.ai
+    # those port should be opened only development mode
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "15672:15672"
+      - "15671:15671"
+    volumes:
+      - /storage/rabbitmq:/var/lib/rabbitmq
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  nginx-master:
+    image: gcr.io/anyvision-training/nginx:tls.ai
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - nginx-master-localnode.tls.ai
+    ports:
+      - "443:443"
+    volumes:
+      - /storage:/opt/nginx/html:ro
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - limit_rate_speed=0
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+  api:
+    image: gcr.io/anyvision-training/api:development
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity
+    networks:
+      prod:
+        aliases:
+          - api.tls.ai
+          - api-localnode.tls.ai
+    ports:
+      - "5443:5443"
+      - "38389:38389"
+      - "3000:3000"
+    volumes:
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
+    environment:
+      - API_IP=api.tls.ai
+      - MONGO_DB_IP=mongodb-master.tls.ai
+      - CA_HOST=apigateway.tls.ai
+      - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+    env_file:
+      - env/global.env
+      - env/api.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+
+
+  mongodb-master:
+    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - mongodb-master.tls.ai
+    ports:
+      - "27017:27017"
+    volumes:
+      - /ssd/mongo_db_data:/data/db
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+  certificator:
+    image: gcr.io/anyvision-training/certificator:latest
+    restart: on-failure
+    #command: --disable-services --no-exitkills --debug sleep infinity
+    volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - ENABLE_COPY_CERT=true
+    logging:
+      options:
+        max-size: 1g
+
+  backend:
+    image: gcr.io/anyvision-training/backend:development
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
+    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      prod:
+        aliases:
+          - proc-localnode.tls.ai
+          - reid-localnode.tls.ai
+          - coll-localnode.tls.ai
+          - arch-localnode.tls.ai
+    ports:
+      - "4005:4005"
+      - "9067:9067"
+      - "9068:9068"
+      - "9069:9069"
+      - "9022:9022" #ssh
+      - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
+    volumes:
+      - /home/user/license:/home/user/license:ro
+      - /ssd/backend_data:/root/pipe_data
+      - /ssd/track_archive_service_data:/root/track_archive_service_data
+      - /storage:/var/www/html
+      #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+    environment:
+      - ENABLE_OPENSSH_SERVICE=true
+      - BACKEND_OPENSSH_PORT=9022
+      - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - external_ip=proc-localnode.tls.ai
+      - storage_ip=nginx-master-localnode.tls.ai
+      - frame_store_storage_ip=nginx-master-localnode.tls.ai
+      - redis_host=127.0.0.1
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb-master.tls.ai
+      - reid_service_ip=reid-localnode.tls.ai
+      - collate_service_ip=coll-localnode.tls.ai
+      - track_archive_service_ip=arch-localnode.tls.ai
+    env_file:
+      - env/backend.env
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    ipc: host        
