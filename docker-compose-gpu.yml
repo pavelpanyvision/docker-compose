@@ -307,6 +307,7 @@ services:
   rabbitmq:
     image: gcr.io/anyvision-training/rabbitmq:latest
     restart: always
+    hostname: rabbitmq
     networks:
       prod:
         aliases:
