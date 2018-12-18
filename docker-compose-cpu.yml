@@ -406,12 +406,12 @@ services:
 #    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
 #    hostname: master-sync-service
 #    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+#    #ports:
+#    #  - "16180:16180"
 #    networks:
 #      prod:
 #        aliases:
 #          - master-sync-service.tls.ai
-#    ports:
-#      - "38395:38395"
 #    volumes:
 #      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
 #      - /etc/localtime:/etc/localtime:ro
@@ -421,9 +421,6 @@ services:
 #    environment:
 #      #- ENABLE_DOCKERIZE=false
 #      - ENABLE_CHOWN=false
-#      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38395
-#      #- ENABLE_DOCKERIZE=false
-#      - ENABLE_CHOWN=true
 #    env_file:
 #      - env/global.env
 #      - env/master-sync-service.env
