@@ -13,58 +13,58 @@ networks:
 services:
 
 
-  dante-proxy:
-    image: gcr.io/anyvision-training/dante-proxy
-    restart: always
-    networks:
-      - prod
-    ports:
-      - "1080:1080"
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ./socks/sockd.conf:/etc/sockd.conf
-    logging:
-      options:
-        max-size: 1g
+  # dante-proxy:
+  #   image: gcr.io/anyvision-training/dante-proxy
+  #   restart: always
+  #   networks:
+  #     - prod
+  #   ports:
+  #     - "1080:1080"
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ./socks/sockd.conf:/etc/sockd.conf
+  #   logging:
+  #     options:
+  #       max-size: 1g
         
 
-  consul:
-    image: gcr.io/anyvision-training/consul:1.4.0
-    restart: always
-    command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE_NAME:-dc1}
-    networks:
-      prod:
-        aliases:
-        - consul.tls.ai
-    ports:
-      - "8500:8500"
-    volumes:
-      - consul_data:/data
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
+  # consul:
+  #   image: gcr.io/anyvision-training/consul:1.4.0
+  #   restart: always
+  #   command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE_NAME:-dc1}
+  #   networks:
+  #     prod:
+  #       aliases:
+  #       - consul.tls.ai
+  #   ports:
+  #     - "8500:8500"
+  #   volumes:
+  #     - consul_data:/data
+  #   env_file:
+  #     - env/global.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
 
-  consul-agent:
-    image: gcr.io/anyvision-training/consul-agent:1.4.0
-    restart: always
-    networks:
-      prod:
-        aliases:
-          - consul-agent.tls.ai
-    volumes:
-      - consul_agent_data:/data
-      - /etc/hostname:/etc/host_hostname:ro
-    environment:
-      - SITE_NAME=dc1
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
+  # consul-agent:
+  #   image: gcr.io/anyvision-training/consul-agent:1.4.0
+  #   restart: always
+  #   networks:
+  #     prod:
+  #       aliases:
+  #         - consul-agent.tls.ai
+  #   volumes:
+  #     - consul_agent_data:/data
+  #     - /etc/hostname:/etc/host_hostname:ro
+  #   environment:
+  #     - SITE_NAME=dc1
+  #   env_file:
+  #     - env/global.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
   dashboard-master:
