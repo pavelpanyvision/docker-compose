@@ -131,7 +131,7 @@ services:
 
 
   # rabbitmq-master:
-  #   image: gcr.io/anyvision-training/rabbitmq:latest
+  #   image: gcr.io/anyvision-training/rabbitmq:18.12
   #   restart: always
   #   networks:
   #     prod:
@@ -156,7 +156,7 @@ services:
 
 
   # nginx-master:
-  #   image: gcr.io/anyvision-training/nginx:tls.ai
+  #   image: gcr.io/anyvision-training/nginx:18.12
   #   restart: always
   #   networks:
   #     prod:
@@ -217,7 +217,7 @@ services:
 
 
   # mongodb-master:
-  #   image: gcr.io/anyvision-training/mongo:3.6-jessie
+  #   image: gcr.io/anyvision-training/mongo:18.12
   #   restart: always
   #   networks:
   #     prod:

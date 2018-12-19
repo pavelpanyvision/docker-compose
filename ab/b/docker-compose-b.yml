@@ -111,7 +111,7 @@ services:
 
 
   guacamole:
-    image: gcr.io/anyvision-production/guacamole:0.9.14
+    image: gcr.io/anyvision-training/guacamole:0.9.14
     restart: always
     networks:
       - anyvision
@@ -132,7 +132,7 @@ services:
 
 
   sftp:
-    image: gcr.io/anyvision-production/sftp:alpine
+    image: gcr.io/anyvision-training/sftp:alpine
     restart: always
     networks:
       - anyvision
@@ -150,7 +150,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-production/nginx:s3
+    image: gcr.io/anyvision-training/nginx:18.12
     restart: always
     networks:
       anyvision:
@@ -177,7 +177,7 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-production/supercronic:alpine
+    image: gcr.io/anyvision-training/supercronic:18.12
     restart: always
     networks:
       anyvision:
@@ -199,7 +199,7 @@ services:
 
 
   # rabbitmq:
-  #   image: gcr.io/anyvision-production/rabbitmq:latest
+  #   image: gcr.io/anyvision-training/rabbitmq:18.12
   #   restart: always
   #   networks:
   #     anyvision:
@@ -224,7 +224,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-production/mongo:3.6-jessie
+    image: gcr.io/anyvision-training/mongo:18.12
     restart: always
     networks:
       anyvision:
@@ -245,7 +245,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-production/redis:latest
+    image: gcr.io/anyvision-training/redis:18.12
     restart: always
     networks:
       anyvision:
@@ -264,7 +264,7 @@ services:
 
 
   # broadcaster:
-  #   image: gcr.io/anyvision-production/broadcaster:development
+  #   image: gcr.io/anyvision-training/broadcaster:development
   #   restart: always
   #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
   #   hostname: broadcaster
@@ -295,7 +295,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:development
+    image: gcr.io/anyvision-training/api-gateway:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -333,7 +333,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:development
+    image: gcr.io/anyvision-training/api:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -376,7 +376,7 @@ services:
 
 
   certificator:
-    image: gcr.io/anyvision-production/certificator:latest
+    image: gcr.io/anyvision-training/certificator:latest
     restart: on-failure
     #command: --disable-services --no-exitkills --debug sleep infinity
     volumes:
@@ -392,7 +392,7 @@ services:
 
 
   backend-pyconcrete:
-    image: gcr.io/anyvision-production/backend:development
+    image: gcr.io/anyvision-training/backend:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -451,7 +451,7 @@ services:
 
 
   dante-proxy:
-    image: gcr.io/anyvision-production/dante-proxy
+    image: gcr.io/anyvision-training/dante-proxy
     restart: always
     networks:
       - anyvision
@@ -472,7 +472,7 @@ services:
 
 
   # dashboard-updater:
-  #   image: gcr.io/anyvision-production/dashboard-updater:latest
+  #   image: gcr.io/anyvision-training/dashboard-updater:latest
   #   restart: always
   #   networks:
   #     - anyvision

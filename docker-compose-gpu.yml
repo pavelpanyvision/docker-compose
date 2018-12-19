@@ -234,7 +234,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx:s3
+    image: gcr.io/anyvision-training/nginx:18.12
     restart: always
     networks:
       prod:
@@ -283,7 +283,7 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:alpine
+    image: gcr.io/anyvision-training/supercronic:18.12
     restart: always
     networks:
       prod:
@@ -305,7 +305,7 @@ services:
 
 
   rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:latest
+    image: gcr.io/anyvision-training/rabbitmq:18.12
     restart: always
     networks:
       prod:
@@ -330,7 +330,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:3.6-jessie
+    image: gcr.io/anyvision-training/mongo:18.12
     restart: always
     networks:
       prod:
@@ -351,7 +351,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:latest
+    image: gcr.io/anyvision-training/redis:18.12
     restart: always
     networks:
       prod:

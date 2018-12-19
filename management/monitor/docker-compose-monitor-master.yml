@@ -17,7 +17,7 @@ services:
 
 
   prometheus:
-    image: gcr.io/anyvision-production/prometheus:v2.3.2
+    image: gcr.io/anyvision-training/prometheus:v2.3.2
     volumes:
       - ./prometheus/:/etc/prometheus:rw
       - prometheus_data:/prometheus:rw
@@ -44,7 +44,7 @@ services:
 
 
   alertmanager:
-    image: gcr.io/anyvision-production/alertmanager:v0.15.2
+    image: gcr.io/anyvision-training/alertmanager:v0.15.2
     volumes:
       - ./alertmanager:/etc/alertmanager:rw
     command:
@@ -73,7 +73,7 @@ services:
 
 
   grafana:
-    image: gcr.io/anyvision-production/grafana:5.2.2
+    image: gcr.io/anyvision-training/grafana:5.2.2
     volumes:
       #- grafana_data:/var/lib/grafana:rw
       #- ./grafana/datasources:/etc/grafana/datasources:rw
@@ -107,7 +107,7 @@ services:
 
           
   blackbox:
-    image: gcr.io/anyvision-production/blackbox-exporter:v0.12.0
+    image: gcr.io/anyvision-training/blackbox-exporter:v0.12.0
     restart: always
     ports:
       - "9115:9115"

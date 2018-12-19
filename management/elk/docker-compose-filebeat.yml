@@ -6,7 +6,7 @@ version: "3.6"
 services:
 
   filebeat:
-    image: gcr.io/anyvision-production/filebeat:6.3.2
+    image: gcr.io/anyvision-training/filebeat:6.3.2
       resources:
         limits:
           cpus: '0.25'
