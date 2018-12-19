@@ -4,8 +4,9 @@ version: '3.3'
 
 volumes:
   redis_db_data:
-  api_gateway_keys:
-
+  #api_gateway_keys:
+  consul_data:
+  consul_agent_data:
 
 networks:
   prod:
@@ -446,7 +447,8 @@ services:
       - "38391:38391"
     volumes:
       - /storage:/var/www/html
-      - api_gateway_keys:/home/user/api-gateway/config/keys
+      #- api_gateway_keys:/home/user/api-gateway/config/keys
+      - /ssd/apigateway/keys:/usr/local/share/keys
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
