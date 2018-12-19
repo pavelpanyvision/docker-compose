@@ -49,6 +49,8 @@ services:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38394
       - ENABLE_MIGRATION_MANAGER=true
       - MONGO_DB_DUMP_PATH=/data/db_backups/
+      - MONGO_DB_IP=mongodb
+      - MONGO_DB_PORT=27017
       #- ENABLE_CHOWN=false
     env_file:
       - env/global.env
