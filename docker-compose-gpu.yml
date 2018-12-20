@@ -395,6 +395,7 @@ services:
       - RUN_AS_USER=user
       #- ENABLE_DOCKERIZE=false
       - ENABLE_CHOWN=false
+      - APP_DIR=/home/user/Broadcaster/
     env_file:
       - env/global.env
       - env/broadcaster.env
@@ -467,6 +468,7 @@ services:
       - REDIS_HOST=redis.tls.ai
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
+      - APP_DIR=/home/user/api-gateway
     env_file:
       - env/api-gateway.env
       - env/global.env
@@ -503,6 +505,7 @@ services:
       - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
+      - APP_DIR=/home/user/Dash-API/
     env_file:
       - env/global.env
       - env/api.env
