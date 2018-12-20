@@ -23,6 +23,9 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     environment:
+      - TELNET_HOST=192.168.1.26
+      - TELNET_PORT=1337
+      - SOCKET_PORT=3022
       - MONGO_DB_IP=mongodb://mongodb.tls.ai
       - MONGO_DB_PORT=27017
       - PORT=3005
