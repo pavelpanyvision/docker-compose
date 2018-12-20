@@ -67,6 +67,7 @@ services:
       - RMQ_EXCHANGE_PORT=5672      
       - MONGO_DB_PORT=27017
       - RUN_AS_USER=user
+      - API_MASTER_IP=api-master.tls.ai
       #- ENABLE_CHOWN=false
     env_file:
       - env/global.env
