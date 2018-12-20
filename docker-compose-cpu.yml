@@ -402,34 +402,35 @@ services:
 
 
 
-#  master-sync-service:
-#    image: gcr.io/anyvision-training/master-sync-service:development
-#    restart: always
-#    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
-#    hostname: master-sync-service
-#    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-#    #those port should be opened only development mode
-#    #ports:
-#    #  - "16180:16180"
-#    networks:
-#      prod:
-#        aliases:
-#          - master-sync-service.tls.ai
-#    volumes:
-#      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-#      - /etc/localtime:/etc/localtime:ro
-#      #- /etc/timezone:/etc/timezone:ro
-#    depends_on:
-#      - api
-#    environment:
-#      #- ENABLE_DOCKERIZE=false
-#      - ENABLE_CHOWN=false
-#    env_file:
-#      - env/global.env
-#      - env/master-sync-service.env
-#    logging:
-#      options:
-#        max-size: 1g
+  # master-sync-service:
+  #   image: gcr.io/anyvision-training/master-sync-service:development
+  #   restart: always
+  #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
+  #   hostname: master-sync-service
+  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+  #   #those port should be opened only development mode
+  #   #ports:
+  #   #  - "16180:16180"
+  #   networks:
+  #     prod:
+  #       aliases:
+  #         - master-sync-service.tls.ai
+  #   volumes:
+  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+  #     - /etc/localtime:/etc/localtime:ro
+  #     #- /etc/timezone:/etc/timezone:ro
+  #   depends_on:
+  #     - api
+  #   environment:
+  #     #- ENABLE_DOCKERIZE=false
+  #     - ENABLE_CHOWN=false
+  #     - RUN_AS_USER=user
+  #   env_file:
+  #     - env/global.env
+  #     - env/master-sync-service.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
 
