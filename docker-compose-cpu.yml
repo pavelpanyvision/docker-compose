@@ -416,6 +416,7 @@ services:
   #       aliases:
   #         - master-sync-service.tls.ai
   #   volumes:
+  #     - /storage:/var/www/html
   #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
   #     - /etc/localtime:/etc/localtime:ro
   #     #- /etc/timezone:/etc/timezone:ro
