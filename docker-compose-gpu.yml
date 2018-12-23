@@ -594,7 +594,7 @@ services:
 
 
   dante-proxy:
-    image: gcr.io/anyvision-training/dante-proxy
+    image: gcr.io/anyvision-training/dante-proxy:18.12
     restart: always
     networks:
       - prod
