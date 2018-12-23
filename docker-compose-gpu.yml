@@ -166,6 +166,8 @@ services:
       - "8500:8500"
     volumes:
       - consul_data:/data
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0
     env_file:
       - env/global.env
     logging:
@@ -175,7 +177,7 @@ services:
 
 
   consul-agent:
-    image: gcr.io/anyvision-training/consul-agent:1.4.0
+    image: gcr.io/anyvision-training/consul-agent:1.4.0-entrypoint
     restart: always
     networks:
       prod:
@@ -185,6 +187,8 @@ services:
       - consul_agent_data:/data
       - /etc/hostname:/etc/host_hostname:ro
     environment:
+      - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_ADDRESS=0.0.0.0
       - SITE_NAME=dc1
     env_file:
       - env/global.env
