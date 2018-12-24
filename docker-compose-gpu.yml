@@ -126,6 +126,9 @@ services:
       - SEAWEEDFS_FILER=1
       - SEAWEEDFS_FILER_PORT=8888
       - SEAWEEDFS_FILER_CMD=-ip=seaweedfs-filer-localnode.tls.ai -master=seaweedfs-master-localnode.tls.ai:9333
+    volumes:
+      - ./seaweedfs/filer.toml:/etc/seaweedfs/filer.toml
+      - /ssd/seaweed-master:/data
     logging:
       options:
         max-size: 1g
@@ -594,7 +597,7 @@ services:
 
 
   dante-proxy:
-    image: gcr.io/anyvision-training/dante-proxy
+    image: gcr.io/anyvision-training/dante-proxy:18.12
     restart: always
     networks:
       - prod
