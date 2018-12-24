@@ -10,7 +10,7 @@ services:
 
 
   ift3-be:
-    image: gcr.io/anyvision-training/ift3-be:development
+    image: gcr.io/anyvision-production/ift3-be:development
     restart: always
     networks:
       prod:
@@ -42,7 +42,7 @@ services:
         max-size: 1g
 
   ift3-fe:
-    image: gcr.io/anyvision-training/ift3-fe:development
+    image: gcr.io/anyvision-production/ift3-fe:development
     restart: always
     networks:
       prod:
