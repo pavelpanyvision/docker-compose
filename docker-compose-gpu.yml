@@ -5,8 +5,8 @@ version: '3.3'
 volumes:
   redis_db_data:
   #api_gateway_keys:
-  consul_data:
-  consul_agent_data:
+#  consul_data:
+#  consul_agent_data:
 
 
 networks:
@@ -160,7 +160,7 @@ services:
   consul:
     image: gcr.io/anyvision-training/consul:1.4.0
     restart: always
-    command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE_NAME:-dc1}
+    command: agent -server -data-dir=/consul/data -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE_NAME:-dc1}
     networks:
       prod:
         aliases:
@@ -168,9 +168,10 @@ services:
     ports:
       - "8500:8500"
     volumes:
-      - consul_data:/data
+      - /storage/consul-data:/consul/data
     environment:
       - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_ADDRESS=0.0.0.0
     env_file:
       - env/global.env
     logging:
@@ -180,14 +181,14 @@ services:
 
 
   consul-agent:
-    image: gcr.io/anyvision-training/consul-agent:1.4.0-entrypoint
+    image: gcr.io/anyvision-training/consul-agent:1.4.0
     restart: always
     networks:
       prod:
         aliases:
           - consul-agent.tls.ai
     volumes:
-      - consul_agent_data:/data
+      - /storage/consul-agent-data:/consul/data
       - /etc/hostname:/etc/host_hostname:ro
     environment:
       - CONSUL_BIND_INTERFACE=eth0
@@ -574,6 +575,7 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
+      - CONSUL_ENV_OVERWRITE=true
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
