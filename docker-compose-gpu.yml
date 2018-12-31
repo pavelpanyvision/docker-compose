@@ -487,7 +487,6 @@ services:
         max-size: 1g
 
 
-
   api:
     image: gcr.io/anyvision-training/api:development
     restart: always
@@ -522,7 +521,6 @@ services:
     logging:
       options:
         max-size: 1g
-
 
 
   certificator:
@@ -647,3 +645,26 @@ services:
   #   logging:
   #     options:
   #       max-size: 1g
+
+  #  push-notification:
+  #    image: gcr.io/anyvision-training/push-notification-service:con-pilot
+  #    restart: always
+  #    #command: --disable-services --no-exitkills --debug sleep infinity
+  #    networks:
+  #      prod:
+  #        aliases:
+  #        - push-notification.tls.ai
+  #    ports:
+  #    - "7443:7443"
+  #    volumes:
+  #    - /storage:/var/www/html
+  #    - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+  #    - /etc/localtime:/etc/localtime:ro
+  #    environment:
+  #    - RUN_AS_USER=user
+  #    - ENABLE_CHOWN=false
+  #    env_file:
+  #    - env/global.env
+  #    logging:
+  #      options:
+  #        max-size: 1g
