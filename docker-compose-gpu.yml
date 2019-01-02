@@ -586,6 +586,9 @@ services:
       - reid_service_ip=reid-localnode.tls.ai
       - collate_service_ip=coll-localnode.tls.ai
       - track_archive_service_ip=arch-localnode.tls.ai
+      - frame_store_rtmp_url=node-rtsp-rtmp-server
+      - frame_store_rtmp_port=80
+      - misc_gpu_encoding=true
     env_file:
       - env/backend.env
       - env/global.env
