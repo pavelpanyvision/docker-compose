@@ -34,6 +34,7 @@ services:
 
   webrtc-streamer:
     image: gcr.io/anyvision-training/webrtc-streamer:18.12
+    restart: always
     networks:
       prod:
         aliases:
@@ -63,6 +64,7 @@ services:
 
   coturn:
     image: gcr.io/anyvision-training/coturn:18.12
+    restart: always
     network_mode: host
     volumes:
       - /ssd/coturn:/var/lib/coturn
