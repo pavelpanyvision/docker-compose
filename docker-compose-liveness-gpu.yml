@@ -25,6 +25,7 @@ services:
       - HOST_IP=liveness-service.tls.ai
       #gpu on slot 0
       - GPU_INSTANCE=0
+      - RUN_AS_USER=user
     env_file:
       - env/liveness-service.env
     logging:
