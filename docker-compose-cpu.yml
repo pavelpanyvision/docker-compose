@@ -554,6 +554,7 @@ services:
       - /home/user/license:/home/user/license:ro
       - /ssd/backend_data:/root/pipe_data
       - /ssd/track_archive_service_data:/root/track_archive_service_data
+      - /ssd/reid_service_data:/root/reid_service_data
       - /storage:/var/www/html
       #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
