@@ -565,6 +565,7 @@ services:
       - /home/user/license:/home/user/license:ro
       - /ssd/backend_data:/root/pipe_data
       - /ssd/track_archive_service_data:/root/track_archive_service_data
+      - /ssd/reid_service_data:/root/reid_service_data
       - /storage:/var/www/html
       #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -573,7 +574,6 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
-      - CONSUL_ENV_OVERWRITE=true
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
@@ -586,6 +586,9 @@ services:
       - reid_service_ip=reid-localnode.tls.ai
       - collate_service_ip=coll-localnode.tls.ai
       - track_archive_service_ip=arch-localnode.tls.ai
+      - frame_store_rtmp_url=node-rtsp-rtmp-server
+      - frame_store_rtmp_port=80
+      - misc_gpu_encoding=true
     env_file:
       - env/backend.env
       - env/global.env
