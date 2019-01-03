@@ -203,10 +203,10 @@ services:
     ports:
       - "8501:8500"
     volumes:
-      - /storage/consul-agent-data:/consul/data
+      #- /storage/consul-agent-data:/consul/data
       - /etc/hostname:/etc/host_hostname:ro
     environment:
-      - CMD=agent -rejoin -retry-join consul.tls.ai -retry-max 10 -retry-interval 15s
+      - CMD=agent -rejoin -retry-join consul.tls.ai -retry-max 10 -retry-interval 15s -disable-host-node-id
       - CONSUL_SERVER=consul.tls.ai
       - CONSUL_BIND_INTERFACE=eth0
       - CONSUL_CLIENT_ADDRESS=0.0.0.0
