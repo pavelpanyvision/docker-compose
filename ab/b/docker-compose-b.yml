@@ -392,7 +392,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend:1.21.0-rc.2
+    image: gcr.io/anyvision-production/backend:1.21.0-rc.3
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
