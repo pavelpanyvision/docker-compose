@@ -468,7 +468,7 @@
         "options": [],
         "query": "label_values(instance)",
         "refresh": 2,
-        "regex": "/(?<=\\-)(.*?)(?=\\.)/",
+        "regex": "/(?=\\-(.*?)\\.)/",
         "sort": 3,
         "tagValuesQuery": "",
         "tags": [],
