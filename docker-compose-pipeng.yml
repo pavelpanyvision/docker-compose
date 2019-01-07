@@ -33,7 +33,7 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=all
       - model_path=/root/pipeng/models/
       - frame_store_path=/data/frame_store/
-      - redis_ip=127.0.0.1
+      - redis_ip=backend
     logging:
       options:
         max-size: 1g
