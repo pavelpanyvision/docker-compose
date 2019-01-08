@@ -862,14 +862,14 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(node_disk_read_bytes_total) by (instance,device)",
+          "expr": "sum(irate(node_disk_read_bytes_total{device!~\"dm.*\"}[2m])) by (instance,device)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Disk Read {{instance}} {{device}}",
           "refId": "A"
         },
         {
-          "expr": "sum(node_disk_written_bytes_total) by (instance,device)",
+          "expr": "sum(irate(node_disk_written_bytes_total{device!~\"dm.*\"}[2m])) by (instance,device)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Disk Write {{instance}} {{device}}",
@@ -963,7 +963,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(irate(container_network_receive_bytes_total{device!~\"lo|bond[0-9]|cbr[0-9]|veth.*\"}[2m])) by (instance,interface)",
+          "expr": "sum(irate(container_network_receive_bytes_total{interface!~\"lo|vir.*|br.*|bond[0-9]|cbr[0-9]|veth.*\"}[2m])) by (instance,interface)",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "In {{instance}} {{interface}}",
@@ -971,7 +971,7 @@
           "step": 600
         },
         {
-          "expr": "sum(irate(container_network_transmit_bytes_total{device!~\"lo|bond[0-9]|cbr[0-9]|veth.*\"}[2m])) by (instance,interface)",
+          "expr": "sum(irate(container_network_transmit_bytes_total{interface!~\"lo|vir.*|br.*|bond[0-9]|cbr[0-9]|veth.*\"}[2m])) by (instance,interface)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Out {{instance}} {{interface}}",
