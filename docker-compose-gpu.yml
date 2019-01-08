@@ -81,7 +81,7 @@ services:
 
 
   seaweedfs-master:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -102,7 +102,7 @@ services:
 
 
   seaweedfs-volume:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -121,7 +121,7 @@ services:
 
 
   seaweedfs-filer:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -145,7 +145,7 @@ services:
 
 
   seaweedfs-s3:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
