@@ -14,6 +14,35 @@ networks:
 
 services:
 
+  memsql:
+    image: gcr.io/anyvision-training/memsql:19.01
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - memsql.tls.ai
+    ports:
+      - "3306:3306"
+    deploy:
+      resources:
+        limits:
+          memory: 128g
+    volumes:
+      - /ssd/memsql:/var/lib/memsql
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
+      - MEMSQL_NODE_ROLE=AIO
+      - JOB_NAME=memsql
+      - MEMSQL_PASSWORD=password
+      - log_level_containerpilot=DEBUG
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
 
   zookeeper:
     image: gcr.io/anyvision-training/zookeeper:19.01
