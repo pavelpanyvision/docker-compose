@@ -388,7 +388,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.21.0-rc.6
+    image: gcr.io/anyvision-production/api:1.21.0-rc.7
     restart: always
     networks:
       prod:
