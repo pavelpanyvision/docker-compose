@@ -14,7 +14,7 @@ services:
 
 
   dashboard-master:
-    image: gcr.io/anyvision-production/dashboard-master:development
+    image: gcr.io/anyvision-production/dashboard-master:1.1.0-rc.6
     restart: always
     networks:
       prod:
