@@ -2,7 +2,13 @@ version: '3.3'
 
 networks:
   monitor-net:
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 172.30.35.0/24
 
+        
 volumes:
   nvidia_dcgm_exporter_date:
 
