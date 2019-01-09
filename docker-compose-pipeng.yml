@@ -1,0 +1,48 @@
+#filename: docker-compose-gpu.yml
+version: '3.3'
+
+networks:
+  prod:
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 172.30.30.0/24
+
+
+services:
+
+  pipeng:
+    image: gcr.io/anyvision-training/pipeng:development
+    restart: always
+    #entrypoint: sleep infinity     ### uncoment if you dont have compiled projet in realease folder and commnent next "command" and "working_dir" section
+    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    ipc: host
+    networks:
+      prod:
+        aliases:
+          - pipeng-localnode.tls.ai
+          - pipeng.tls.ai
+    ports:
+      - "50051:50051"                                        ### for remote VMS rtsp connections
+    volumes:
+      - /home/user/license:/home/user/license:ro
+      - /storage/pipeng_frame_store:/data/frame_store
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
+      #- /root/pipeNG:/root/pipeng                           ### mount your local project directory to the container
+    environment:
+      - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - model_path=/root/pipeng/models/
+      - frame_store_path=/data/frame_store/
+      - redis_ip=backend
+      - CMD=--config /root/pipeng/pipeNG.json --mode V5
+    logging:
+      options:
+        max-size: 1g
+    
+
