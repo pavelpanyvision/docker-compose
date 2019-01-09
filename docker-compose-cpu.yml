@@ -5,6 +5,8 @@ version: '3.3'
 volumes:
   redis_db_data:
   #api_gateway_keys:
+  consul_data:
+  consul_agent_data:
 
 
 networks:
@@ -79,7 +81,7 @@ services:
 
 
   seaweedfs-master:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -100,7 +102,7 @@ services:
 
 
   seaweedfs-volume:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -119,7 +121,7 @@ services:
 
 
   seaweedfs-filer:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -143,7 +145,7 @@ services:
 
 
   seaweedfs-s3:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -174,7 +176,7 @@ services:
     ports:
       - "8500:8500"
     volumes:
-      - /storage/consul-data:/consul/data
+      -  consul_data:/consul/data
       - /etc/hostname:/etc/host_hostname:ro
     environment:
       - CMD=agent -server -bootstrap -ui
@@ -200,10 +202,8 @@ services:
       prod:
         aliases:
           - consul-agent.tls.ai
-    ports:
-      - "8501:8500"
     volumes:
-      #- /storage/consul-agent-data:/consul/data
+      - consul_agent_data:/consul/data
       - /etc/hostname:/etc/host_hostname:ro
     environment:
       - CMD=agent -rejoin -retry-join consul.tls.ai -retry-max 10 -retry-interval 15s -disable-host-node-id
