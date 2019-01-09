@@ -2,9 +2,19 @@ version: '3.3'
 
 networks:
   monitor-net:
-  anyvision:
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 172.30.35.0/24    
+  prod:
     external:
       name: docker-compose_prod
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 172.30.30.0/24
 
 
 volumes:

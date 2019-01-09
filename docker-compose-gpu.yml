@@ -11,6 +11,11 @@ volumes:
 
 networks:
   prod:
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 172.30.30.0/24
 
 
 services:
