@@ -31,7 +31,7 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-production/webrtc-streamer:development
+    image: gcr.io/anyvision-training/webrtc-streamer:development
     restart: always
     networks:
       prod:
@@ -72,7 +72,7 @@ services:
 
 
   seaweedfs-master:
-    image: gcr.io/anyvision-production/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -93,7 +93,7 @@ services:
 
 
   seaweedfs-volume:
-    image: gcr.io/anyvision-production/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -112,7 +112,7 @@ services:
 
 
   seaweedfs-filer:
-    image: gcr.io/anyvision-production/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -136,7 +136,7 @@ services:
 
 
   seaweedfs-s3:
-    image: gcr.io/anyvision-production/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -158,9 +158,8 @@ services:
 
 
   consul:
-    image: gcr.io/anyvision-production/consul:1.4.0
+    image: gcr.io/anyvision-production/consul:18.12
     restart: always
-    command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE_NAME:-dc1}
     networks:
       prod:
         aliases:
@@ -168,9 +167,17 @@ services:
     ports:
       - "8500:8500"
     volumes:
-      - consul_data:/data
+      -  consul_data:/consul/data
+      - /etc/hostname:/etc/host_hostname:ro
     environment:
+      - CMD=agent -server -bootstrap -ui
+      - CONSUL_SERVER=127.0.0.1
       - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_ADDRESS=0.0.0.0
+      - JOB_NAME=consul
+      - DATACENTER=dc1
+      - SITE_NAME=local
+      - RUN_AS_USER=root
     env_file:
       - env/global.env
     logging:
@@ -180,19 +187,24 @@ services:
 
 
   consul-agent:
-    image: gcr.io/anyvision-production/consul-agent:1.4.0-entrypoint
+    image: gcr.io/anyvision-production/consul:18.12
     restart: always
     networks:
       prod:
         aliases:
           - consul-agent.tls.ai
     volumes:
-      - consul_agent_data:/data
+      - consul_agent_data:/consul/data
       - /etc/hostname:/etc/host_hostname:ro
     environment:
+      - CMD=agent -rejoin -retry-join consul.tls.ai -retry-max 10 -retry-interval 15s -disable-host-node-id
+      - CONSUL_SERVER=consul.tls.ai
       - CONSUL_BIND_INTERFACE=eth0
       - CONSUL_CLIENT_ADDRESS=0.0.0.0
-      - SITE_NAME=dc1
+      - JOB_NAME=consul-agent
+      - DATACENTER=dc1
+      - SITE_NAME=local
+      - RUN_AS_USER=root
     env_file:
       - env/global.env
     logging:
