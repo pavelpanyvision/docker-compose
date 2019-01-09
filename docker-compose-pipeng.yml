@@ -25,6 +25,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
+      - /storage/pipe_logs:/root/pipeng/pipe_logs
       #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
       #- /root/pipeNG:/root/pipeng                           ### mount your local project directory to the container
     environment:
