@@ -20,10 +20,12 @@ services:
 
 
   node-rtsp-rtmp-server:
-    image: gcr.io/anyvision-production/node-rtsp-rtmp-server
+    image: gcr.io/anyvision-production/node-rtsp-rtmp-server:18.12
     restart: always
     networks:
-      - prod
+      prod:
+        aliases:
+         - node-rtsp-rtmp-server-localnode.tls.ai
     # ports:
     #   - "80:80"
     #   - "1935:1935"
@@ -34,7 +36,7 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-production/webrtc-streamer:development
+    image: gcr.io/anyvision-production/webrtc-streamer:18.12
     restart: always
     networks:
       prod:
@@ -45,8 +47,18 @@ services:
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
-      - HOST_IP=${HOST_IP}
-      - WEBRTC_STREAMER_OPTIONS=-nDefault -urtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov -H0.0.0.0:8000s -scoturn-localnode.tls.ai:3478 -twebrtc:webrtc@coturn-localnode.tls.ai:3478 -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
+      - WEBRTC_STREAMER_OPTIONS=-H0.0.0.0:8000s -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
+      - CONSUL_AGENT=consul-agent.tls.ai
+      - APIGATEWAY_IP=apigateway.tls.ai
+      - APIGATEWAY_PROTOCOL=https
+      - APIGATEWAY_PORT=9443
+      - NODE_RTSP_IP=node-rtsp-rtmp-server-localnode.tls.ai
+      - NODE_RTSP_PROTOCOL=rtsp
+      - NODE_RTSP_PORT=80
+      - CAMERA_INT_REQ_TIME=1000
+      - CRT_CA_BUNDLE=/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
+      #- WAN_MODE=true
+      #- WAN_STUN_URL=stun.l.google.com:19302
     logging:
       options:
         max-size: 1g
@@ -54,20 +66,17 @@ services:
 
 
   coturn:
-    image: gcr.io/anyvision-production/coturn:latest
+    image: gcr.io/anyvision-production/coturn:18.12
     restart: always
-    networks:
-      prod:
-        aliases:
-          - coturn-localnode.tls.ai
-    ports:
-      - "3478:3478"
-      - "49160-49260:49160-49260/udp"
+    network_mode: host
     volumes:
+      - /ssd/coturn:/var/lib/coturn
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
-      - HOST_IP=${HOST_IP}
-    command: -v -n --log-file=stdout --min-port=49160 --max-port=49260 --no-stun --no-multicast-peers --no-loopback-peers --fingerprint --external-ip=${HOST_IP} --user webrtc:webrtc --lt-cred-mech --realm tls.ai --cert /usr/local/share/ca-certificates/tls.ai/tls.ai.full.pem --pkey /usr/local/share/ca-certificates/tls.ai/tls.ai.key
+      - COTURN_CMD=-v -n --log-file stdout --min-port 50000 --max-port 50050 --no-stun --no-multicast-peers --no-loopback-peers --fingerprint --user webrtc:webrtc --lt-cred-mech --realm tls.ai --cert /usr/local/share/ca-certificates/tls.ai/tls.ai.full.pem --pkey /usr/local/share/ca-certificates/tls.ai/tls.ai.key
+      #- EXTERNAL_IP=
+      - CONSUL_AGENT=127.0.0.1
+      - CONSUL_AGENT_PORT=8501
     logging:
       options:
         max-size: 1g
@@ -75,7 +84,7 @@ services:
 
 
   seaweedfs-master:
-    image: gcr.io/anyvision-production/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -96,7 +105,7 @@ services:
 
 
   seaweedfs-volume:
-    image: gcr.io/anyvision-production/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -115,7 +124,7 @@ services:
 
 
   seaweedfs-filer:
-    image: gcr.io/anyvision-production/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -136,7 +145,7 @@ services:
 
 
   seaweedfs-s3:
-    image: gcr.io/anyvision-production/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -158,7 +167,7 @@ services:
 
 
   consul:
-    image: gcr.io/anyvision-production/consul:1.4.0
+    image: gcr.io/anyvision-production/consul:18.12
     restart: always
     command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE_NAME:-dc1}
     networks:
@@ -178,7 +187,7 @@ services:
 
 
   consul-agent:
-    image: gcr.io/anyvision-production/consul-agent:1.4.0
+    image: gcr.io/anyvision-production/consul-agent:18.12
     restart: always
     networks:
       prod:
@@ -194,46 +203,6 @@ services:
     logging:
       options:
         max-size: 1g
-
-
-
-  # guacamole:
-  #   image: gcr.io/anyvision-production/guacamole:0.9.14
-  #   restart: always
-  #   networks:
-  #     - prod
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
-  #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
-  #   environment:
-  #     - GUACD_LOGLEVEL=info
-  #   env_file:
-  #     - env/global.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-  #
-  #
-  #
-  # sftp:
-  #   image: gcr.io/anyvision-production/sftp:alpine
-  #   restart: always
-  #   networks:
-  #     - prod
-  #   volumes:
-  #     - /storage/sftp_data:/home/user
-  #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
-  #   command: user:pass:2000:2000:files
-  #   env_file:
-  #     - env/global.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-
 
 
   nginx:
@@ -259,29 +228,6 @@ services:
     logging:
       options:
         max-size: 1g
-
-
-
-  # x11vnc:
-  #   image: gcr.io/anyvision-production/x11vnc
-  #   restart: always
-  #   networks:
-  #     - prod
-  #   #ports:
-  #     #- "5900:5900"
-  #   volumes:
-  #     - /tmp/.X11-unix:/tmp/.X11-unix:rw
-  #     #- /dev/shm:/dev/shm:rw
-  #   environment:
-  #     - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
-  #     #- VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
-  #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
-  #   ipc: host
-  #   logging:
-  #     options:
-  #       max-size: 1g
-
 
 
   cron:
@@ -576,6 +522,9 @@ services:
       - reid_service_ip=reid-localnode.tls.ai
       - collate_service_ip=coll-localnode.tls.ai
       - track_archive_service_ip=arch-localnode.tls.ai
+      - frame_store_rtmp_url=node-rtsp-rtmp-server-localnode.tls.ai
+      - frame_store_rtmp_port=80
+      - misc_gpu_encoding=false   
     env_file:
       - env/backend.env
       - env/global.env

@@ -226,45 +226,6 @@ services:
 
 
 
-  # guacamole:
-  #   image: gcr.io/anyvision-production/guacamole:0.9.14
-  #   restart: always
-  #   networks:
-  #     - prod
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - ./guacamole/user-mapping-local.xml:/etc/guacamole/user-mapping.xml
-  #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
-  #   environment:
-  #     - GUACD_LOGLEVEL=info
-  #   env_file:
-  #     - env/global.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-  #
-  #
-  #
-  # sftp:
-  #   image: gcr.io/anyvision-production/sftp:alpine
-  #   restart: always
-  #   networks:
-  #     - prod
-  #   volumes:
-  #     - /storage/sftp_data:/home/user
-  #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
-  #   command: user:pass:2000:2000:files
-  #   env_file:
-  #     - env/global.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-
-
-
   nginx:
     image: gcr.io/anyvision-production/nginx:18.12
     restart: always
@@ -289,28 +250,6 @@ services:
     logging:
       options:
         max-size: 1g
-
-
-
-  # x11vnc:
-  #   image: gcr.io/anyvision-production/x11vnc
-  #   restart: always
-  #   networks:
-  #     - prod
-  #   #ports:
-  #     #- "5900:5900"
-  #   volumes:
-  #     - /tmp/.X11-unix:/tmp/.X11-unix:rw
-  #     #- /dev/shm:/dev/shm:rw
-  #   environment:
-  #     - VNC_OPTIONS=-nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
-  #     #- VNC_OPTIONS=-noshm -nodpms -noxdamage -shared -forever -passwd 123456 -rfbport 5900 -display ${DISPLAY:-:1}
-  #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
-  #   ipc: host
-  #   logging:
-  #     options:
-  #       max-size: 1g
 
 
 
