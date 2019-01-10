@@ -36,6 +36,8 @@ services:
       - MEMSQL_NODE_ROLE=AIO
       - JOB_NAME=memsql
       - MEMSQL_PASSWORD=password
+      - AGG_MEMORY_LIMIT=4g
+      - LEAF_MEMORY_LIMIT=60g
       - log_level_containerpilot=DEBUG
     env_file:
       - env/global.env
@@ -52,7 +54,7 @@ services:
       - 2181:2181
     environment:
       - CONSUL_SERVER="consul.tls.ai"
-      - ZOO_MY_ID=3
+      - ZOO_MY_ID=1
       - ZOO_SERVERS='server.1=zookeeper.tls.ai:2888:3888'
     env_file:
       - env/global.env
@@ -62,6 +64,20 @@ services:
       prod:
         aliases:
          - zookeeper.tls.ai
+
+  kafka_manager:
+    hostname: kafka-manager
+    image: hlebalbau/kafka-manager:stable
+    ports:
+      - "9000:9000"
+    environment:
+      ZK_HOSTS: "zookeeper.tls.ai:2181"
+      APPLICATION_SECRET: "random-secret"
+    networks:
+      prod:
+        aliases:
+         - kafka-manager.tls.ai
+    command: -Dpidfile.path=/dev/null
 
 
   kafka:
@@ -87,7 +103,7 @@ services:
       - KAFKA_LISTENERS=INSIDE://kafka.tls.ai:9092
       #KAFKA_LISTENERS=INSIDE://kafka-localnode.tls.ai:9092,OUTSIDE://kafka-localnode.tls.ai:9092
       - KAFKA_INTER_BROKER_LISTENER_NAME=INSIDE
-      #- KAFKA_CREATE_TOPICS="test:3:2"
+      - KAFKA_CREATE_TOPICS="detections:3:1"
     env_file:
       - env/global.env
     networks:
