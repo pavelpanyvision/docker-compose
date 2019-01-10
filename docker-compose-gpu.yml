@@ -62,19 +62,19 @@ services:
         aliases:
          - zookeeper.tls.ai
 
-  kafka_manager:
-    hostname: kafka-manager
-    image: hlebalbau/kafka-manager:stable
-    ports:
-      - "9000:9000"
-    environment:
-      ZK_HOSTS: "zookeeper.tls.ai:2181"
-      APPLICATION_SECRET: "random-secret"
-    networks:
-      prod:
-        aliases:
-         - kafka-manager.tls.ai
-    command: -Dpidfile.path=/dev/null
+#  kafka_manager:
+#    hostname: kafka-manager
+#    image: hlebalbau/kafka-manager:stable
+#    ports:
+#      - "9000:9000"
+#    environment:
+#      ZK_HOSTS: "zookeeper.tls.ai:2181"
+#      APPLICATION_SECRET: "random-secret"
+#    networks:
+#      prod:
+#        aliases:
+#         - kafka-manager.tls.ai
+#    command: -Dpidfile.path=/dev/null
 
 
   kafka:
@@ -100,6 +100,13 @@ services:
       - KAFKA_LISTENERS=INSIDE://kafka.tls.ai:9092
       #KAFKA_LISTENERS=INSIDE://kafka-localnode.tls.ai:9092,OUTSIDE://kafka-localnode.tls.ai:9092
       - KAFKA_INTER_BROKER_LISTENER_NAME=INSIDE
+      # disable auto create topics, need to add manually 
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      # keep old detection for 48H if size won't be greater than 2GB
+      - KAFKA_LOG_RETENTION_HOURS=48
+      # keep old detection for 2GB if time is not greater than 48H
+      - KAFKA_LOG_RETENTION_BYTES=2147483648
+      # create detection topic with 3 partitions and 1 replica (all in one config)
       - KAFKA_CREATE_TOPICS=detections:3:1
     env_file:
       - env/global.env
