@@ -138,6 +138,9 @@ services:
       - SEAWEEDFS_FILER=1
       - SEAWEEDFS_FILER_PORT=8888
       - SEAWEEDFS_FILER_CMD=-ip=seaweedfs-filer-localnode.tls.ai -master=seaweedfs-master-localnode.tls.ai:9333
+    volumes:
+      - ./seaweedfs/filer.toml:/etc/seaweedfs/filer.toml
+      - /ssd/seaweed-master:/data      
     logging:
       options:
         max-size: 1g
@@ -177,7 +180,17 @@ services:
     ports:
       - "8500:8500"
     volumes:
-      - consul_data:/data
+      -  consul_data:/consul/data
+      - /etc/hostname:/etc/host_hostname:ro
+    environment:
+      - CMD=agent -server -bootstrap -ui
+      - CONSUL_SERVER=127.0.0.1
+      - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_ADDRESS=0.0.0.0
+      - JOB_NAME=consul
+      - DATACENTER=dc1
+      - SITE_NAME=local
+      - RUN_AS_USER=root
     env_file:
       - env/global.env
     logging:
@@ -197,7 +210,14 @@ services:
       - consul_agent_data:/data
       - /etc/hostname:/etc/host_hostname:ro
     environment:
-      - SITE_NAME=dc1
+      - CMD=agent -rejoin -retry-join consul.tls.ai -retry-max 10 -retry-interval 15s -disable-host-node-id
+      - CONSUL_SERVER=consul.tls.ai
+      - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_ADDRESS=0.0.0.0
+      - JOB_NAME=consul-agent
+      - DATACENTER=dc1
+      - SITE_NAME=local
+      - RUN_AS_USER=root
     env_file:
       - env/global.env
     logging:
@@ -501,6 +521,7 @@ services:
       - /home/user/license:/home/user/license:ro
       - /ssd/backend_data:/root/pipe_data
       - /ssd/track_archive_service_data:/root/track_archive_service_data
+      - /ssd/reid_service_data:/root/reid_service_data      
       - /storage:/var/www/html
       #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
