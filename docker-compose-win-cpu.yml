@@ -392,7 +392,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.21.0-rc.11
+    image: gcr.io/anyvision-production/api:1.21.0-rc.13
     restart: always
     networks:
       prod:
