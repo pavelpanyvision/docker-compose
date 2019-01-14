@@ -108,6 +108,16 @@ services:
       - KAFKA_LOG_RETENTION_BYTES=2147483648
       # create detection topic with 3 partitions and 1 replica (all in one config)
       - KAFKA_CREATE_TOPICS=detections:3:1
+      # set broker max size message 2MB
+      - KAFKA_MESSAGE_MAX_BYTES=2097152
+      # default broker network threads is 3
+      - KAFKA_NUM_NETWORK_THREADS=6
+      # default kafka replica fetchers is 1
+      - KAFKA_NUM_REPLICA_FETCHERS=2
+      # number of partitions for offset, can't be change after initial start!!!
+      - KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS=6
+      # default 100MB but better smaller with "small" kafka like ours :) 25MB
+      - KAFKA_OFFSETS_TOPIC_SEGMENT_BYTES=26214400
     env_file:
       - env/global.env
     networks:
