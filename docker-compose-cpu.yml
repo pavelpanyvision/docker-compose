@@ -200,7 +200,7 @@ services:
 
 
   consul-agent:
-    image: gcr.io/anyvision-production/consul-agent:18.12
+    image: gcr.io/anyvision-production/consul:18.12
     restart: always
     networks:
       prod:
