@@ -1,0 +1,32 @@
+#filename: docker-compose-apimaster.yml
+version: '3.3'
+
+
+networks:
+  prod:
+
+
+services:
+
+
+  gallery-enhancer:
+    image: gcr.io/anyvision-training/gallery-enhancer:19.01
+    restart: always
+    entrypoint: ["/usr/local/bin/tini", "--", "/usr/local/bin/entrypoint.sh"]
+    networks:
+      prod:
+        aliases:
+          - gallery-enhancer-localnode.tls.ai
+    volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+    environment:
+      - PORT=3000
+      - API_URL=api-localnode.tls.ai:3000
+      - THRESHOLD=0.75
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
