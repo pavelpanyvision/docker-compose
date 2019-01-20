@@ -10,11 +10,6 @@ networks:
   prod:
     external:
       name: docker-compose_prod
-    ipam:
-      driver: default
-      config:
-      -
-        subnet: 172.30.30.0/24
 
 
 volumes:
@@ -123,7 +118,6 @@ services:
       - "9115:9115"
     networks:
       - monitor-net
-      - anyvision
     volumes:
       - ./blackbox-exporter:/config
     command:
