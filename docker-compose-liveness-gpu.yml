@@ -27,7 +27,7 @@ services:
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
+      - /storage/liveness-logs:/var/log/liveness-logs:rw
     environment:
       - HOST_IP=liveness-service.tls.ai
       #gpu on slot 0
