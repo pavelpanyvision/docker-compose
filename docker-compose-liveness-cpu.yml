@@ -26,11 +26,12 @@ services:
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
+      - /storage/liveness-logs:/var/log/liveness-logs:rw
       #- /etc/timezone:/etc/timezone:ro
     environment:
       - HOST_IP=liveness-service.tls.ai
       #- HOST_PORT=50051
-      - WORKERS=2
+      #- WORKERS=2
       #- LIVENESS_RGB_MODEL_PATH=
       #- LIVENESS_DIFF_MODEL_PATH=
       #by default cpu mode
