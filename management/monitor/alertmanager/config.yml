@@ -1,0 +1,59 @@
+global:
+    resolve_timeout: 5m
+
+
+route:
+    #group_by: [Alertname]
+    #group_by: [service]
+    group_by: [service,Alertname]
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 2h
+
+    receiver: 'default-receiver' # Send all notifications to me.
+    #routes:
+    #  - receiver: email-notification # Send all notifications to me.
+    #  - receiver: 'slack'
+
+
+receivers:
+    #- name: 'slack'
+    - name: 'default-receiver'
+      slack_configs:
+          - channel: '#devops'
+            api_url: 'https://hooks.slack.com/services/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'
+            send_resolved: true # Whether or not to notify about resolved alerts.
+            username: 'webhookbot'
+            icon_url   : "https://media.licdn.com/dms/image/C4D0BAQFH-T0BVg-jYg/company-logo_200_200/0?e=2159024400&v=beta&t=FyeMvn4J_EJgZFC73oN8yPpM37EIdx_fZWs2e2PcBoQ"
+            color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+            title_link: '{{ template "slack.default.titlelink" . }}'
+            pretext: '{{ .CommonAnnotations.summary }}'
+            #title: '{{ .ExternalURL }}/#/alerts?receiver={{ .Receiver }}'
+            title: '{{ template "slack.default.title" . }}'
+            #text: '{{ template "custom_slack_message" . }}'
+            #text: "{{ .CommonAnnotations.description }}"
+            text: |-
+              {{ range .Alerts }}
+                *Alert:* {{ .Annotations.summary }} - `{{ .Labels.severity }}`
+                *Description:* {{ .Annotations.description }}
+                *Details:*
+                {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+                {{ end }}
+              {{ end }}
+            fallback: '{{ template "slack.default.fallback" . }}'
+
+
+    #- name: email-notification
+      email_configs:
+      - to: 'dors@anyvision.co'
+        from: 'anyvision-notifciation@anyvision.co'
+        require_tls: true
+        smarthost: smtp.gmail.com:587
+        auth_username: "av.jenkins.reader@anyvision.co"
+        auth_identity: "av.jenkins.reader@anyvision.co"
+        auth_password: "##########"
+        send_resolved: true # Whether or not to notify about resolved alerts.
+        #html: '{{ template "email.html" . }}'
+
+#templates:
+  #- /etc/alertmanager/email.tmpl

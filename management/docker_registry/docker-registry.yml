@@ -1,0 +1,32 @@
+version: '3.3'
+
+networks:
+  docker_registry:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.0.0/16
+
+
+services:
+
+  dockerregistry:
+    image: registry:2
+    restart: always
+    networks:
+      docker_registry:
+        aliases:
+          - dockerregistry.tls.ai
+    ports:
+     - 5000:5000
+    volumes:
+      - /storage/dockerregistry:/var/lib/registry
+      #- /usr/local/share/ca-certificates/anyvision:/certs
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:5000
+      #- REGISTRY_HTTP_TLS_CERTIFICATE=/certs/anyvisionCA.pem
+      #- REGISTRY_HTTP_TLS_KEY=/certs/anyvisionCA.key.pem
+    logging:
+      options:
+        max-size: 1g

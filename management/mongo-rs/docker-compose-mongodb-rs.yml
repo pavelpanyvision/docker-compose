@@ -1,0 +1,148 @@
+#filename: docker-compose-migration-db.yml
+version: '3.3'
+
+networks:
+  prod:
+
+secrets:
+  mongo_key:
+    file: ./key
+
+services:
+
+  mongodb1:
+    image: mongo:4.0.3
+    networks:
+      prod:
+        aliases:
+          - mongodb1.tls.ai
+    ports:
+      - "27017:27017"
+    volumes:
+      - /ssd/mongo_db_data1:/data/db
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongousradmin
+      #MONGO_INITDB_ROOT_PASSWORD: mongopassadmin
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /opt/mongodb-keyfile
+    #env_file:
+    #  - env/global.env
+    secrets:
+      - source: mongo_key
+        target: /opt/mongodb-keyfile
+        uid: '999'
+        mode: 0600
+    logging:
+      options:
+        max-size: 1g
+    command: --replSet anyvision-rs --port 27017 --bind_ip 0.0.0.0 --auth --keyFile /opt/mongodb-keyfile
+    #entrypoint: mongod --replSet anyvision-rs --port 27017 --bind_ip 0.0.0.0
+    deploy:
+      #mode: global
+      mode: replicated
+      replicas: 1
+      restart_policy:
+       delay: 5s
+      #update_config:
+      #  parallelism: 1
+      #  delay: 1m30s
+
+
+
+
+        
+  mongodb2:
+    image: mongo:4.0.3
+    networks:
+      prod:
+        aliases:
+          - mongodb2.tls.ai
+    ports:
+      - "27018:27018"
+    volumes:
+      - /ssd/mongo_db_data2:/data/db
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongousradmin
+      #MONGO_INITDB_ROOT_PASSWORD: mongopassadmin
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /opt/mongodb-keyfile
+    #env_file:
+    #  - env/global.env
+    secrets:
+      - source: mongo_key
+        target: /opt/mongodb-keyfile
+        uid: '999'
+        mode: 0600
+    logging:
+      options:
+        max-size: 1g
+    command: --replSet anyvision-rs --port 27018 --bind_ip 0.0.0.0 --auth --keyFile /opt/mongodb-keyfile
+    #entrypoint: mongod --replSet anyvision-rs --port 27018 --bind_ip 0.0.0.0 
+    deploy:
+      #mode: global
+      mode: replicated
+      replicas: 1
+      restart_policy:
+       delay: 5s
+      update_config:
+        parallelism: 1
+        delay: 1m30s
+
+  mongodb3:
+    image: mongo:4.0.3
+    networks:
+      prod:
+        aliases:
+          - mongodb3.tls.ai
+    ports:
+      - "27019:27019"
+    volumes:
+      - /ssd/mongo_db_data3:/data/db
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongousradmin
+      #MONGO_INITDB_ROOT_PASSWORD: mongopassadmin
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /opt/mongodb-keyfile
+    #env_file:
+    #  - env/global.env
+    secrets:
+      - source: mongo_key
+        target: /opt/mongodb-keyfile
+        uid: '999'
+        mode: 0600
+    logging:
+      options:
+        max-size: 1g
+    command: --replSet anyvision-rs --port 27019 --bind_ip 0.0.0.0 --auth --keyFile /opt/mongodb-keyfile
+    #entrypoint: mongod --replSet anyvision-rs --port 27018 --bind_ip 0.0.0.0 
+    deploy:
+      #mode: global
+      mode: replicated
+      replicas: 1
+      restart_policy:
+       delay: 5s
+      #update_config:
+      #  parallelism: 1
+      #  delay: 1m30s
+
+  mongo-express:
+    image: mongo-express:0.49.0
+    networks:
+      - prod
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mongousradmin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: mongopassadmin
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+      ME_CONFIG_MONGODB_SERVER: mongodb1.tls.ai
+    deploy:
+      #mode: global
+      mode: replicated
+      replicas: 1
+      restart_policy:
+       delay: 5s
+      update_config:
+        parallelism: 1
+        delay: 1m30s

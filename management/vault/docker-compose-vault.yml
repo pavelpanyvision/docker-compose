@@ -1,0 +1,70 @@
+#filename: docker-compose-migration-db.yml
+version: '3.3'
+
+networks:
+  prod:
+    external:
+      name: docker-compose_prod
+
+
+secrets:
+  vault_key:
+    file: ./tls.ai.key
+  vault_crt:
+    file: ./tls.ai.full.pem
+
+services:
+
+  vault:
+    image: vault:0.11.4
+    privileged: true
+    #entrypoint: sleep 1d
+    networks:
+      prod:
+        aliases:
+          - vault.tls.ai
+    ports:
+      - "8200:8200"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /storage/vault/file:/vault/file
+      #- /storage/vault/audit/vault_audit.log:/vault/vault_audit.log
+      #- ./tls:/vault/tls
+      - type: bind
+        source: ./tls
+        target: /vault/tls
+    environment:
+      #VAULT_DEV_ROOT_TOKEN_ID: myroot
+      #VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+      #VAULT_LOCAL_CONFIG: '{"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h", "ui": true,"listener": {"tcp": {"address": "0.0.0.0:8200","tls_disable": "true"} }'
+      #VAULT_LOCAL_CONFIG: '{"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h", "ui": true,"listener": {"tcp": {"address": "vault.tls.ai:8200","tls_disable": "false","tls_cert_file": "/vault/tls/tls.ai.full.pem","tls_key_file": "/vault/tls/tls.ai.key"} }'      #VAULT_SKIP_VERIFY: true
+      VAULT_LOCAL_CONFIG: '{"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h", "ui": true,"listener": {"tcp": {"address": "0.0.0.0:8200","tls_disable": "false","tls_cert_file": "/vault/tls/tls.ai.full.pem","tls_key_file": "/vault/tls/tls.ai.key"} }'      #VAULT_SKIP_VERIFY: true
+      VAULT_UI: 'true'
+      #AULT_REDIRECT_INTERFACE: 
+      #VAULT_CLUSTER_INTERFACE:
+    #env_file:
+    #  - env/global.env
+    #secrets:
+    #  - source: vault_key
+    #    target: /vault/config/tls.ai.key
+    #    uid: '100'
+    #    mode: 0600
+    #secrets:
+    #  - source: vault_crt
+    #    target: /vault/config/tls.ai.full.pem
+    #    uid: '1000'
+    #    mode: 0600        
+    logging:
+      options:
+        max-size: 1g
+    command: server # -dev
+    #entrypoint: mongod --replSet anyvision-rs --port 27017 --bind_ip 0.0.0.0
+    deploy:
+      #mode: global
+      mode: replicated
+      replicas: 1
+      restart_policy:
+       delay: 5s
+      #update_config:
+      #  parallelism: 1
+      #  delay: 1m30s
