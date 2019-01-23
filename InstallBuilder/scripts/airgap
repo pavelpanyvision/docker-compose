@@ -1,0 +1,216 @@
+#!/bin/bash
+
+# Absolute path to this script
+SCRIPT=$(readlink -f "$0")
+# Absolute path to the script directory
+BASEDIR=$(dirname "$SCRIPT")
+
+# Loads the dispatch library
+# Changes zsh globbing patterns
+unsetopt NO_MATCH >/dev/null 2>&1 || :
+
+# Dispatches calls of commands and arguments
+dispatch ()
+{
+    namespace="$1"     # Namespace to be dispatched
+    arg="${2:-}"       # First argument
+    short="${arg#*-}"  # First argument without trailing -
+    long="${short#*-}" # First argument without trailing --
+
+    # Exit and warn if no first argument is found
+    if [ -z "$arg" ]; then
+        "${namespace}_" # Call empty call placeholder
+        return 1
+    fi
+
+    shift 2 # Remove namespace and first argument from $@
+
+    # Detects if a command, --long or -short option was called
+    if [ "$arg" = "--$long" ];then
+        longname="${long%%=*}" # Long argument before the first = sign
+
+        # Detects if the --long=option has = sign
+        if [ "$long" != "$longname" ]; then
+            longval="${long#*=}"
+            long="$longname"
+            set -- "$longval" "${@:-}"
+        fi
+
+        main_call=${namespace}_option_${long}
+
+
+    elif [ "$arg" = "-$short" ];then
+        main_call=${namespace}_option_${short}
+    else
+        main_call=${namespace}_command_${long}
+    fi
+
+    $main_call "${@:-}" && dispatch_returned=$? || dispatch_returned=$?
+
+    if [ $dispatch_returned = 127 ]; then
+        "${namespace}_call_" "$namespace" "$arg" # Empty placeholder
+        return 1
+    fi
+
+    return $dispatch_returned
+}
+
+
+# Check Docker command executable exit code
+docker images > /dev/null 2>&1; rc=$?;
+if [[ $rc != 0 ]]; then
+    echo "This script must be run with Docker capable privileges!"
+    exit 1
+fi
+
+
+# Placeholder calls
+airgap_ () ( echo "No arguments provided."; airgap_option_help )
+airgap_call_ () ( echo "Invalid call '$@'"; airgap_option_help )
+
+
+# Options
+airgap_option_help () (
+    echo -e "\nUsage:\n$0 [load|pull|push]\n"
+)
+airgap_option_load_help () (
+    echo -e "\nUsage:\n$0 load [images_directory]\n"
+    echo -e "Example:\n$0 load /tmp/docker_images\n"
+)
+airgap_option_pull_help () (
+    echo -e "\nUsage:\n$0 pull [compose_file] [destination]\n"
+    echo -e "Example:\n$0 pull docker-compose.yml /tmp/docker_images\n"
+)
+airgap_option_push_help () (
+    echo -e "\nUsage:\n$0 push [images_directory] [registry[:port]]\n"
+    echo -e "Example:\n$0 push /tmp/docker_images registry.local:5000\n"
+)
+airgap_option_registry_help () (
+    echo -e "\nUsage:\n$0 registry [registry_image_directory]\n"
+    echo -e "Example:\n$0 registry /tmp/docker_images\n"
+)
+
+
+# Commands
+airgap_command_load () (
+    set -eu
+    images_dir="$1"
+    if [ -n "$images_dir" ]; then
+        FILES="$images_dir"/*.tar.gz
+        for IMAGE in $FILES; do
+            echo "Loading image $IMAGE"
+            docker load -i $IMAGE
+        done
+    else
+        airgap_option_load_help
+    fi
+    set +eu
+)
+
+
+airgap_command_push () (
+    set -eu
+    images_dir="$1"
+    registry_host="$2"
+
+    if [ -n "$images_dir" ] && [ -n "$registry_host" ]; then
+        FILES="$images_dir"/*.tar.gz
+        for IMAGE in $FILES; do
+            if [[ $IMAGE != *"registry"* ]] ; then
+                echo "Loading $IMAGE"
+                docker load -i $IMAGE
+
+                IMAGE_SOURCE_NAME=$(echo $IMAGE | awk -F "/" '{print $NF}'  | sed -e 's/__/\:/g' |  sed -e 's/_/\//g' )
+                IMAGE_SOURCE_NAME_NO_TARGZ=${IMAGE_SOURCE_NAME%".tar.gz"}
+                IMAGE_WITHOUT_REGISTRY=$(echo $IMAGE_SOURCE_NAME_NO_TARGZ | awk -F "/" '{print $NF}')
+                IMAGE_LOCAL_REGISTRY="$registry_host/$IMAGE_WITHOUT_REGISTRY"
+
+                echo "Retagging $IMAGE_SOURCE_NAME_NO_TARGZ to $IMAGE_LOCAL_REGISTRY"
+                docker tag $IMAGE_SOURCE_NAME_NO_TARGZ $IMAGE_LOCAL_REGISTRY
+                docker rmi $IMAGE_SOURCE_NAME_NO_TARGZ
+
+                echo "Pushing $IMAGE_LOCAL_REGISTRY"
+                docker push $IMAGE_LOCAL_REGISTRY
+            fi
+        done
+    else
+        airgap_option_push_help
+    fi
+    set +eu
+)
+
+
+airgap_command_pull () (
+    set -eu
+    compose_file="$1"
+    destination="$2"
+    compose_file_dir=$(dirname "$compose_file")
+    compose_basename=$(basename "$compose_file")
+
+    if [ -n "$compose_file" ] && [ -n "$destination" ]; then
+        # Create destination dir
+        mkdir -p "$destination"
+
+        if [ -z "$(ls -A $destination)" ]; then
+            echo "$destination is empty, proceeding..."
+        else
+            echo "$destination is not empty, you must clean the directory manually and re-run the script."
+            exit 1
+        fi
+
+        mkdir -p $destination/{scripts,compose,images}
+
+        # Pull and Save the Docker Registry Image
+        docker pull registry:2
+        docker save docker.io/registry:2 | gzip -c > "$destination/images/docker-io.registry.tar.gz"
+
+        for IMG in $(cat $compose_file | awk '{if ($1 == "image:") print $2;}'); do
+            IMAGE=$(echo $IMG | tr -d "'")
+            docker pull $IMAGE
+            sanitized_img=$(echo $IMAGE | sed -e 's/\//_/g' | sed -e 's/\:/__/g')
+            echo "Saving $IMAGE to $destination/images/$sanitized_img.tar.gz"
+            docker save $IMAGE | gzip -c > "$destination/images/$sanitized_img.tar.gz"
+        done
+
+        # Copy the offline scripts,compose file and .env files to the destination dir
+        cp $SCRIPT $destination/scripts/
+        rsync -a $compose_file \
+                 $compose_file_dir/crontab \
+                 $compose_file_dir/env \
+                 $compose_file_dir/guacamole \
+                 $destination/compose/
+
+        # Generate symlink for DockStation
+        cd $destination/compose
+        ln -s $compose_basename docker-compose.yml
+
+        # Generate md5sum for all the images
+        cd $destination/images
+        md5sum *.tar.gz > $destination/images/checksums.md5
+
+        # Grant 777 permissions
+        chmod -R 777 $destination/
+    else
+        airgap_option_pull_help
+    fi
+    set +eu
+)
+
+
+airgap_command_registry () (
+    set -eu
+    registry_image_dir="$1"
+    IMAGE="$registry_image_dir/docker-io.registry.tar.gz"
+    if [[ -f $IMAGE ]] ; then
+        echo "Loading $IMAGE"
+        docker load -i $IMAGE
+        docker run -d -p 5000:5000 --restart=always --name registry -v /opt/docker-registry:/var/lib/registry registry:2
+    else
+        airgap_option_registry_help
+    fi
+    set +eu
+)
+
+
+# Dispatch
+dispatch airgap "$@"
