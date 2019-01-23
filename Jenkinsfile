@@ -12,9 +12,8 @@ timeout(time: 120, unit: 'MINUTES') {
             checkout changelog: false, poll: false, scm: [
                     $class: 'GitSCM',
                     branches: [[name: '*/master']],
-                    extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'jenkins/jenkins-pipeline/Jenkinsfile_installation'],
-                                                                                      [path: 'jenkins/jenkins-pipeline/Jenkinsfile_airgap']]]],
-                    userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/devops.git"]]
+                    extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'InstallBuilder/Jenkins_installation']]]],
+                    userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/docker-compose.git"]]
             ]
 
             //load remote jenkins_pipeline
