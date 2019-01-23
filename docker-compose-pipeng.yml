@@ -7,7 +7,7 @@ networks:
 services:
 
   pipeng:
-    image: gcr.io/anyvision-training/pipeng:development
+    image: gcr.io/anyvision-training/pipeng-trt4:development
     restart: always
     #entrypoint: sleep infinity     ### uncoment if you dont have compiled projet in realease folder and commnent next "command" and "working_dir" section
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
