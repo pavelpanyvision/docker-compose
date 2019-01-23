@@ -11,7 +11,7 @@ timeout(time: 120, unit: 'MINUTES') {
 
             checkout changelog: false, poll: false, scm: [
                     $class: 'GitSCM',
-                    branches: [[name: '*/master']],
+                    branches: [[name: '*/{env.BRANCH_NAME}']],
                     extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'InstallBuilder/Jenkinsfile_installation']]]],
                     userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/docker-compose.git"]]
             ]
@@ -29,3 +29,4 @@ timeout(time: 120, unit: 'MINUTES') {
         } //end catch
     } // end of node
 } //end of timeout
+1
