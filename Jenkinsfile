@@ -9,14 +9,14 @@ timeout(time: 120, unit: 'MINUTES') {
             // Clean up work space
             step([$class: 'WsCleanup'])
 
-            // // if the parapets came from upstream
-            // if (!env.GIT_REPO_NAME && !env.GIT_OWNER) {
-            //     def split = "${JOB_NAME}".split('/')
-            //     env.GIT_BRANCH_NAME = split[1]
-            //     echo "the branch name is:${GIT_BRANCH_NAME}"
-            //     env.DEPLOY_NAME = split[0]
-            //     echo "the deploy name is:${DEPLOY_NAME}"
-            // }
+            // if the parapets came from upstream
+            if (!env.GIT_REPO_NAME && !env.GIT_OWNER) {
+                def split = "${JOB_NAME}".split('/')
+                env.GIT_BRANCH_NAME = split[1]
+                echo "the branch name is:${GIT_BRANCH_NAME}"
+                env.DEPLOY_NAME = split[0]
+                echo "the deploy name is:${DEPLOY_NAME}"
+            }
 
             checkout changelog: false, poll: false, scm: [
                     $class: 'GitSCM',
