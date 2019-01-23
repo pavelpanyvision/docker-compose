@@ -103,8 +103,8 @@ def generic_pipeline_method() {
                             env.builder_dir = "${HOME}/installbuilder-18.12.0/bin"
                             // env.installbuilder_dir = "${env.WORKSPACE}/Installation/InstallBuilder"
                             // env.scripts_path = "${env.WORKSPACE}/Installation/InstallBuilder/scripts"
-                            env.installbuilder_dir = "${env.WORKSPACE}/docker-compose/InstallBuilder"
-                            env.scripts_path = "${env.WORKSPACE}/docker-compose/InstallBuilder/scripts"
+                            env.installbuilder_dir = "${env.WORKSPACE}/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/InstallBuilder"
+                            env.scripts_path = "${env.WORKSPACE}/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/InstallBuilder/scripts"
                             env.airgap_script_path = "${env.WORKSPACE}/devops/scripts/air_gapped_deployment"
 
                             //docker compose directories
