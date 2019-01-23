@@ -63,18 +63,18 @@ def generic_pipeline_method() {
                             } // end of dir
 
                             //download Installation repository
-                            dir("Installation") {
+                            // dir("Installation") {
 
-                                checkout changelog: false, poll: false, scm: [
-                                        $class: 'GitSCM',
-                                        branches: [[name: "*/${INSTALLATION_REPO_BRANCH_NAME}"]],
-                                        extensions: [
-                                                [$class: 'GitLFSPull'],
-                                                [$class: 'CheckoutOption', timeout: 20]
-                                        ],
-                                        userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/Installation.git"]]
-                                ]
-                            } // end of dir
+                            //     checkout changelog: false, poll: false, scm: [
+                            //             $class: 'GitSCM',
+                            //             branches: [[name: "*/${INSTALLATION_REPO_BRANCH_NAME}"]],
+                            //             extensions: [
+                            //                     [$class: 'GitLFSPull'],
+                            //                     [$class: 'CheckoutOption', timeout: 20]
+                            //             ],
+                            //             userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/Installation.git"]]
+                            //     ]
+                            // } // end of dir
 
                             //download airgap script
                             dir ("devops") {
@@ -284,10 +284,7 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_GPU} " +
-                                                "elk_compose_name=${docker_compose_ELK_folder} " +
-                                                "elk_node_compose_name=${docker_compose_ELK_NODE_folder} " +
-                                                "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
-                                                "monitor_node_compose_name=${docker_compose_MONITOR_NODE_folder}")
+                                                "install_folder=${DOCKER_COMPOSE_REPO_BRANCH_NAME}")
                                     },
                                     build_CPU: {
                                         sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
@@ -297,10 +294,7 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_CPU} " +
-                                                "elk_compose_name=${docker_compose_ELK_folder} " +
-                                                "elk_node_compose_name=${docker_compose_ELK_NODE_folder} " +
-                                                "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
-                                                "monitor_node_compose_name=${docker_compose_MONITOR_NODE_folder}")
+                                                "install_folder=${DOCKER_COMPOSE_REPO_BRANCH_NAME}")
                                     },
                                     build_GPU_WHITE: {
                                         sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
@@ -310,12 +304,9 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_GPU} " +
-                                                "elk_compose_name=${docker_compose_ELK_WHITE_folder} " +
-                                                "elk_node_compose_name=${docker_compose_ELK_NODE_WHITE_folder} " +
-                                                "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_WHITE_folder} " +
-                                                "monitor_node_compose_name=${docker_compose_MONITOR_NODE_WHITE_folder} " +
-                                                "project.leftImage='' project.logoImage='' project.splashImage='' project.disableSplashScreen=1 " +
-                                                "project.vendor='FaceSearch' project.shortName='FaceRec' project.fullName='FaceRec'")
+                                                "install_folder=${DOCKER_COMPOSE_REPO_BRANCH_NAME}")
+                                                // "project.leftImage='' project.logoImage='' project.splashImage='' project.disableSplashScreen=1 " +
+                                                // "project.vendor='FaceSearch' project.shortName='FaceRec' project.fullName='FaceRec'")
                                     },
                                     build_CPU_WHITE: {
                                         sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
@@ -325,12 +316,9 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_CPU} " +
-                                                "elk_compose_name=${docker_compose_ELK_WHITE_folder} " +
-                                                "elk_node_compose_name=${docker_compose_ELK_NODE_WHITE_folder} " +
-                                                "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
-                                                "monitor_node_compose_name=${docker_compose_MONITOR_NODE_WHITE_folder} " +
-                                                "project.leftImage='' project.logoImage='' project.splashImage='' project.disableSplashScreen=1 " +
-                                                "project.vendor='FaceSearch' project.shortName='FaceRec' project.fullName='FaceRec'")
+                                                "install_folder=${DOCKER_COMPOSE_REPO_BRANCH_NAME}")
+                                                // "project.leftImage='' project.logoImage='' project.splashImage='' project.disableSplashScreen=1 " +
+                                                // "project.vendor='FaceSearch' project.shortName='FaceRec' project.fullName='FaceRec'")
                                     }
 
                         } // end of stage BUILD
