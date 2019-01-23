@@ -63,18 +63,18 @@ def generic_pipeline_method() {
                             } // end of dir
 
                             //download Installation repository
-                            dir("Installation") {
+                            // dir("Installation") {
 
-                                checkout changelog: false, poll: false, scm: [
-                                        $class: 'GitSCM',
-                                        branches: [[name: "*/${INSTALLATION_REPO_BRANCH_NAME}"]],
-                                        extensions: [
-                                                [$class: 'GitLFSPull'],
-                                                [$class: 'CheckoutOption', timeout: 20]
-                                        ],
-                                        userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/Installation.git"]]
-                                ]
-                            } // end of dir
+                            //     checkout changelog: false, poll: false, scm: [
+                            //             $class: 'GitSCM',
+                            //             branches: [[name: "*/${INSTALLATION_REPO_BRANCH_NAME}"]],
+                            //             extensions: [
+                            //                     [$class: 'GitLFSPull'],
+                            //                     [$class: 'CheckoutOption', timeout: 20]
+                            //             ],
+                            //             userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/Installation.git"]]
+                            //     ]
+                            // } // end of dir
 
                             //download airgap script
                             dir ("devops") {
