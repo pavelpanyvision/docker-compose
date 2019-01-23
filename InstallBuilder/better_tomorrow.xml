@@ -1,0 +1,879 @@
+<project>
+    <shortName>bettertomorrow</shortName>
+    <fullName>Better Tomorrow</fullName>
+    <version>1.20.0</version>
+    <installerFilename>${product_shortname}-${product_version}-${build_number}-${compose_name}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
+    <leftImage>${env(WORKSPACE)}/Installation/InstallBuilder/images/Left_side.png</leftImage>
+    <logoImage>${env(WORKSPACE)}/Installation/InstallBuilder/images/logo.png</logoImage>
+    <splashImage>${env(WORKSPACE)}/Installation/InstallBuilder/images/Splash.png</splashImage>
+    <componentList>
+        <component>
+            <name>scripts</name>
+            <description>Scripts</description>
+            <canBeEdited>0</canBeEdited>
+            <selected>1</selected>
+            <show>0</show>
+            <folderList>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfiles</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <origin>${env(WORKSPACE)}/Installation/InstallBuilder/scripts/airgap</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>${env(WORKSPACE)}/Installation/InstallBuilder/scripts/dockstation_injector.py</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>${env(WORKSPACE)}/Installation/InstallBuilder/scripts/change_network.sh</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>${env(WORKSPACE)}/Installation/InstallBuilder/scripts/optparse.bash</origin>
+                        </distributionFile>
+                    </distributionFileList>
+                </folder>
+            </folderList>
+            <readyToInstallActionList>
+                <throwError text="Please install Docker first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker"/>
+                    </ruleList>
+                </throwError>
+                <throwError text="Please install Docker-Compose first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker-compose"/>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>User ${username} does not exist, please use a username that exists on the system.</customErrorMessage>
+                    <text>Error: User does not exist.</text>
+                    <ruleList>
+                        <userTest>
+                            <logic>not_exists</logic>
+                            <username>${username}</username>
+                        </userTest>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>Using root as the target user is prohibited.</customErrorMessage>
+                    <text>Error: Cannot use root as target user</text>
+                    <ruleList>
+                        <compareText>
+                            <logic>equals</logic>
+                            <text>${username}</text>
+                            <value>root</value>
+                        </compareText>
+                    </ruleList>
+                </throwError>
+            </readyToInstallActionList>
+            <startMenuShortcutList>
+                <startMenuShortcut>
+                    <comment>Uninstall ${product_fullname}</comment>
+                    <name>Uninstall ${product_fullname}</name>
+                    <runAsAdmin>0</runAsAdmin>
+                    <runInTerminal>0</runInTerminal>
+                    <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
+                    <windowsExecArgs></windowsExecArgs>
+                    <windowsIcon></windowsIcon>
+                    <windowsPath>${installdir}/</windowsPath>
+                </startMenuShortcut>
+            </startMenuShortcutList>
+        </component>
+        <component>
+            <name>main</name>
+            <description>Main Program</description>
+            <canBeEdited>1</canBeEdited>
+            <selected>1</selected>
+            <show>1</show>
+            <folderList>
+                <folder>
+                    <description>Main Images</description>
+                    <destination>${installdir}/main</destination>
+                    <name>main_images</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/docker_${product_version}-${product_type}/images</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Docker Compose</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>dockercompose</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>${env(WORKSPACE)}/docker_${product_version}-${product_type}/compose/*</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+            </folderList>
+            <postInstallationActionList>
+                <showProgressDialog>
+                    <title>Finalizing Installation</title>
+                    <width>400</width>
+                    <actionList>
+                        <runProgram>
+                            <program>${installdir}/airgap</program>
+                            <programArguments>load ${installdir}/main/images</programArguments>
+                            <progressText>Importing Docker Images, please wait...</progressText>
+                            <useMSDOSPath>0</useMSDOSPath>
+                        </runProgram>
+                    </actionList>
+                </showProgressDialog>
+                <setInstallerVariableFromScriptOutput>
+                    <exec>docker-compose</exec>
+                    <execArgs>-f docker-compose.yml run --rm backend --task license-ver -o</execArgs>
+                    <name>hw_fingerprint</name>
+                    <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
+                </setInstallerVariableFromScriptOutput>
+                <runProgram>
+                    <program>echo</program>
+                    <programArguments>"${hw_fingerprint}" &gt; /home/${username}/hw_fingerprint.txt</programArguments>
+                </runProgram>
+            </postInstallationActionList>
+            <readyToInstallActionList>
+                <throwError text="Please install Docker first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker"/>
+                    </ruleList>
+                </throwError>
+                <throwError text="Please install Docker-Compose first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker-compose"/>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>User ${username} does not exist, please use a username that exists on the system.</customErrorMessage>
+                    <text>Error: User does not exist.</text>
+                    <ruleList>
+                        <userTest>
+                            <logic>not_exists</logic>
+                            <username>${username}</username>
+                        </userTest>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>Using root as the target user is prohibited.</customErrorMessage>
+                    <text>Error: Cannot use root as target user</text>
+                    <ruleList>
+                        <compareText>
+                            <logic>equals</logic>
+                            <text>${username}</text>
+                            <value>root</value>
+                        </compareText>
+                    </ruleList>
+                </throwError>
+            </readyToInstallActionList>
+            <startMenuShortcutList>
+                <startMenuShortcut>
+                    <comment>Uninstall ${product_fullname}</comment>
+                    <name>Uninstall ${product_fullname}</name>
+                    <runAsAdmin>0</runAsAdmin>
+                    <runInTerminal>0</runInTerminal>
+                    <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
+                    <windowsExecArgs></windowsExecArgs>
+                    <windowsIcon></windowsIcon>
+                    <windowsPath>${installdir}/</windowsPath>
+                </startMenuShortcut>
+            </startMenuShortcutList>
+        </component>
+        <component>
+            <name>dashboard</name>
+            <description>Dashboard Client</description>
+            <canBeEdited>1</canBeEdited>
+            <selected>1</selected>
+            <show>1</show>
+            <folderList>
+                <folder>
+                    <description>/usr/local/bin</description>
+                    <destination>/usr/local/bin</destination>
+                    <name>localbin</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <origin>${env(WORKSPACE)}/${project.vendor}-${product_version}-linux-x86_64.AppImage</origin>
+                        </distributionFile>
+                    </distributionFileList>
+                </folder>
+            </folderList>
+            <postInstallationActionList>
+                <runProgram>
+                    <program>chmod</program>
+                    <programArguments>+x /usr/local/bin/*.AppImage</programArguments>
+                </runProgram>
+            </postInstallationActionList>
+        </component>
+        <component>
+            <name>elk_master</name>
+            <description>ELK (Master)</description>
+            <canBeEdited>1</canBeEdited>
+            <selected>1</selected>
+            <show>1</show>
+            <folderList>
+                <folder>
+                    <description>ELK Master Images</description>
+                    <destination>${installdir}/elk_master</destination>
+                    <name>elk_master_images</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/docker_${elk_compose_name}/images</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Docker Compose</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>dockercompose</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>${env(WORKSPACE)}/docker_${elk_compose_name}/compose/*</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>ELK Master Files</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>elk_master_files</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/${project.version}/management/elk/elk</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+            </folderList>
+            <postInstallationActionList>
+                <showProgressDialog>
+                    <title>Finalizing Installation</title>
+                    <width>400</width>
+                    <actionList>
+                        <runProgram>
+                            <program>${installdir}/airgap</program>
+                            <programArguments>load ${installdir}/elk_master/images</programArguments>
+                            <progressText>Importing Docker Images, please wait...</progressText>
+                            <useMSDOSPath>0</useMSDOSPath>
+                        </runProgram>
+                    </actionList>
+                </showProgressDialog>
+            </postInstallationActionList>
+            <readyToInstallActionList>
+                <throwError text="Please install Docker first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker"/>
+                    </ruleList>
+                </throwError>
+                <throwError text="Please install Docker-Compose first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker-compose"/>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>User ${username} does not exist, please use a username that exists on the system.</customErrorMessage>
+                    <text>Error: User does not exist.</text>
+                    <ruleList>
+                        <userTest>
+                            <logic>not_exists</logic>
+                            <username>${username}</username>
+                        </userTest>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>Using root as the target user is prohibited.</customErrorMessage>
+                    <text>Error: Cannot use root as target user</text>
+                    <ruleList>
+                        <compareText>
+                            <logic>equals</logic>
+                            <text>${username}</text>
+                            <value>root</value>
+                        </compareText>
+                    </ruleList>
+                </throwError>
+            </readyToInstallActionList>
+        </component>
+        <component>
+            <name>elk_node</name>
+            <description>ELK (Node)</description>
+            <canBeEdited>1</canBeEdited>
+            <selected>0</selected>
+            <show>1</show>
+            <folderList>
+                <folder>
+                    <description>ELK Node Images</description>
+                    <destination>${installdir}/elk_node</destination>
+                    <name>elk_node_images</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/docker_${elk_node_compose_name}/images</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Docker Compose</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>dockercompose</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>${env(WORKSPACE)}/docker_${elk_node_compose_name}/compose/*</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>ELK Node Files</description>
+                    <destination>/home/${username}/docker-compose/${product_version}/elk/beats/filebeat/config</destination>
+                    <name>elk_node_files</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <origin>${env(WORKSPACE)}/${project.version}/management/elk/elk/beats/filebeat/config/filebeat.yml</origin>
+                        </distributionFile>
+                    </distributionFileList>
+                </folder>
+            </folderList>
+            <postInstallationActionList>
+                <showProgressDialog>
+                    <title>Finalizing Installation</title>
+                    <width>400</width>
+                    <actionList>
+                        <runProgram>
+                            <program>${installdir}/airgap</program>
+                            <programArguments>load ${installdir}/elk_node/images</programArguments>
+                            <progressText>Importing Docker Images, please wait...</progressText>
+                            <useMSDOSPath>0</useMSDOSPath>
+                        </runProgram>
+                    </actionList>
+                </showProgressDialog>
+            </postInstallationActionList>
+            <readyToInstallActionList>
+                <throwError text="Please install Docker first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker"/>
+                    </ruleList>
+                </throwError>
+                <throwError text="Please install Docker-Compose first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker-compose"/>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>User ${username} does not exist, please use a username that exists on the system.</customErrorMessage>
+                    <text>Error: User does not exist.</text>
+                    <ruleList>
+                        <userTest>
+                            <logic>not_exists</logic>
+                            <username>${username}</username>
+                        </userTest>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>Using root as the target user is prohibited.</customErrorMessage>
+                    <text>Error: Cannot use root as target user</text>
+                    <ruleList>
+                        <compareText>
+                            <logic>equals</logic>
+                            <text>${username}</text>
+                            <value>root</value>
+                        </compareText>
+                    </ruleList>
+                </throwError>
+            </readyToInstallActionList>
+        </component>
+        <component>
+            <name>monitoring_master</name>
+            <description>Monitoring (Master)</description>
+            <canBeEdited>1</canBeEdited>
+            <selected>1</selected>
+            <show>1</show>
+            <folderList>
+                <folder>
+                    <description>Monitoring Master Images</description>
+                    <destination>${installdir}/monitoring_master</destination>
+                    <name>monitoring_master_images</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/docker_${monitor_master_compose_name}/images</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Docker Compose</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>dockercompose</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>${env(WORKSPACE)}/docker_${monitor_master_compose_name}/compose/*</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Monitoring Master Files</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>monitoringmasterfiles</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>${env(WORKSPACE)}/${project.version}/management/monitor/prometheus</origin>
+                        </distributionDirectory>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/${project.version}/management/monitor/grafana</origin>
+                        </distributionDirectory>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/${project.version}/management/monitor/blackbox-exporter</origin>
+                        </distributionDirectory>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/${project.version}/management/monitor/alertmanager</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+            </folderList>
+            <postInstallationActionList>
+                <showProgressDialog>
+                    <title>Finalizing Installation</title>
+                    <width>400</width>
+                    <actionList>
+                        <runProgram>
+                            <program>${installdir}/airgap</program>
+                            <programArguments>load ${installdir}/monitoring_master/images</programArguments>
+                            <progressText>Importing Docker Images, please wait...</progressText>
+                            <useMSDOSPath>0</useMSDOSPath>
+                        </runProgram>
+                    </actionList>
+                </showProgressDialog>
+            </postInstallationActionList>
+            <readyToInstallActionList>
+                <throwError text="Please install Docker first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker"/>
+                    </ruleList>
+                </throwError>
+                <throwError text="Please install Docker-Compose first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker-compose"/>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>User ${username} does not exist, please use a username that exists on the system.</customErrorMessage>
+                    <text>Error: User does not exist.</text>
+                    <ruleList>
+                        <userTest>
+                            <logic>not_exists</logic>
+                            <username>${username}</username>
+                        </userTest>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>Using root as the target user is prohibited.</customErrorMessage>
+                    <text>Error: Cannot use root as target user</text>
+                    <ruleList>
+                        <compareText>
+                            <logic>equals</logic>
+                            <text>${username}</text>
+                            <value>root</value>
+                        </compareText>
+                    </ruleList>
+                </throwError>
+            </readyToInstallActionList>
+        </component>
+        <component>
+            <name>monitoring_node</name>
+            <description>Monitoring (Node)</description>
+            <canBeEdited>1</canBeEdited>
+            <selected>1</selected>
+            <show>1</show>
+            <folderList>
+                <folder>
+                    <description>Monitoring Node Images</description>
+                    <destination>${installdir}/monitoring_node</destination>
+                    <name>monitoring_node_images</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/docker_${monitor_node_compose_name}/images</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Docker Compose</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>dockercompose1</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>${env(WORKSPACE)}/docker_${monitor_node_compose_name}/compose/*</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+            </folderList>
+            <postInstallationActionList>
+                <showProgressDialog>
+                    <title>Finalizing Installation</title>
+                    <width>400</width>
+                    <actionList>
+                        <runProgram>
+                            <program>${installdir}/airgap</program>
+                            <programArguments>load ${installdir}/monitoring_node/images</programArguments>
+                            <progressText>Importing Docker Images, please wait...</progressText>
+                            <useMSDOSPath>0</useMSDOSPath>
+                        </runProgram>
+                    </actionList>
+                </showProgressDialog>
+            </postInstallationActionList>
+            <readyToInstallActionList>
+                <throwError text="Please install Docker first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker"/>
+                    </ruleList>
+                </throwError>
+                <throwError text="Please install Docker-Compose first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker-compose"/>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>User ${username} does not exist, please use a username that exists on the system.</customErrorMessage>
+                    <text>Error: User does not exist.</text>
+                    <ruleList>
+                        <userTest>
+                            <logic>not_exists</logic>
+                            <username>${username}</username>
+                        </userTest>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>Using root as the target user is prohibited.</customErrorMessage>
+                    <text>Error: Cannot use root as target user</text>
+                    <ruleList>
+                        <compareText>
+                            <logic>equals</logic>
+                            <text>${username}</text>
+                            <value>root</value>
+                        </compareText>
+                    </ruleList>
+                </throwError>
+            </readyToInstallActionList>
+        </component>
+    </componentList>
+    <initializationActionList>
+        <actionGroup>
+            <actionList>
+                <throwError text="Please launch the installer as root">
+                    <ruleEvaluationLogic>or</ruleEvaluationLogic>
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="pkexec"/>
+                        <compareText>
+                            <logic>equals</logic>
+                            <text>${linux_distribution}</text>
+                            <value>redhat</value>
+                        </compareText>
+                    </ruleList>
+                </throwError>
+                <runProgram program="pkexec">
+                    <programArguments>env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY "${installer_pathname}" &amp;</programArguments>
+                </runProgram>
+                <exit exitCode="${program_exit_code}"/>
+            </actionList>
+            <ruleList>
+                <isFalse>
+                    <value>${installer_is_root_install}</value>
+                </isFalse>
+            </ruleList>
+        </actionGroup>
+    </initializationActionList>
+    <allowComponentSelection>1</allowComponentSelection>
+    <createUninstaller>0</createUninstaller>
+    <defaultUnixDirectoryPermissions></defaultUnixDirectoryPermissions>
+    <defaultUnixFilePermissions></defaultUnixFilePermissions>
+    <enableRollback>1</enableRollback>
+    <enableSslSupport>1</enableSslSupport>
+    <enableTimestamp>1</enableTimestamp>
+    <overrideGtkButtonText>1</overrideGtkButtonText>
+    <vendor>AnyVision</vendor>
+    <finalPageActionList>
+        <runProgram>
+            <program>chown</program>
+            <programArguments>-R ${username}:${username} /home/${username}/docker-compose</programArguments>
+            <show>0</show>
+        </runProgram>
+        <actionGroup progressText="Add compose to Dockstation">
+            <show>0</show>
+            <actionList>
+                <runProgram>
+                    <program>mkdir</program>
+                    <programArguments>-p /home/${username}/.config/dockstation</programArguments>
+                </runProgram>
+                <if>
+                    <actionList>
+                        <runProgram>
+                            <program>python</program>
+                            <programArguments>${installdir}/dockstation_injector.py -f "/home/${username}/docker-compose/${product_version}" -t "${product_version}" -n "${sanitized_version}" -e "/home/${username}/.config/dockstation/Settings"</programArguments>
+                        </runProgram>
+                    </actionList>
+                    <conditionRuleList>
+                        <programTest>
+                            <condition>is_in_path</condition>
+                            <name>python</name>
+                        </programTest>
+                    </conditionRuleList>
+                    <elseActionList>
+                        <setInstallerVariableFromRegEx>
+                            <name>sanitized_version</name>
+                            <pattern>^(\d)\.(\d{1,2})\.(\d{1,2})</pattern>
+                            <substitution>\1\2\3</substitution>
+                            <text>${product_version}</text>
+                        </setInstallerVariableFromRegEx>
+                        <runProgram>
+                            <program>python3</program>
+                            <programArguments>${installdir}/dockstation_injector.py -f "/home/${username}/docker-compose/${product_version}" -t "${product_version}" -n "${sanitized_version}" -e "/home/${username}/.config/dockstation/Settings"</programArguments>
+                        </runProgram>
+                    </elseActionList>
+                </if>
+                <runProgram>
+                    <program>chown</program>
+                    <programArguments>-R ${username}:${username} /home/${username}/.config/dockstation</programArguments>
+                </runProgram>
+            </actionList>
+            <ruleList>
+                <fileExists>
+                    <path>/usr/local/bin/dockstation-1.4.1-x86_64.AppImage</path>
+                </fileExists>
+            </ruleList>
+        </actionGroup>
+        <runProgram>
+            <program>docker-compose</program>
+            <programArguments>-f docker-compose.yml -p ${product_version} up -d</programArguments>
+            <progressText>Start the main stack</progressText>
+            <useMSDOSPath>0</useMSDOSPath>
+            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
+            <ruleList>
+                <componentTest>
+                    <logic>exists</logic>
+                    <name>main</name>
+                </componentTest>
+                <fileExists>
+                    <path>/home/${username}/docker-compose/${product_version}/docker-compose.yml</path>
+                </fileExists>
+            </ruleList>
+        </runProgram>
+        <runProgram>
+            <program>sysctl</program>
+            <programArguments>-w vm.max_map_count=262144</programArguments>
+            <progressText>Change vm.max_map_count host kernel parameter</progressText>
+            <show>0</show>
+            <useMSDOSPath>0</useMSDOSPath>
+            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
+            <ruleList>
+                <componentTest>
+                    <logic>exists</logic>
+                    <name>elk_master</name>
+                </componentTest>
+                <fileExists>
+                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-elk-stack.yml</path>
+                </fileExists>
+            </ruleList>
+        </runProgram>
+        <runProgram>
+            <program>docker-compose</program>
+            <programArguments>-f docker-compose-elk-stack.yml -p ${product_version} up -d</programArguments>
+            <progressText>Start the elk master stack</progressText>
+            <useMSDOSPath>0</useMSDOSPath>
+            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
+            <ruleList>
+                <componentTest>
+                    <logic>exists</logic>
+                    <name>elk_master</name>
+                </componentTest>
+                <fileExists>
+                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-elk-stack.yml</path>
+                </fileExists>
+            </ruleList>
+        </runProgram>
+        <runProgram>
+            <program>docker-compose</program>
+            <programArguments>-f docker-compose-filebeat.yml -p ${product_version} up -d</programArguments>
+            <progressText>Start the elk node</progressText>
+            <useMSDOSPath>0</useMSDOSPath>
+            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
+            <ruleList>
+                <componentTest>
+                    <logic>exists</logic>
+                    <name>elk_node</name>
+                </componentTest>
+                <fileExists>
+                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-filebeat.yml</path>
+                </fileExists>
+            </ruleList>
+        </runProgram>
+        <runProgram>
+            <program>chmod</program>
+            <programArguments>+x ${installdir}/change_network.sh</programArguments>
+            <show>0</show>
+        </runProgram>
+        <runProgram>
+            <program>${installdir}/change_network.sh</program>
+            <programArguments>-n ${product_version} -c docker-compose-monitor-master.yml</programArguments>
+            <progressText>changing network name to product_version_prod for monitor master</progressText>
+            <show>0</show>
+            <useMSDOSPath>0</useMSDOSPath>
+            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
+            <ruleList>
+                <componentTest>
+                    <logic>exists</logic>
+                    <name>monitoring_master</name>
+                </componentTest>
+                <fileExists>
+                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-monitor-master.yml</path>
+                </fileExists>
+            </ruleList>
+        </runProgram>
+        <runProgram>
+            <program>docker-compose</program>
+            <programArguments>-f docker-compose-monitor-master.yml -p ${product_version} up -d</programArguments>
+            <progressText>Start the monitoring master</progressText>
+            <useMSDOSPath>0</useMSDOSPath>
+            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
+            <ruleList>
+                <componentTest>
+                    <logic>exists</logic>
+                    <name>monitoring_master</name>
+                </componentTest>
+                <fileExists>
+                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-monitor-master.yml</path>
+                </fileExists>
+            </ruleList>
+        </runProgram>
+        <runProgram>
+            <program>docker-compose</program>
+            <programArguments>-f docker-compose-monitor-node.yml -p ${product_version} up -d</programArguments>
+            <progressText>Start the monitoring node</progressText>
+            <useMSDOSPath>0</useMSDOSPath>
+            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
+            <ruleList>
+                <componentTest>
+                    <logic>exists</logic>
+                    <name>monitoring_node</name>
+                </componentTest>
+                <fileExists>
+                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-monitor-node.yml</path>
+                </fileExists>
+            </ruleList>
+        </runProgram>
+        <deleteFile>
+            <path>${installdir}</path>
+            <progressText>Remove temporary Docker images</progressText>
+            <show>0</show>
+        </deleteFile>
+        <runProgram>
+            <program>${project.vendor}-${product_version}-linux-x86_64.AppImage</program>
+            <programArguments></programArguments>
+            <progressText>Run the Dashboard application</progressText>
+            <useMSDOSPath>0</useMSDOSPath>
+            <workingDirectory>/usr/local/bin</workingDirectory>
+            <ruleList>
+                <componentTest>
+                    <logic>exists</logic>
+                    <name>dashboard</name>
+                </componentTest>
+                <fileExists>
+                    <path>/usr/local/bin/${project.vendor}-${product_version}-linux-x86_64.AppImage</path>
+                </fileExists>
+            </ruleList>
+        </runProgram>
+    </finalPageActionList>
+    <parameterList>
+        <directoryParameter>
+            <name>installdir</name>
+            <description>Installer.Parameter.installdir.description</description>
+            <explanation>Installer.Parameter.installdir.explanation</explanation>
+            <value></value>
+            <default>${platform_install_prefix}/${product_shortname}-${product_version}</default>
+            <allowEmptyValue>0</allowEmptyValue>
+            <cliOptionName>prefix</cliOptionName>
+            <insertAfter>welcome</insertAfter>
+            <mustBeWritable>1</mustBeWritable>
+            <mustExist>0</mustExist>
+            <width>30</width>
+        </directoryParameter>
+        <parameterGroup>
+            <name>extra_config</name>
+            <title>Configuration</title>
+            <explanation></explanation>
+            <value></value>
+            <default></default>
+            <insertAfter>installdir</insertAfter>
+            <parameterList>
+                <stringParameter>
+                    <name>username</name>
+                    <description>Username</description>
+                    <explanation>Please enter the system username to install the compose files to.</explanation>
+                    <value></value>
+                    <default>user</default>
+                    <allowEmptyValue>0</allowEmptyValue>
+                    <cliOptionName>username</cliOptionName>
+                    <width>30</width>
+                </stringParameter>
+            </parameterList>
+            <validationActionList>
+                <throwError>
+                    <customErrorMessage>User ${username} does not exist, please use a username that exists on the system.</customErrorMessage>
+                    <text>Error: User does not exist.</text>
+                    <ruleList>
+                        <userTest>
+                            <logic>not_exists</logic>
+                            <username>${username}</username>
+                        </userTest>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>Using root as the target user is prohibited.</customErrorMessage>
+                    <text>Error: Cannot use root as target user</text>
+                    <ruleList>
+                        <compareText>
+                            <logic>equals</logic>
+                            <text>${username}</text>
+                            <value>root</value>
+                        </compareText>
+                    </ruleList>
+                </throwError>
+            </validationActionList>
+        </parameterGroup>
+        <parameterGroup>
+            <name>hw_fingerprint_page</name>
+            <title>Hardware Fingerprint</title>
+            <explanation></explanation>
+            <value></value>
+            <default></default>
+            <insertAfter>installation</insertAfter>
+            <parameterList>
+                <infoParameter>
+                    <name>hwinfo</name>
+                    <description></description>
+                    <explanation>Please copy the fingerprint below and send it to the vendor in order to generate a license for this machine:</explanation>
+                    <value>${hw_fingerprint}</value>
+                    <default></default>
+                    <trimMarginNumChars>0</trimMarginNumChars>
+                </infoParameter>
+            </parameterList>
+        </parameterGroup>
+    </parameterList>
+    <platformOptionsList>
+        <platformOptions>
+            <platform>linux-x64</platform>
+        </platformOptions>
+    </platformOptionsList>
+</project>
+
