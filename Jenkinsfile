@@ -11,7 +11,7 @@ timeout(time: 120, unit: 'MINUTES') {
 
             checkout changelog: false, poll: false, scm: [
                     $class: 'GitSCM',
-                    branches: [[name: '*/1.20.0-on-demand-1.20.0-verint']],
+                    branches: [[name: '*/"${GIT_BRANCH_NAME}"']],
                     extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'InstallBuilder/Jenkinsfile_installation']]]],
                     userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/docker-compose.git"]]
             ]
