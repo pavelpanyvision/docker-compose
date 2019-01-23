@@ -27,9 +27,6 @@
                             <origin>${env(WORKSPACE)}/$(install_folder)/InstallBuilder/scripts/dockstation_injector.py</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>${env(WORKSPACE)}/$(install_folder)/InstallBuilder/scripts/change_network.sh</origin>
-                        </distributionFile>
-                        <distributionFile>
                             <origin>${env(WORKSPACE)}/$(install_folder)/InstallBuilder/scripts/optparse.bash</origin>
                         </distributionFile>
                     </distributionFileList>
@@ -307,109 +304,6 @@
                 </componentTest>
                 <fileExists>
                     <path>/home/${username}/docker-compose/${product_version}/docker-compose.yml</path>
-                </fileExists>
-            </ruleList>
-        </runProgram>
-        <runProgram>
-            <program>sysctl</program>
-            <programArguments>-w vm.max_map_count=262144</programArguments>
-            <progressText>Change vm.max_map_count host kernel parameter</progressText>
-            <show>0</show>
-            <useMSDOSPath>0</useMSDOSPath>
-            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
-            <ruleList>
-                <componentTest>
-                    <logic>exists</logic>
-                    <name>elk_master</name>
-                </componentTest>
-                <fileExists>
-                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-elk-stack.yml</path>
-                </fileExists>
-            </ruleList>
-        </runProgram>
-        <runProgram>
-            <program>docker-compose</program>
-            <programArguments>-f docker-compose-elk-stack.yml -p ${product_version} up -d</programArguments>
-            <progressText>Start the elk master stack</progressText>
-            <useMSDOSPath>0</useMSDOSPath>
-            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
-            <ruleList>
-                <componentTest>
-                    <logic>exists</logic>
-                    <name>elk_master</name>
-                </componentTest>
-                <fileExists>
-                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-elk-stack.yml</path>
-                </fileExists>
-            </ruleList>
-        </runProgram>
-        <runProgram>
-            <program>docker-compose</program>
-            <programArguments>-f docker-compose-filebeat.yml -p ${product_version} up -d</programArguments>
-            <progressText>Start the elk node</progressText>
-            <useMSDOSPath>0</useMSDOSPath>
-            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
-            <ruleList>
-                <componentTest>
-                    <logic>exists</logic>
-                    <name>elk_node</name>
-                </componentTest>
-                <fileExists>
-                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-filebeat.yml</path>
-                </fileExists>
-            </ruleList>
-        </runProgram>
-        <runProgram>
-            <program>chmod</program>
-            <programArguments>+x ${installdir}/change_network.sh</programArguments>
-            <show>0</show>
-        </runProgram>
-        <runProgram>
-            <program>${installdir}/change_network.sh</program>
-            <programArguments>-n ${product_version} -c docker-compose-monitor-master.yml</programArguments>
-            <progressText>changing network name to product_version_prod for monitor master</progressText>
-            <show>0</show>
-            <useMSDOSPath>0</useMSDOSPath>
-            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
-            <ruleList>
-                <componentTest>
-                    <logic>exists</logic>
-                    <name>monitoring_master</name>
-                </componentTest>
-                <fileExists>
-                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-monitor-master.yml</path>
-                </fileExists>
-            </ruleList>
-        </runProgram>
-        <runProgram>
-            <program>docker-compose</program>
-            <programArguments>-f docker-compose-monitor-master.yml -p ${product_version} up -d</programArguments>
-            <progressText>Start the monitoring master</progressText>
-            <useMSDOSPath>0</useMSDOSPath>
-            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
-            <ruleList>
-                <componentTest>
-                    <logic>exists</logic>
-                    <name>monitoring_master</name>
-                </componentTest>
-                <fileExists>
-                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-monitor-master.yml</path>
-                </fileExists>
-            </ruleList>
-        </runProgram>
-        <runProgram>
-            <program>docker-compose</program>
-            <programArguments>-f docker-compose-monitor-node.yml -p ${product_version} up -d</programArguments>
-            <progressText>Start the monitoring node</progressText>
-            <useMSDOSPath>0</useMSDOSPath>
-            <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
-            <ruleList>
-                <componentTest>
-                    <logic>exists</logic>
-                    <name>monitoring_node</name>
-                </componentTest>
-                <fileExists>
-                    <path>/home/${username}/docker-compose/${product_version}/docker-compose-monitor-node.yml</path>
                 </fileExists>
             </ruleList>
         </runProgram>
