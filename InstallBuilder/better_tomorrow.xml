@@ -3,9 +3,9 @@
     <fullName>Better Tomorrow</fullName>
     <version>1.20.0</version>
     <installerFilename>${product_shortname}-${product_version}-${build_number}-${compose_name}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
-    <leftImage>${env(WORKSPACE)}/Installation/InstallBuilder/images/Left_side.png</leftImage>
-    <logoImage>${env(WORKSPACE)}/Installation/InstallBuilder/images/logo.png</logoImage>
-    <splashImage>${env(WORKSPACE)}/Installation/InstallBuilder/images/Splash.png</splashImage>
+    <leftImage>${env(WORKSPACE)}/${project.version}/InstallBuilder/images/Left_side.png</leftImage>
+    <logoImage>${env(WORKSPACE)}/${project.version}/InstallBuilder/images/logo.png</logoImage>
+    <splashImage>${env(WORKSPACE)}/${project.version}/InstallBuilder/images/Splash.png</splashImage>
     <componentList>
         <component>
             <name>scripts</name>
