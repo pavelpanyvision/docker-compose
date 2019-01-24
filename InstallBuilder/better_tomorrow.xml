@@ -3,9 +3,9 @@
     <fullName>Better Tomorrow</fullName>
     <version>1.20.0</version>
     <installerFilename>${product_shortname}-${product_version}-${build_number}-${compose_name}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
-    <leftImage>${env(WORKSPACE)}/Installation/InstallBuilder/images/icon.PNG</leftImage>
-    <logoImage>${env(WORKSPACE)}/Installation/InstallBuilder/images/VerintLogo.png</logoImage>
-    <splashImage>${env(WORKSPACE)}/Installation/InstallBuilder/images/VerintLogo.png</splashImage>
+    <leftImage>${env(WORKSPACE)}/${project.version}/InstallBuilder/images/icon.PNG</leftImage>
+    <logoImage>${env(WORKSPACE)}/${project.version}/InstallBuilder/images/VerintLogo.png</logoImage>
+    <splashImage>${env(WORKSPACE)}/${project.version}/InstallBuilder/images/VerintLogo.png</splashImage>
     <componentList>
         <component>
             <name>scripts</name>
@@ -21,13 +21,13 @@
                     <platforms>all</platforms>
                     <distributionFileList>
                         <distributionFile>
-                            <origin>${env(WORKSPACE)}/$(install_folder)/InstallBuilder/scripts/airgap</origin>
+                            <origin>${env(WORKSPACE)}/${project.version}/InstallBuilder/scripts/airgap</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>${env(WORKSPACE)}/$(install_folder)/InstallBuilder/scripts/dockstation_injector.py</origin>
+                            <origin>${env(WORKSPACE)}/${project.version}/InstallBuilder/scripts/dockstation_injector.py</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>${env(WORKSPACE)}/$(install_folder)/InstallBuilder/scripts/optparse.bash</origin>
+                            <origin>${env(WORKSPACE)}/${project.version}/InstallBuilder/scripts/optparse.bash</origin>
                         </distributionFile>
                     </distributionFileList>
                 </folder>
