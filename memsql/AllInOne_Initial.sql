@@ -54,7 +54,7 @@ DELIMITER ;
 
 CREATE TABLE IF NOT EXISTS `detection` (
   `track_id` varchar(36) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `source_id` varchar(24) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `source_id` varchar(36) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `pipe_id` varchar(36) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `collate_id` varchar(36) CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
   `detection_type` tinyint(4) NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `detection` (
 
 CREATE TABLE IF NOT EXISTS `detection_in_memory` (
   `track_id` binary(36) NOT NULL,
-  `source_id` binary(24) NOT NULL,
+  `source_id` binary(36) NOT NULL,
   `detection_type` tinyint(4) NOT NULL,
   `creation_date` AS DATE(creation_datetime) PERSISTED DATE,
   `creation_datetime` datetime NOT NULL,
@@ -141,7 +141,7 @@ END //
 DELIMITER ;
 
 DELIMITER //
-CREATE OR REPLACE PROCEDURE get_track(_track_id VARCHAR(36),_source_id VARCHAR(24),_detection_type tinyint,_creation_date date) 
+CREATE OR REPLACE PROCEDURE get_track(_track_id VARCHAR(36),_source_id VARCHAR(36),_detection_type tinyint,_creation_date date) 
 AS
 DECLARE
 BEGIN
@@ -157,7 +157,7 @@ DELIMITER ;
 
 
 DELIMITER //
-CREATE OR REPLACE PROCEDURE search_by_features(_features_hex VARCHAR(4096),_start_datetime datetime,_end_datetime datetime,_detection_type tinyint,_source_id VARCHAR(24),_score_threshold float, _top_results INT) 
+CREATE OR REPLACE PROCEDURE search_by_features(_features_hex VARCHAR(4096),_start_datetime datetime,_end_datetime datetime,_detection_type tinyint,_source_id VARCHAR(36),_score_threshold float, _top_results INT) 
 AS
 DECLARE 
 	rows_min_c INT = 0;
@@ -177,7 +177,7 @@ BEGIN
   rows_max_c = row_count();
   
   DROP TABLE IF EXISTS temp_search_results;
-  CREATE TEMPORARY TABLE temp_search_results (track_id VARCHAR(36),source_id VARCHAR(24),score float);
+  CREATE TEMPORARY TABLE temp_search_results (track_id VARCHAR(36),source_id VARCHAR(36),score float);
   
   IF _source_id = "" THEN
       # start is in memory no need for disk!
@@ -240,7 +240,7 @@ BEGIN
 		  AND creation_date <= DATE(_end_datetime)
 		  AND creation_datetime >= _start_datetime
 		  AND creation_datetime <= _end_datetime
-          AND source_id = _source_id
+          AND source_id = CAST(_source_id AS BINARY(36))
 		  AND DOT_PRODUCT(features,unhex(_features_hex)) >= _score_threshold
           ORDER BY score DESC LIMIT _top_results;		
 	  ELSE
@@ -265,14 +265,14 @@ BEGIN
 			  WHERE detection_type = _detection_type
 			  AND creation_date <= DATE(_end_datetime)
 			  AND creation_datetime <= _end_datetime
-              AND source_id = _source_id
+              AND source_id = CAST(_source_id AS BINARY(36))
 			  AND DOT_PRODUCT(features,unhex(_features_hex)) >= _score_threshold
               ORDER BY score DESC LIMIT _top_results;
               
 			# get all disk ending in memory
             INSERT INTO temp_search_results
 			SELECT track_id,source_id,DOT_PRODUCT(features,unhex(_features_hex)) as score
-			  FROM detection_in_memory
+			  FROM detection
 			  WHERE detection_type = _detection_type
               AND creation_date >= DATE(_start_datetime)
 			  AND creation_date < (select MIN(creation_date) from detection_in_memory)
@@ -292,7 +292,7 @@ DELIMITER ;
 
 
 DELIMITER // 
-CREATE OR REPLACE PROCEDURE delete_track(_track_id VARCHAR(36),_source_id VARCHAR(24),_detection_type tinyint,_creation_date date)
+CREATE OR REPLACE PROCEDURE delete_track(_track_id VARCHAR(36),_source_id VARCHAR(36),_detection_type tinyint,_creation_date date)
 AS 
 DECLARE
 err_msg VARCHAR(512) = '';
@@ -310,8 +310,8 @@ BEGIN
   DELETE FROM detection_in_memory 
   WHERE detection_type = _detection_type
   AND creation_date = _creation_date
-  AND track_id = _track_id
-  AND source_id = _source_id;
+  AND track_id = CAST(_track_id AS BINARY(36))
+  AND source_id = CAST(_source_id AS BINARY(36));
   row_c += row_count();
     COMMIT;
     IF row_c = 0 THEN
@@ -360,7 +360,7 @@ DELIMITER ;
 
 
 DELIMITER //
-CREATE OR REPLACE PROCEDURE delete_tracks_by_source_id(_source_id varchar(24))
+CREATE OR REPLACE PROCEDURE delete_tracks_by_source_id(_source_id varchar(36))
 AS
 DECLARE 
     row_count int;
@@ -378,7 +378,7 @@ BEGIN
   row_count = 1;
   WHILE row_count > 0 LOOP
     DELETE FROM detection_in_memory 
-    WHERE source_id = _source_id
+    WHERE source_id = CAST(_source_id AS BINARY(36))
     LIMIT 50000;
     row_count = row_count();
     total_row_count += row_count;
@@ -389,7 +389,7 @@ DELIMITER ;
 
 
 
-#update finishe of first version
+#update finish of first version
 UPDATE db_schema_version 
 SET deploy_end = NOW(),
 is_success = 'true'
@@ -413,7 +413,7 @@ CREATE TABLE IF NOT EXISTS db_schema_version (
 );
 
 CREATE TABLE IF NOT EXISTS db_errors_msg_log (
-  row_guid CHAR(32) NOT NULL,
+  row_guid VARCHAR(32) NOT NULL,
   row_datetime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   procedure_name VARCHAR(256) NULL,
   error_msg VARCHAR(512) NULL,
@@ -463,6 +463,10 @@ CREATE TABLE IF NOT EXISTS `poi` (
   KEY `pk_poi` (poi_id, detection_type, feature_id)
 );
 
+/*
+call save_poi('[{"poi_id": "P_UUID","detection_type": 1,"groups": ["GROUPAID","GROUPCID","GROUPBID"], "features_data": [{"feature_id": "F_UUID","source_id": "S_UUID", "features":[0.324234,0.23432423,0.324234,0.2345]}]},{"poi_id": "P_UUID2","detection_type": 1,"groups": ["GROUPAID","GROUPCID","GROUPBID"], "features_data": [{"feature_id": "F_UUID","source_id": "S_UUID", "features":[0.324234,0.23432423,0.324234,0.2345]}]}]');
+*/
+
 DELIMITER //
 CREATE OR REPLACE PROCEDURE save_poi(_array_of_tracks json) 
 AS
@@ -488,7 +492,7 @@ BEGIN
 			START TRANSACTION;
 				# clean exists
                 DELETE FROM poi
-                WHERE poi_id = current_poi_id;
+                WHERE poi_id = CAST(current_poi_id AS BINARY(36));
                 # Insert new
                 FOR z IN 0 .. (array_features_data_length-1) LOOP
 					current_feature_data = JSON_EXTRACT_JSON(current_features_data,z);
@@ -508,7 +512,7 @@ BEGIN
 				ROLLBACK;
 				err_msg = exception_message();
 				CALL insert_error_row('save_poi',err_msg);
-                INSERT INTO save_tracks_result (poi_id,is_success,error_msg) VALUES (current_track_id,"failed",err_msg);
+                INSERT INTO save_poi_result (poi_id,is_success,error_msg) VALUES (current_poi_id,"failed",err_msg);
 		END;
   END LOOP;
   ECHO SELECT poi_id as pod_id,is_success as is_success,error_msg as error_msg from save_poi_result;
@@ -516,7 +520,9 @@ BEGIN
 END //
 DELIMITER ;
 
-
+/*
+call get_poi('P_UUID');
+*/
 
 DELIMITER //
 CREATE OR REPLACE PROCEDURE get_poi(_poi_id VARCHAR(36)) 
@@ -526,7 +532,7 @@ DECLARE
     features_hex VARCHAR(4096);
     res_features_arr json = '[]';
 BEGIN
-  arr = COLLECT(CONCAT("SELECT hex(features) FROM poi WHERE poi_id = '",_poi_id,"'"), QUERY(features_hex varchar(4096)));
+  arr = COLLECT(CONCAT("SELECT hex(features) FROM poi WHERE poi_id = CAST('",_poi_id,"' AS BINARY(36))"), QUERY(features_hex varchar(4096)));
   FOR x in arr LOOP
     features_hex = x.features_hex;
     res_features_arr = JSON_ARRAY_PUSH_STRING(res_features_arr,features_hex);
@@ -536,6 +542,9 @@ END //
 DELIMITER ;
 
 
+/*
+call delete_poi('[{"poi_id": "P_UUID", "detection_type": 1}, {"poi_id": "P_UUID2", "detection_type": 1}]');
+*/
 DELIMITER //
 CREATE OR REPLACE PROCEDURE delete_poi(_array_of_poi_id json) 
 AS
@@ -548,27 +557,27 @@ DECLARE
    	err_msg VARCHAR(512) = '';
 BEGIN
   DROP TABLE IF EXISTS delete_poi_result;
-  CREATE TEMPORARY TABLE delete_poi_result(poi_id VARCHAR(36),is_success VARCHAR(10), rows_deleted int,error_msg VARCHAR(512));
+  CREATE TEMPORARY TABLE delete_poi_result(poi_id VARCHAR(36),is_success VARCHAR(10), rows_del int,error_msg VARCHAR(512));
   FOR i IN 0 .. (array_length-1) LOOP
 		BEGIN
 			current_json = JSON_EXTRACT_JSON(_array_of_poi_id,i);
-			current_poi_id = JSON_EXTRACT_STRING(current_json,'poi_id');
-            current_detection_type = JSON_EXTRACT_DOUBLE(current_json,'detection_type');
+			current_poi_id = current_json::$poi_id;
+            current_detection_type = current_json::%detection_type;
 			START TRANSACTION;
 				# clean exists
                 DELETE FROM poi
-                WHERE poi_id = current_poi_id;
+                WHERE poi_id = CAST(current_poi_id AS BINARY(36));
                 rows_deleted = row_count();
 			COMMIT;
-			INSERT INTO delete_poi_result (poi_id,is_success,rows_deleted,error_msg) VALUES (current_poi_id,"success",rows_deleted,"");
+			INSERT INTO delete_poi_result (poi_id,is_success,rows_del,error_msg) VALUES (current_poi_id,"success",rows_deleted,"");
 			EXCEPTION WHEN OTHERS THEN
 				ROLLBACK;
 				err_msg = exception_message();
 				CALL insert_error_row('delete_poi',err_msg);
-                INSERT INTO delete_poi_result (poi_id,is_success,rows_deleted,error_msg) VALUES (current_track_id,"failed",0,err_msg);
+                INSERT INTO delete_poi_result (poi_id,is_success,rows_del,error_msg) VALUES (current_track_id,"failed",0,err_msg);
 		END;
   END LOOP;
-  ECHO SELECT poi_id as pod_id,is_success as is_success,rows_deleted as rows_deleted,error_msg as error_msg from delete_poi_result;
+  ECHO SELECT poi_id as pod_id,is_success as is_success,rows_del as rows_deleted,error_msg as error_msg from delete_poi_result;
   DROP TABLE IF EXISTS delete_poi_result;
 END //
 DELIMITER ;
@@ -649,18 +658,18 @@ DELIMITER //
 CREATE OR REPLACE PROCEDURE remove_features_from_poi(_poi_id varchar(36), _detection_type tinyint, _array_of_features json) 
 AS
 DECLARE 
-    current_feature_data JSON;
+    current_feature_data_id JSON;
     array_length INT = JSON_LENGTH(_array_of_features);
    	err_msg VARCHAR(512) = '';
     rows_c INT = 0;
 BEGIN
   FOR i IN 0 .. (array_length-1) LOOP
 		BEGIN
-			current_feature_data = JSON_EXTRACT_JSON(_array_of_features,i);
+			current_feature_data_id = JSON_EXTRACT_JSON(_array_of_features,i);
 			START TRANSACTION;
 			DELETE FROM poi
-            WHERE poi_id = _poi_id
-            AND feature_id = current_feature_data;
+            WHERE poi_id = CAST(_poi_id AS BINARY(36))
+            AND feature_id = CAST(current_feature_data_id AS BINARY(36));
 			rows_c += row_count();
 			COMMIT;
 			EXCEPTION WHEN OTHERS THEN
@@ -686,14 +695,11 @@ DECLARE
     rows_c INT = 0;
 BEGIN
   DROP TABLE IF EXISTS list_of_poi;
-  CREATE TEMPORARY TABLE list_of_poi(poi_id VARCHAR(36));
+  CREATE TEMPORARY TABLE list_of_poi(poi_id BINARY(36));
   current_group_id = update_json::$group_id;
   array_length = JSON_LENGTH(update_json::poi);  
   FOR i IN 0 .. (array_length-1) LOOP
-		INSERT INTO list_of_poi (poi_id) VALUES 
-        (
-			update_json::poi::i
-        );
+		INSERT INTO list_of_poi (poi_id) VALUES (JSON_EXTRACT_JSON(update_json::poi,i));
   END LOOP;
   BEGIN
 	  START TRANSACTION;
@@ -726,7 +732,7 @@ BEGIN
 	  START TRANSACTION;
 	  UPDATE poi
 	  SET groups = update_json::groups
-	  WHERE poi_id = update_json::$poi_id;
+	  WHERE poi_id = CAST(update_json::$poi_id AS BINARY(36));
 	  rows_c = row_count();
 	  COMMIT;
 				EXCEPTION WHEN OTHERS THEN
@@ -804,4 +810,3 @@ WHERE version_num = 1;
 -- START PIPELINE load_kafka_detection;
 -- 
 -- ######################## Kafka To MemSQL  #####################################
-
