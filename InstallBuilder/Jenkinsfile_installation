@@ -217,22 +217,22 @@ def generic_pipeline_method() {
                         stage('Pull-AirGap') {
                             env.EMAIL_SEND = 'devops@anyvision.co'
                             sh("gcloud docker --authorize-only")
-                            // parallel airgap_GPU: {
-                            //             sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU} ${docker_images_destination_folder_GPU}")
-                            //         },
-                            //         airgap_CPU: {
-                            //             sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU} ${docker_images_destination_folder_CPU}")
-                            //         },
-                            //         airgap_ELK: {
-                            //             sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK} ${docker_images_destination_folder_ELK}")
-                            //             sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE} ${docker_images_destination_folder_ELK_NODE}")
-                            //         },
+                            parallel airgap_GPU: {
+                                        sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU} ${docker_images_destination_folder_GPU}")
+                                    },
+                                    airgap_CPU: {
+                                        sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU} ${docker_images_destination_folder_CPU}")
+                                    },
+                                    airgap_ELK: {
+                                        sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK} ${docker_images_destination_folder_ELK}")
+                                        sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE} ${docker_images_destination_folder_ELK_NODE}")
+                                    },
                             //         airgap_MONITOR:{
                             //             sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_MASTER} ${docker_images_destination_folder_MONITOR_MASTER}")
                             //             sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_NODE} ${docker_images_destination_folder_MONITOR_NODE}")
                             //         },
                                     //remove Anyvision from compose files
-                           parallel airgap_GPU_WHITE: {
+                                    airgap_GPU_WHITE: {
                                         sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE")
                                         sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE")
                                         sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE ${docker_images_destination_folder_GPU_WHITE}")
@@ -276,25 +276,25 @@ def generic_pipeline_method() {
                                     }
 
                             //build
-                            // parallel build_GPU: {
-                            //             sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
-                            //                     // "project.version=${docker_compose_GPU_folder} " +
-                            //                     "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +                                               
-                            //                     "product_type=${docker_compose_GPU_type} " +                                                
-                            //                     "build_number=${BUILD_NUMBER} " +
-                            //                     "network_name=${repo_extension_branch_name} " +
-                            //                     "compose_name=${env.compose_extension_GPU} ")                                               
-                            //         },
-                            //         build_CPU: {
-                            //             sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
-                            //                     // "project.version=${docker_compose_CPU_folder} " +
-                            //                     "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +
-                            //                     "product_type=${docker_compose_CPU_type} " +
-                            //                     "build_number=${BUILD_NUMBER} " +
-                            //                     "network_name=${repo_extension_branch_name} " +
-                            //                     "compose_name=${env.compose_extension_CPU} ")                                               
-                            //         },
-                            parallel build_GPU_WHITE: {
+                            parallel build_GPU: {
+                                        sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
+                                                // "project.version=${docker_compose_GPU_folder} " +
+                                                "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +                                               
+                                                "product_type=${docker_compose_GPU_type} " +                                                
+                                                "build_number=${BUILD_NUMBER} " +
+                                                "network_name=${repo_extension_branch_name} " +
+                                                "compose_name=${env.compose_extension_GPU} ")                                               
+                                    },
+                                    build_CPU: {
+                                        sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
+                                                // "project.version=${docker_compose_CPU_folder} " +
+                                                "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +
+                                                "product_type=${docker_compose_CPU_type} " +
+                                                "build_number=${BUILD_NUMBER} " +
+                                                "network_name=${repo_extension_branch_name} " +
+                                                "compose_name=${env.compose_extension_CPU} ")                                               
+                                    },
+                                    build_GPU_WHITE: {
                                         sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
                                                 // "project.version=${docker_compose_GPU_WHITE_folder} " +
                                                 "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +
@@ -327,13 +327,13 @@ def generic_pipeline_method() {
                             echo "pushing to aws s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME} and to s3://${BUCKET_NAME}/installbuilder-whitelabel/${DOCKER_COMPOSE_REPO_BRANCH_NAME}"
                             
                             if ( "${INSTALLATION_REPO_BRANCH_NAME}" == 'master') {
-                                // parallel push_GPU: {
-                                //             sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
-                                //         },
-                                //         push_CPU: {
-                                //             sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
-                                //         },
-                                parallel push_GPU_WHITE: {
+                                parallel push_GPU: {
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
+                                        },
+                                        push_CPU: {
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
+                                        },
+                                        push_GPU_WHITE: {
                                             sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
                                         },
                                         push_CPU_WHITE: {
@@ -342,13 +342,13 @@ def generic_pipeline_method() {
                             }
 
                             else if ( "${INSTALLATION_REPO_BRANCH_NAME}" == 'development') {
-                                // parallel push_GPU: {
-                                //             sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
-                                //         },
-                                //         push_CPU: {
-                                //             sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
-                                //         },
-                                parallel push_GPU_WHITE: {
+                                parallel push_GPU: {
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
+                                        },
+                                        push_CPU: {
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
+                                        },
+                                        push_GPU_WHITE: {
                                             sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
                                         },
                                         push_CPU_WHITE: {
