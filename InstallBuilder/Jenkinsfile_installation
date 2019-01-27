@@ -223,14 +223,14 @@ def generic_pipeline_method() {
                                     airgap_CPU: {
                                         sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU} ${docker_images_destination_folder_CPU}")
                                     },
-                                    airgap_ELK: {
-                                        sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK} ${docker_images_destination_folder_ELK}")
-                                        sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE} ${docker_images_destination_folder_ELK_NODE}")
-                                    },
-                            //         airgap_MONITOR:{
-                            //             sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_MASTER} ${docker_images_destination_folder_MONITOR_MASTER}")
-                            //             sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_NODE} ${docker_images_destination_folder_MONITOR_NODE}")
-                            //         },
+                                    // airgap_ELK: {
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK} ${docker_images_destination_folder_ELK}")
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE} ${docker_images_destination_folder_ELK_NODE}")
+                                    // },
+                                    // airgap_MONITOR:{
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_MASTER} ${docker_images_destination_folder_MONITOR_MASTER}")
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_NODE} ${docker_images_destination_folder_MONITOR_NODE}")
+                                    // },
                                     //remove Anyvision from compose files
                                     airgap_GPU_WHITE: {
                                         sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE")
@@ -266,11 +266,11 @@ def generic_pipeline_method() {
                             env.EMAIL_SEND = 'devops@anyvision.co'
                             
                             //download dashboards for each processor type
-                            parallel download_dashboard_GPU: {
+                            parallel download_dashboard: {
                                         // sh("wget https://s3.eu-central-1.amazonaws.com/anyvision-dashboard/latest/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/AnyVision-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage -O ${env.WORKSPACE}/AnyVision-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
                                         sh("wget https://s3.eu-central-1.amazonaws.com/anyvision-dashboard/latest/on-demand-verint/AnyVision-1.20.0-linux-x86_64.AppImage -O ${env.WORKSPACE}/AnyVision-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
                                     },
-                                    download_dashboard_CPU_WHITE: {
+                                    download_dashboard_WHITE: {
                                         // sh("wget https://s3.eu-central-1.amazonaws.com/facesearch-dashboard/latest/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage -O ${env.WORKSPACE}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
                                         sh("wget https://s3.eu-central-1.amazonaws.com/facesearch-dashboard/latest/on-demand-verint/FaceSearch-1.20.0-linux-x86_64.AppImage -O ${env.WORKSPACE}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
                                     }
