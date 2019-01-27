@@ -475,7 +475,7 @@ services:
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
       - APP_DIR=/home/user/Dash-API/
-      - FEATURE_TOGGLE_KAFKA=true ### Requires running pipeng with s3 mode; only works when adding cameras/videos with dashboard
+      - FEATURE_TOGGLE_KAFKA=false ### Requires running pipeng with s3 mode; only works when adding cameras/videos with dashboard
     env_file:
       - env/global.env
       - env/api.env
