@@ -272,7 +272,7 @@ def generic_pipeline_method() {
                                     },
                                     download_dashboard_WHITE: {
                                         // sh("wget https://s3.eu-central-1.amazonaws.com/facesearch-dashboard/latest/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage -O ${env.WORKSPACE}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
-                                        sh("wget https://s3.eu-central-1.amazonaws.com/facesearch-dashboard/latest/on-demand-verint/FaceDetect-1.20.0-linux-x86_64.AppImage -O ${env.WORKSPACE}/FaceDetect-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
+                                        sh("wget https://s3.eu-central-1.amazonaws.com/facesearch-dashboard/latest/on-demand-verint/FaceDetect-1.20.0-linux-x86_64.AppImage -O ${env.WORKSPACE}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
                                     }
 
                             //build
@@ -303,7 +303,7 @@ def generic_pipeline_method() {
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_GPU} " +                                                
                                                 "project.leftImage='' project.logoImage='' project.splashImage='' project.disableSplashScreen=1 " +
-                                                "project.vendor='FaceDetect' project.shortName='FaceRec' project.fullName='FaceRec'")
+                                                "project.vendor='FaceSearch' project.shortName='FaceRec' project.fullName='FaceRec'")
                                     },
                                     build_CPU_WHITE: {
                                         sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
@@ -314,7 +314,7 @@ def generic_pipeline_method() {
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_CPU} " +                                               
                                                 "project.leftImage='' project.logoImage='' project.splashImage='' project.disableSplashScreen=1 " +
-                                                "project.vendor='FaceDetect' project.shortName='FaceRec' project.fullName='FaceRec'")
+                                                "project.vendor='FaceSearch' project.shortName='FaceRec' project.fullName='FaceRec'")
                                     }
 
                         } // end of stage BUILD
