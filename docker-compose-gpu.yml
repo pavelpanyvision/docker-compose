@@ -571,7 +571,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-training/api:on-demand-backend-for-pipeng
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
