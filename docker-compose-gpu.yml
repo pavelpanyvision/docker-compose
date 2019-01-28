@@ -26,8 +26,9 @@ services:
     volumes:
       - /ssd/memsql:/var/lib/memsql
       - /etc/localtime:/etc/localtime:ro
-      - ./memsql:/mnt
-      #- /etc/timezone:/etc/timezone:ro
+      - ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
+      # if need to deploy reid comment tracks db line and uncomment reid line
+      #- ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
     environment:
       - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
       - MEMSQL_NODE_ROLE=AIO
