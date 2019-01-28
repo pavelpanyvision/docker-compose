@@ -316,6 +316,8 @@
             <program>${project.vendor}-${product_version}-linux-x86_64.AppImage</program>
             <programArguments></programArguments>
             <progressText>Run the Dashboard application</progressText>
+            <run>0</run>
+            <show>0</show>
             <useMSDOSPath>0</useMSDOSPath>
             <workingDirectory>/usr/local/bin</workingDirectory>
             <ruleList>
