@@ -376,7 +376,7 @@ services:
 
 
   # master-sync-service:
-  #   image: gcr.io/anyvision-production/master-sync-service:development
+  #   image: gcr.io/anyvision-production/master-sync-service:1.1.0-rc.19
   #   restart: always
   #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
   #   hostname: master-sync-service
