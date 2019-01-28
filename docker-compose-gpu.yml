@@ -571,7 +571,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-training/api:on-demand-backend-for-pipeng
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -598,6 +598,7 @@ services:
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
       - APP_DIR=/home/user/Dash-API/
+      - FEATURE_TOGGLE_KAFKA=true ### Requires running pipeng with s3 mode; only works when adding cameras/videos with dashboard
     env_file:
       - env/global.env
       - env/api.env
