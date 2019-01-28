@@ -283,7 +283,7 @@ def generic_pipeline_method() {
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_CPU} " +                                               
                                                 "project.leftImage='' project.logoImage='' project.splashImage='' project.disableSplashScreen=1 " +
-                                                "project.vendor='FaceSearch' project.shortName='FaceRec' project.fullName='FaceRec'")
+                                                "project.vendor='FaceRec' project.shortName='FaceRec' project.fullName='FaceRec'")
                                     }
 
                         } // end of stage BUILD
