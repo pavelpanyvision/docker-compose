@@ -182,9 +182,9 @@
         <component>
             <name>dashboard</name>
             <description>Dashboard Client</description>
-            <canBeEdited>0</canBeEdited>
-            <selected>0</selected>
-            <show>0</show>
+            <canBeEdited>1</canBeEdited>
+            <selected>1</selected>
+            <show>1</show>
             <folderList>
                 <folder>
                     <description>/usr/local/bin</description>
@@ -316,8 +316,6 @@
             <program>${project.vendor}-${product_version}-linux-x86_64.AppImage</program>
             <programArguments></programArguments>
             <progressText>Run the Dashboard application</progressText>
-            <run>0</run>
-            <show>0</show>
             <useMSDOSPath>0</useMSDOSPath>
             <workingDirectory>/usr/local/bin</workingDirectory>
             <ruleList>
