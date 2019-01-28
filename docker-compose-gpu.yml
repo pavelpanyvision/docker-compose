@@ -80,6 +80,8 @@ services:
   kafka:
     image: gcr.io/anyvision-training/kafka:19.01
     restart: always
+    depends_on:
+      - "zookeeper"
     ports:
        - "9092:9092"
     volumes:
