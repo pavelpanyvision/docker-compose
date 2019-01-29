@@ -68,8 +68,8 @@ CREATE TABLE IF NOT EXISTS `detection` (
 
 
 CREATE TABLE IF NOT EXISTS `detection_in_memory` (
-  `track_id` binary(36) NOT NULL,
-  `source_id` binary(24) NOT NULL,
+  `track_id` VARCHAR(36) NOT NULL,
+  `source_id` VARCHAR(24) NOT NULL,
   `detection_type` tinyint(4) NOT NULL,
   `creation_date` AS DATE(creation_datetime) PERSISTED DATE,
   `creation_datetime` datetime NOT NULL,
@@ -229,7 +229,7 @@ BEGIN
 		  AND creation_date <= DATE(_end_datetime)
 		  AND creation_datetime >= _start_datetime
 		  AND creation_datetime <= _end_datetime
-          AND source_id = CAST(_source_id AS BINARY(24))
+          AND source_id = _source_id
 		  AND DOT_PRODUCT(features,unhex(_features_hex)) >= _score_threshold
           ORDER BY score DESC LIMIT _top_results;		
 	  ELSE
@@ -254,7 +254,7 @@ BEGIN
 			  WHERE detection_type = _detection_type
 			  AND creation_date <= DATE(_end_datetime)
 			  AND creation_datetime <= _end_datetime
-              AND source_id = CAST(_source_id AS BINARY(24))
+              AND source_id = _source_id
 			  AND DOT_PRODUCT(features,unhex(_features_hex)) >= _score_threshold
               ORDER BY score DESC LIMIT _top_results;
               
@@ -299,8 +299,8 @@ BEGIN
   DELETE FROM detection_in_memory 
   WHERE detection_type = _detection_type
   AND creation_date = _creation_date
-  AND track_id = CAST(_track_id AS BINARY(36))
-  AND source_id = CAST(_source_id AS BINARY(24));
+  AND track_id = _track_id
+  AND source_id = _source_id;
   row_c += row_count();
     COMMIT;
     IF row_c = 0 THEN
@@ -367,7 +367,7 @@ BEGIN
   row_count = 1;
   WHILE row_count > 0 LOOP
     DELETE FROM detection_in_memory 
-    WHERE source_id = CAST(_source_id AS BINARY(24))
+    WHERE source_id = _source_id
     LIMIT 50000;
     row_count = row_count();
     total_row_count += row_count;

@@ -54,16 +54,16 @@ END //
 DELIMITER ;
 
 CREATE TABLE IF NOT EXISTS `poi` (
-  `poi_id` binary(36) NOT NULL,
+  `poi_id` VARCHAR(36) NOT NULL,
   `detection_type` tinyint(4) NOT NULL,
-  `source_id` binary(36) NOT NULL,
-  `feature_id` binary(36) NOT NULL,
+  `is_ignored` BOOLEAN NOT NULL,
+  `feature_id` VARCHAR(36) NOT NULL,
   `features` varbinary(2048) DEFAULT NULL,
   KEY `pk_poi` (poi_id, detection_type, feature_id)
 );
 
 /*
-call save_poi('[{"poi_id": "P_UUID","detection_type": 1,"groups": ["GROUPAID","GROUPCID","GROUPBID"], "features_data": [{"feature_id": "F_UUID","source_id": "S_UUID", "features":[0.324234,0.23432423,0.324234,0.2345]}]},{"poi_id": "P_UUID2","detection_type": 1,"groups": ["GROUPAID","GROUPCID","GROUPBID"], "features_data": [{"feature_id": "F_UUID","source_id": "S_UUID", "features":[0.324234,0.23432423,0.324234,0.2345]}]}]');
+call save_poi('[{"is_ignored": false, "poi_id": "P_UUID","detection_type": 1,"groups": ["GROUPAID","GROUPCID","GROUPBID"], "features_data": [{"feature_id": "F_UUID", "features":[0.324234,0.23432423,0.324234,0.2345]}]},{"is_ignored": true, "poi_id": "P_UUID2","detection_type": 1,"groups": ["GROUPAID","GROUPCID","GROUPBID"], "features_data": [{"feature_id": "F_UUID","source_id": "S_UUID", "features":[0.324234,0.23432423,0.324234,0.2345]}]}]');
 */
 
 DELIMITER //
@@ -77,6 +77,7 @@ DECLARE
     array_length INTEGER = JSON_LENGTH(_array_of_tracks);
     array_features_data_length INTEGER = 0;
     current_detection_type INTEGER;
+	current_is_ignored BOOLEAN;
    	err_msg VARCHAR(512) = '';
 BEGIN
   DROP TABLE IF EXISTS save_poi_result;
@@ -86,20 +87,21 @@ BEGIN
 			current_json = JSON_EXTRACT_JSON(_array_of_tracks,i);
 			current_poi_id = current_json::$poi_id;
             current_detection_type = current_json::%detection_type;
+			current_is_ignored = current_feature_data::is_ignored;
 			current_features_data = current_json::features_data;
             array_features_data_length = JSON_LENGTH(current_features_data);
 			START TRANSACTION;
 				# clean exists
                 DELETE FROM poi
-                WHERE poi_id = CAST(current_poi_id AS BINARY(36));
+                WHERE poi_id = current_poi_id;
                 # Insert new
                 FOR z IN 0 .. (array_features_data_length-1) LOOP
 					current_feature_data = JSON_EXTRACT_JSON(current_features_data,z);
 					INSERT INTO poi
-									(poi_id, detection_type, source_id, feature_id, features) VALUES (
+									(poi_id, detection_type, is_ignored, feature_id, features) VALUES (
 									current_poi_id,
                                     current_detection_type,
-                                    current_feature_data::$source_id,
+                                    current_is_ignored,
                                     current_feature_data::$feature_id,
                                     JSON_ARRAY_PACK(current_feature_data::features)
                                     );
@@ -130,7 +132,7 @@ DECLARE
     features_hex VARCHAR(4096);
     res_features_arr json = '[]';
 BEGIN
-  arr = COLLECT(CONCAT("SELECT hex(features) FROM poi WHERE poi_id = CAST('",_poi_id,"' AS BINARY(36))"), QUERY(features_hex varchar(4096)));
+  arr = COLLECT(CONCAT("SELECT hex(features) FROM poi WHERE poi_id = '",_poi_id,"'"), QUERY(features_hex varchar(4096)));
   FOR x in arr LOOP
     features_hex = x.features_hex;
     res_features_arr = JSON_ARRAY_PUSH_STRING(res_features_arr,features_hex);
@@ -164,7 +166,7 @@ BEGIN
 			START TRANSACTION;
 				# clean exists
                 DELETE FROM poi
-                WHERE poi_id = CAST(current_poi_id AS BINARY(36));
+                WHERE poi_id = current_poi_id;
                 rows_deleted = row_count();
 			COMMIT;
 			INSERT INTO delete_poi_result (poi_id,is_success,rows_del,error_msg) VALUES (current_poi_id,"success",rows_deleted,"");
@@ -182,7 +184,7 @@ DELIMITER ;
 
 
 DELIMITER //
-CREATE OR REPLACE PROCEDURE add_features_to_poi(_poi_id varchar(36), _detection_type tinyint, _array_of_features json) 
+CREATE OR REPLACE PROCEDURE add_features_to_poi(_poi_id varchar(36), _is_ignored boolean, _detection_type tinyint, _array_of_features json) 
 AS
 DECLARE 
     current_feature_data JSON;
@@ -196,10 +198,10 @@ BEGIN
 			START TRANSACTION;
 				# Insert new
 			INSERT INTO poi
-							(poi_id, detection_type, source_id, feature_id, features) VALUES (
+							(poi_id, detection_type, is_ignored, feature_id, features) VALUES (
 							_poi_id,
 							_detection_type,
-							current_feature_data::$source_id,
+							_is_ignored,
 							current_feature_data::$feature_id,
 							JSON_ARRAY_PACK(current_feature_data::features)
 							);
@@ -230,8 +232,8 @@ BEGIN
 			current_feature_data_id = JSON_EXTRACT_JSON(_array_of_features,i);
 			START TRANSACTION;
 			DELETE FROM poi
-            WHERE poi_id = CAST(_poi_id AS BINARY(36))
-            AND feature_id = CAST(current_feature_data_id AS BINARY(36));
+            WHERE poi_id = _poi_id
+            AND feature_id = current_feature_data_id;
 			rows_c += row_count();
 			COMMIT;
 			EXCEPTION WHEN OTHERS THEN
