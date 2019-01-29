@@ -268,17 +268,14 @@ def generic_pipeline_method() {
                             //download dashboards for each processor type
                             parallel download_dashboard_GPU: {
                                         sh("wget https://s3.eu-central-1.amazonaws.com/anyvision-dashboard/latest/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/AnyVision-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage -O ${env.WORKSPACE}/AnyVision-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
-                                        // sh("wget https://s3.eu-central-1.amazonaws.com/anyvision-dashboard/latest/1.20.0/AnyVision-1.20.0-linux-x86_64.AppImage -O ${env.WORKSPACE}/AnyVision-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
                                     },
                                     download_dashboard_CPU_WHITE: {
                                         sh("wget https://s3.eu-central-1.amazonaws.com/facesearch-dashboard/latest/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage -O ${env.WORKSPACE}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
-                                        // sh("wget https://s3.eu-central-1.amazonaws.com/facesearch-dashboard/latest/1.20.0/FaceSearch-1.20.0-linux-x86_64.AppImage -O ${env.WORKSPACE}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
                                     }
 
                             //build
                             parallel build_GPU: {
                                         sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
-                                                // "project.version=${docker_compose_GPU_folder} " +
                                                 "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +                                               
                                                 "product_type=${docker_compose_GPU_type} " +                                                
                                                 "build_number=${BUILD_NUMBER} " +
@@ -291,7 +288,6 @@ def generic_pipeline_method() {
                                     },
                                     build_CPU: {
                                         sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
-                                                // "project.version=${docker_compose_CPU_folder} " +
                                                 "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +
                                                 "product_type=${docker_compose_CPU_type} " +
                                                 "build_number=${BUILD_NUMBER} " +
@@ -304,7 +300,6 @@ def generic_pipeline_method() {
                                     },
                                     build_GPU_WHITE: {
                                         sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
-                                                // "project.version=${docker_compose_GPU_WHITE_folder} " +
                                                 "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +
                                                 "product_type=${docker_compose_GPU_WHITE_type} " +
                                                 "build_number=${BUILD_NUMBER} " +
@@ -319,7 +314,6 @@ def generic_pipeline_method() {
                                     },
                                     build_CPU_WHITE: {
                                         sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
-                                                // "project.version=${docker_compose_CPU_WHITE_folder} " +
                                                 "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +
                                                 "product_type=${docker_compose_CPU_WHITE_type} " +
                                                 "build_number=${BUILD_NUMBER} " +

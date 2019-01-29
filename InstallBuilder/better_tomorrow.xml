@@ -1,7 +1,7 @@
 <project>
     <shortName>bettertomorrow</shortName>
     <fullName>Better Tomorrow</fullName>
-    <version>1.20.0</version>
+    <version>1.21.0</version>
     <installerFilename>${product_shortname}-${product_version}-${build_number}-${compose_name}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
     <leftImage>${env(WORKSPACE)}/${project.version}/InstallBuilder/images/Left_side.png</leftImage>
     <logoImage>${env(WORKSPACE)}/${project.version}/InstallBuilder/images/logo.png</logoImage>
@@ -212,7 +212,7 @@
             <name>elk_master</name>
             <description>ELK (Master)</description>
             <canBeEdited>1</canBeEdited>
-            <selected>1</selected>
+            <selected>0</selected>
             <show>1</show>
             <folderList>
                 <folder>
@@ -392,7 +392,7 @@
             <name>monitoring_master</name>
             <description>Monitoring (Master)</description>
             <canBeEdited>1</canBeEdited>
-            <selected>1</selected>
+            <selected>0</selected>
             <show>1</show>
             <folderList>
                 <folder>
@@ -492,7 +492,7 @@
             <name>monitoring_node</name>
             <description>Monitoring (Node)</description>
             <canBeEdited>1</canBeEdited>
-            <selected>1</selected>
+            <selected>0</selected>
             <show>1</show>
             <folderList>
                 <folder>
@@ -673,6 +673,7 @@
             <program>sysctl</program>
             <programArguments>-w vm.max_map_count=262144</programArguments>
             <progressText>Change vm.max_map_count host kernel parameter</progressText>
+            <run>0</run>
             <show>0</show>
             <useMSDOSPath>0</useMSDOSPath>
             <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
@@ -690,6 +691,7 @@
             <program>docker-compose</program>
             <programArguments>-f docker-compose-elk-stack.yml -p ${product_version} up -d</programArguments>
             <progressText>Start the elk master stack</progressText>
+            <run>0</run>
             <useMSDOSPath>0</useMSDOSPath>
             <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
             <ruleList>
@@ -706,6 +708,7 @@
             <program>docker-compose</program>
             <programArguments>-f docker-compose-filebeat.yml -p ${product_version} up -d</programArguments>
             <progressText>Start the elk node</progressText>
+            <run>0</run>
             <useMSDOSPath>0</useMSDOSPath>
             <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
             <ruleList>
@@ -727,6 +730,7 @@
             <program>${installdir}/change_network.sh</program>
             <programArguments>-n ${product_version} -c docker-compose-monitor-master.yml</programArguments>
             <progressText>changing network name to product_version_prod for monitor master</progressText>
+            <run>0</run>
             <show>0</show>
             <useMSDOSPath>0</useMSDOSPath>
             <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
@@ -744,6 +748,7 @@
             <program>docker-compose</program>
             <programArguments>-f docker-compose-monitor-master.yml -p ${product_version} up -d</programArguments>
             <progressText>Start the monitoring master</progressText>
+            <run>0</run>
             <useMSDOSPath>0</useMSDOSPath>
             <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
             <ruleList>
@@ -760,6 +765,7 @@
             <program>docker-compose</program>
             <programArguments>-f docker-compose-monitor-node.yml -p ${product_version} up -d</programArguments>
             <progressText>Start the monitoring node</progressText>
+            <run>0</run>
             <useMSDOSPath>0</useMSDOSPath>
             <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
             <ruleList>
