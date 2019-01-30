@@ -7,7 +7,9 @@ networks:
 services:
 
   pipeng:
-    image: gcr.io/anyvision-training/pipeng-trt4:development
+    #image: gcr.io/anyvision-training/pipeng-trt4:development
+    #image: gcr.io/anyvision-training/backend-base-dev:TRT5-CUDA10.0
+    image: gcr.io/anyvision-training/backend-base-dev:TRT4-CUDA9.2
     restart: always
     #entrypoint: sleep infinity     ### uncoment if you dont have compiled projet in realease folder and commnent next "command" and "working_dir" section
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -38,5 +40,3 @@ services:
     logging:
       options:
         max-size: 1g
-    
-
