@@ -52,15 +52,15 @@ BEGIN
 END // 
 DELIMITER ;
 
-CREATE TABLE IF NOT EXISTS `detection_in_memory` (
+CREATE TABLE IF NOT EXISTS `tracks_in_memory` (
   `track_id` VARCHAR(36) NOT NULL,
   `source_id` VARCHAR(24) NOT NULL,
   `detection_type` TINYINT(4) NOT NULL,
   `creation_date` AS DATE(creation_datetime) PERSISTED DATE,
   `creation_datetime` DATETIME NOT NULL,
   `features` VARBINARY(2048) NOT NULL,
-  SHARD KEY `s_detection_in_memory` (creation_date,source_id,detection_type),
-  PRIMARY KEY `pk_detection_in_memory` (track_id,creation_date,source_id,detection_type)
+  SHARD KEY `s_tracks_in_memory` (creation_date,source_id,detection_type),
+  PRIMARY KEY `pk_tracks_in_memory` (track_id,creation_date,source_id,detection_type)
 );
 
 DELIMITER //
@@ -79,7 +79,7 @@ BEGIN
   current_json = JSON_EXTRACT_JSON(_array_of_tracks,i);
   current_track_id = current_json::$track_id;
   START TRANSACTION;
-  INSERT INTO detection_in_memory
+  INSERT INTO tracks_in_memory
     (track_id, source_id, creation_datetime, detection_type, features)
     VALUES(
         current_track_id,
@@ -108,7 +108,7 @@ AS
 DECLARE
 BEGIN
   ECHO SELECT hex(features) as features_hex
-  FROM detection_in_memory
+  FROM tracks_in_memory
   WHERE track_id = _track_id
   AND source_id = _source_id
   AND detection_type = _detection_type
@@ -124,7 +124,7 @@ AS
 BEGIN
   IF _source_id = "" THEN
         ECHO SELECT track_id,source_id,DOT_PRODUCT(features,unhex(_features_hex)) as score
-		  FROM detection_in_memory
+		  FROM tracks_in_memory
 		  WHERE detection_type = _detection_type
 		  AND creation_date >= DATE(_start_datetime)
 		  AND creation_date <= DATE(_end_datetime)
@@ -135,7 +135,7 @@ BEGIN
           LIMIT _top_results;		
   ELSE
         ECHO SELECT track_id,source_id,DOT_PRODUCT(features,unhex(_features_hex)) as score
-		  FROM detection_in_memory
+		  FROM tracks_in_memory
 		  WHERE detection_type = _detection_type
 		  AND creation_date >= DATE(_start_datetime)
 		  AND creation_date <= DATE(_end_datetime)
@@ -160,7 +160,7 @@ BEGIN
     BEGIN
     START TRANSACTION;
     
-  DELETE FROM detection_in_memory 
+  DELETE FROM tracks_in_memory 
   WHERE detection_type = _detection_type
   AND creation_date = _creation_date
   AND track_id = _track_id
@@ -191,7 +191,7 @@ DECLARE
 BEGIN
   row_count = 1;
   WHILE row_count > 0 LOOP
-    DELETE FROM detection_in_memory 
+    DELETE FROM tracks_in_memory 
     WHERE source_id = _source_id
     LIMIT 50000;
     row_count = row_count();
@@ -211,7 +211,7 @@ DECLARE
 BEGIN
   row_count = 1;
   WHILE row_count > 0 LOOP
-    DELETE FROM detection_in_memory 
+    DELETE FROM tracks_in_memory 
     WHERE creation_date = _creation_date
     LIMIT 50000;
     row_count = row_count();
@@ -233,12 +233,12 @@ DECLARE
 BEGIN
   DROP TABLE IF EXISTS min_memory_day;
   CREATE TEMPORARY TABLE min_memory_day(min_date date);  
-  INSERT INTO min_memory_day SELECT min(creation_date) FROM detection_in_memory;
+  INSERT INTO min_memory_day SELECT min(creation_date) FROM tracks_in_memory;
   BEGIN
   row_count = 1;
   START TRANSACTION;
   WHILE row_count > 0 LOOP
-    DELETE FROM detection_in_memory 
+    DELETE FROM tracks_in_memory 
     WHERE creation_date = (select min_date from min_memory_day limit 1)
     LIMIT 50000;
     row_count = row_count();
