@@ -85,19 +85,17 @@ services:
         aliases:
          - zookeeper.tls.ai
 
-#  kafka_manager:
-#    hostname: kafka-manager
-#    image: hlebalbau/kafka-manager:stable
+#  kafka-hq:
+#    hostname: kafka-hq
+#    image:  gcr.io/anyvision-training/kafkahq:19.01
 #    ports:
-#      - "9000:9000"
+#      - "8888:8080"
 #    environment:
-#      ZK_HOSTS: "zookeeper.tls.ai:2181"
-#      APPLICATION_SECRET: "random-secret"
+#      KAFKAHQ_CONFIGURATION: "{ kafka { connections { my_kafka_cluster { bootstrap.servers: "kafka.tls.ai:9092" }}}}"
 #    networks:
 #      prod:
 #        aliases:
-#         - kafka-manager.tls.ai
-#    command: -Dpidfile.path=/dev/null
+#         - kafka-hq.tls.ai
 
 
   kafka:
