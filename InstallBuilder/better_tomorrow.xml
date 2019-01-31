@@ -115,7 +115,7 @@
             <postInstallationActionList>
                 <runProgram>
                     <program>docker-compose</program>
-                    <programArguments>-f docker-compose.yml -p ${product_version} create consul consul-agent backend</programArguments>
+                    <programArguments>-f docker-compose.yml -p anyvision create consul consul-agent backend</programArguments>
                     <progressText>Getting license version - create backend container</progressText>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
@@ -123,16 +123,8 @@
                 </runProgram>
                 <runProgram>
                     <program>docker-compose</program>
-                    <programArguments>-f docker-compose.yml -p ${product_version} start consul consul-agent backend</programArguments>
+                    <programArguments>-f docker-compose.yml -p anyvision start consul consul-agent backend</programArguments>
                     <progressText>Getting license version - start backend container</progressText>
-                    <show>0</show>
-                    <useMSDOSPath>0</useMSDOSPath>
-                    <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
-                </runProgram>
-                <runProgram>
-                    <program>docker-compose</program>
-                    <programArguments>-f docker-compose.yml -p ${product_version} stop consul consul-agent backend</programArguments>
-                    <progressText>Getting license version - stop backend container</progressText>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
                     <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
@@ -157,6 +149,14 @@
                     <show>0</show>
                     <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
                 </setInstallerVariableFromScriptOutput>
+                <runProgram>
+                    <program>docker-compose</program>
+                    <programArguments>-f docker-compose.yml -p anyvision stop consul consul-agent backend</programArguments>
+                    <progressText>Getting license version - stop backend container</progressText>
+                    <show>0</show>
+                    <useMSDOSPath>0</useMSDOSPath>
+                    <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
+                </runProgram>
                 <runProgram>
                     <program>echo</program>
                     <programArguments>"${hw_fingerprint}" &gt; /home/${username}/hw_fingerprint.txt</programArguments>
