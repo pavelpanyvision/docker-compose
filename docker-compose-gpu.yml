@@ -42,6 +42,29 @@ services:
       options:
         max-size: 1g
 
+#  memsql-migrator:
+#    image: gcr.io/anyvision-training/memsql-migrator:19.01
+#    restart: always
+#    networks:
+#      prod:
+#        aliases:
+#          - memsql-migrator.tls.ai
+#    volumes:
+#      # need to mount the root of track_archive_service_data in old server 
+#      - /storage/track_archive_service_data:/old_tracks
+#    #environment:
+#      # these are the defaults in the script, can be change with ENV
+#      #- MEMSQL_HOST=memsql.tls.ai
+#      #- MEMSQL_PORT=3306
+#      #- MEMSQL_USER=root
+#      #- MEMSQL_PASSWORD=password
+#      #- MEMSQL_DATABASE=tracks_db
+#      #- MEMSQL_IMPORT_THREADS=4
+#    env_file:
+#      - env/global.env
+#    logging:
+#      options:
+#        max-size: 1g
 
   zookeeper:
     image: gcr.io/anyvision-training/zookeeper:19.01
