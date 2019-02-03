@@ -143,7 +143,7 @@
                 </runProgram>
                 <setInstallerVariableFromScriptOutput>
                     <exec>docker</exec>
-                    <execArgs>exec -it anyvision_backend_1 /bin/bash -c "license-ver -o"</execArgs>
+                    <execArgs>exec -it ${product_version}_backend_1 /bin/bash -c "license-ver -o"</execArgs>
                     <name>hw_fingerprint</name>
                     <progressText>Getting license version</progressText>
                     <show>0</show>
