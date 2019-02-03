@@ -20,6 +20,37 @@ networks:
 
 services:
 
+  memsql:
+    image: gcr.io/anyvision-training/memsql:19.01
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - memsql.tls.ai
+    ports:
+      - "3306:3306"
+    volumes:
+      - /ssd/memsql:/var/lib/memsql
+      - /etc/localtime:/etc/localtime:ro
+      - ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
+      # if need to deploy reid comment tracks db line and uncomment reid line
+      #- ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
+    environment:
+      - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
+      - MEMSQL_NODE_ROLE=AIO
+      - JOB_NAME=memsql
+      - MEMSQL_PASSWORD=password
+      - AGG_MEMORY_LIMIT=4g
+      - LEAF_MEMORY_LIMIT=60g
+      - log_level_containerpilot=DEBUG
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
 
   node-rtsp-rtmp-server:
     image: gcr.io/anyvision-training/node-rtsp-rtmp-server:18.12
