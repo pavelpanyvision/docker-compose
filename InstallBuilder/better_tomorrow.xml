@@ -127,7 +127,7 @@
                 </showProgressDialog>
                 <runProgram>
                     <program>docker-compose</program>
-                    <programArguments>-f docker-compose.yml -p ${product_version} up --no-start consul consul-agent backend</programArguments>
+                    <programArguments>-f docker-compose.yml -p ${network_name} up --no-start consul consul-agent backend</programArguments>
                     <progressText>Getting license version - create backend container</progressText>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
@@ -135,7 +135,7 @@
                 </runProgram>
                 <runProgram>
                     <program>docker-compose</program>
-                    <programArguments>-f docker-compose.yml -p ${product_version} start consul consul-agent backend</programArguments>
+                    <programArguments>-f docker-compose.yml -p ${network_name} start consul consul-agent backend</programArguments>
                     <progressText>Getting license version - start backend container</progressText>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
@@ -143,7 +143,7 @@
                 </runProgram>
                 <setInstallerVariableFromScriptOutput>
                     <exec>docker</exec>
-                    <execArgs>exec -it ${product_version}_backend_1 /bin/bash -c "license-ver -o"</execArgs>
+                    <execArgs>exec -it ${network_name}_backend_1 /bin/bash -c "license-ver -o"</execArgs>
                     <name>hw_fingerprint</name>
                     <progressText>Getting license version</progressText>
                     <show>0</show>
@@ -151,7 +151,7 @@
                 </setInstallerVariableFromScriptOutput>
                 <runProgram>
                     <program>docker-compose</program>
-                    <programArguments>-f docker-compose.yml -p ${product_version} stop consul consul-agent backend</programArguments>
+                    <programArguments>-f docker-compose.yml -p ${network_name} stop consul consul-agent backend</programArguments>
                     <progressText>Getting license version - stop backend container</progressText>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
@@ -685,7 +685,7 @@
         </actionGroup>
         <runProgram>
             <program>docker-compose</program>
-            <programArguments>-f docker-compose.yml -p ${product_version} up -d</programArguments>
+            <programArguments>-f docker-compose.yml -p ${network_name} up -d</programArguments>
             <progressText>Start the main stack</progressText>
             <useMSDOSPath>0</useMSDOSPath>
             <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
@@ -719,7 +719,7 @@
         </runProgram>
         <runProgram>
             <program>docker-compose</program>
-            <programArguments>-f docker-compose-elk-stack.yml -p ${product_version} up -d</programArguments>
+            <programArguments>-f docker-compose-elk-stack.yml -p ${network_name} up -d</programArguments>
             <progressText>Start the elk master stack</progressText>
             <run>0</run>
             <useMSDOSPath>0</useMSDOSPath>
@@ -736,7 +736,7 @@
         </runProgram>
         <runProgram>
             <program>docker-compose</program>
-            <programArguments>-f docker-compose-filebeat.yml -p ${product_version} up -d</programArguments>
+            <programArguments>-f docker-compose-filebeat.yml -p ${network_name} up -d</programArguments>
             <progressText>Start the elk node</progressText>
             <run>0</run>
             <useMSDOSPath>0</useMSDOSPath>
@@ -776,7 +776,7 @@
         </runProgram>
         <runProgram>
             <program>docker-compose</program>
-            <programArguments>-f docker-compose-monitor-master.yml -p ${product_version} up -d</programArguments>
+            <programArguments>-f docker-compose-monitor-master.yml -p ${network_name} up -d</programArguments>
             <progressText>Start the monitoring master</progressText>
             <run>0</run>
             <useMSDOSPath>0</useMSDOSPath>
@@ -793,7 +793,7 @@
         </runProgram>
         <runProgram>
             <program>docker-compose</program>
-            <programArguments>-f docker-compose-monitor-node.yml -p ${product_version} up -d</programArguments>
+            <programArguments>-f docker-compose-monitor-node.yml -p ${network_name} up -d</programArguments>
             <progressText>Start the monitoring node</progressText>
             <run>0</run>
             <useMSDOSPath>0</useMSDOSPath>
