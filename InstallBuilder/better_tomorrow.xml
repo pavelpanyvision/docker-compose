@@ -117,6 +117,7 @@
             </folderList>
             <postInstallationActionList>
                 <showProgressDialog>
+                    <abortOnError>0</abortOnError>
                     <title>Finalizing Installation</title>
                     <width>400</width>
                     <actionList>
@@ -161,7 +162,7 @@
                 </runProgram>
                 <setInstallerVariableFromScriptOutput>
                     <exec>docker</exec>
-                    <execArgs>exec -it network_backend_1 /bin/bash -c "license-ver -o"</execArgs>
+                    <execArgs>exec network_backend_1 /bin/bash -c "license-ver -o"</execArgs>
                     <name>hw_fingerprint</name>
                     <progressText>Getting license version</progressText>
                     <show>0</show>
@@ -262,97 +263,6 @@
             </postInstallationActionList>
         </component>
         <component>
-            <name>elk_master</name>
-            <description>ELK (Master)</description>
-            <canBeEdited>1</canBeEdited>
-            <detailedDescription>ELK Master will get logs from ELK Node. and local server. Should not be installed with ELK Node on the local server.</detailedDescription>
-            <selected>0</selected>
-            <show>1</show>
-            <folderList>
-                <folder>
-                    <description>ELK Master Images</description>
-                    <destination>${installdir}/elk_master</destination>
-                    <name>elk_master_images</name>
-                    <platforms>all</platforms>
-                    <distributionFileList>
-                        <distributionDirectory>
-                            <origin>${env(WORKSPACE)}/docker_${elk_compose_name}/images</origin>
-                        </distributionDirectory>
-                    </distributionFileList>
-                </folder>
-                <folder>
-                    <description>Docker Compose</description>
-                    <destination>/home/${username}/docker-compose/${product_version}</destination>
-                    <name>dockercompose</name>
-                    <platforms>all</platforms>
-                    <distributionFileList>
-                        <distributionDirectory>
-                            <allowWildcards>1</allowWildcards>
-                            <origin>${env(WORKSPACE)}/docker_${elk_compose_name}/compose/*</origin>
-                        </distributionDirectory>
-                    </distributionFileList>
-                </folder>
-                <folder>
-                    <description>ELK Master Files</description>
-                    <destination>/home/${username}/docker-compose/${product_version}</destination>
-                    <name>elk_master_files</name>
-                    <platforms>all</platforms>
-                    <distributionFileList>
-                        <distributionDirectory>
-                            <origin>${env(WORKSPACE)}/${project.version}/management/elk/elk</origin>
-                        </distributionDirectory>
-                    </distributionFileList>
-                </folder>
-            </folderList>
-            <postInstallationActionList>
-                <showProgressDialog>
-                    <title>Finalizing Installation</title>
-                    <width>400</width>
-                    <actionList>
-                        <runProgram>
-                            <program>${installdir}/airgap</program>
-                            <programArguments>load ${installdir}/elk_master/images</programArguments>
-                            <progressText>Importing Docker Images, please wait...</progressText>
-                            <useMSDOSPath>0</useMSDOSPath>
-                        </runProgram>
-                    </actionList>
-                </showProgressDialog>
-            </postInstallationActionList>
-            <readyToInstallActionList>
-                <throwError text="Please install Docker first and then run the installer">
-                    <ruleList>
-                        <programTest condition="is_not_in_path" name="docker"/>
-                    </ruleList>
-                </throwError>
-                <throwError text="Please install Docker-Compose first and then run the installer">
-                    <ruleList>
-                        <programTest condition="is_not_in_path" name="docker-compose"/>
-                    </ruleList>
-                </throwError>
-                <throwError>
-                    <customErrorMessage>User ${username} does not exist, please use a username that exists on the system.</customErrorMessage>
-                    <text>Error: User does not exist.</text>
-                    <ruleList>
-                        <userTest>
-                            <logic>not_exists</logic>
-                            <username>${username}</username>
-                        </userTest>
-                    </ruleList>
-                </throwError>
-                <throwError>
-                    <customErrorMessage>Using root as the target user is prohibited.</customErrorMessage>
-                    <text>Error: Cannot use root as target user</text>
-                    <ruleList>
-                        <compareText>
-                            <logic>equals</logic>
-                            <text>${username}</text>
-                            <value>root</value>
-                        </compareText>
-                    </ruleList>
-                </throwError>
-            </readyToInstallActionList>
-        </component>
-         <component>
             <name>hq</name>
             <description>HQ</description>
             <canBeEdited>1</canBeEdited>
@@ -403,6 +313,97 @@
                         <runProgram>
                             <program>${installdir}/airgap</program>
                             <programArguments>load ${installdir}/hq/images</programArguments>
+                            <progressText>Importing Docker Images, please wait...</progressText>
+                            <useMSDOSPath>0</useMSDOSPath>
+                        </runProgram>
+                    </actionList>
+                </showProgressDialog>
+            </postInstallationActionList>
+            <readyToInstallActionList>
+                <throwError text="Please install Docker first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker"/>
+                    </ruleList>
+                </throwError>
+                <throwError text="Please install Docker-Compose first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker-compose"/>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>User ${username} does not exist, please use a username that exists on the system.</customErrorMessage>
+                    <text>Error: User does not exist.</text>
+                    <ruleList>
+                        <userTest>
+                            <logic>not_exists</logic>
+                            <username>${username}</username>
+                        </userTest>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>Using root as the target user is prohibited.</customErrorMessage>
+                    <text>Error: Cannot use root as target user</text>
+                    <ruleList>
+                        <compareText>
+                            <logic>equals</logic>
+                            <text>${username}</text>
+                            <value>root</value>
+                        </compareText>
+                    </ruleList>
+                </throwError>
+            </readyToInstallActionList>
+        </component>
+        <component>
+            <name>elk_master</name>
+            <description>ELK (Master)</description>
+            <canBeEdited>1</canBeEdited>
+            <detailedDescription>ELK Master will get logs from ELK Node. and local server. Should not be installed with ELK Node on the local server.</detailedDescription>
+            <selected>0</selected>
+            <show>1</show>
+            <folderList>
+                <folder>
+                    <description>ELK Master Images</description>
+                    <destination>${installdir}/elk_master</destination>
+                    <name>elk_master_images</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/docker_${elk_compose_name}/images</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Docker Compose</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>dockercompose</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>${env(WORKSPACE)}/docker_${elk_compose_name}/compose/*</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>ELK Master Files</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>elk_master_files</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/${project.version}/management/elk/elk</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+            </folderList>
+            <postInstallationActionList>
+                <showProgressDialog>
+                    <title>Finalizing Installation</title>
+                    <width>400</width>
+                    <actionList>
+                        <runProgram>
+                            <program>${installdir}/airgap</program>
+                            <programArguments>load ${installdir}/elk_master/images</programArguments>
                             <progressText>Importing Docker Images, please wait...</progressText>
                             <useMSDOSPath>0</useMSDOSPath>
                         </runProgram>
