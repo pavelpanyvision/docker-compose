@@ -375,39 +375,6 @@ services:
 
 
 
-  # master-sync-service:
-  #   image: gcr.io/anyvision-production/master-sync-service:1.1.0-rc.19
-  #   restart: always
-  #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
-  #   hostname: master-sync-service
-  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-  #   #those port should be opened only development mode
-  #   #ports:
-  #   #  - "16180:16180"
-  #   networks:
-  #     prod:
-  #       aliases:
-  #         - master-sync-service.tls.ai
-  #   volumes:
-  #     - /storage:/var/www/html
-  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-  #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
-  #   depends_on:
-  #     - api
-  #   environment:
-  #     #- ENABLE_DOCKERIZE=false
-  #     - ENABLE_CHOWN=false
-  #     - RUN_AS_USER=user
-  #   env_file:
-  #     - env/global.env
-  #     - env/master-sync-service.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-
-
-
   apigateway:
     image: gcr.io/anyvision-production/api-gateway:1.21.0
     restart: always
