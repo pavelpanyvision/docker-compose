@@ -32,6 +32,9 @@
                         <distributionFile>
                             <origin>${env(WORKSPACE)}/${project.version}/InstallBuilder/scripts/optparse.bash</origin>
                         </distributionFile>
+                        <distributionFile>
+                            <origin>${env(WORKSPACE)}/${project.version}/InstallBuilder/scripts/remove_docker_and_network.sh</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
             </folderList>
