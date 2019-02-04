@@ -114,12 +114,14 @@ def generic_pipeline_method() {
 
                             //docker compose type
                             env.docker_compose_GPU_type = "GPU"
+                            env.docker_compose_HQ_type = "HQ"
                             env.docker_compose_CPU_type = "CPU"
                             env.docker_compose_ELK_type = "ELK"
                             env.docker_compose_ELK_NODE_type = "ELK_NODE"
                             env.docker_compose_MONITOR_MASTER_type = "MONITOR_MASTER"
                             env.docker_compose_MONITOR_NODE_type = "MONITOR_NODE"
                             env.docker_compose_GPU_WHITE_type = "GPU_WHITE"
+                            env.docker_compose_HQ_WHITE_type = "HQ_WHITE"
                             env.docker_compose_CPU_WHITE_type = "CPU_WHITE"
                             env.docker_compose_ELK_WHITE_type = "ELK_WHITE"
                             env.docker_compose_ELK_NODE_WHITE_type = "ELK_NODE_WHITE"
@@ -128,12 +130,14 @@ def generic_pipeline_method() {
 
                             //set docker compose new folders
                             env.docker_compose_GPU_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_GPU_type}"
+                            env.docker_compose_HQ_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_HQ_type}"
                             env.docker_compose_CPU_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_CPU_type}"
                             env.docker_compose_ELK_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_type}"
                             env.docker_compose_ELK_NODE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_NODE_type}"
                             env.docker_compose_MONITOR_MASTER_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_MONITOR_MASTER_type}"
                             env.docker_compose_MONITOR_NODE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_MONITOR_NODE_type}"
                             env.docker_compose_GPU_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_GPU_WHITE_type}"
+                            env.docker_compose_HQ_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_HQ_WHITE_type}"
                             env.docker_compose_CPU_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_CPU_WHITE_type}"
                             env.docker_compose_ELK_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_WHITE_type}"
                             env.docker_compose_ELK_NODE_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_NODE_WHITE_type}"
@@ -142,12 +146,14 @@ def generic_pipeline_method() {
 
                             //set images destination folders
                             env.docker_images_destination_folder_GPU = "${env.WORKSPACE}/docker_${docker_compose_GPU_folder}"
+                            env.docker_images_destination_folder_HQ = "${env.WORKSPACE}/docker_${docker_compose_HQ_folder}"
                             env.docker_images_destination_folder_CPU = "${env.WORKSPACE}/docker_${docker_compose_CPU_folder}"
                             env.docker_images_destination_folder_ELK = "${env.WORKSPACE}/docker_${docker_compose_ELK_folder}"
                             env.docker_images_destination_folder_ELK_NODE = "${env.WORKSPACE}/docker_${docker_compose_ELK_NODE_folder}"
                             env.docker_images_destination_folder_MONITOR_MASTER = "${env.WORKSPACE}/docker_${docker_compose_MONITOR_MASTER_folder}"
                             env.docker_images_destination_folder_MONITOR_NODE = "${env.WORKSPACE}/docker_${docker_compose_MONITOR_NODE_folder}"
                             env.docker_images_destination_folder_GPU_WHITE = "${env.WORKSPACE}/docker_${docker_compose_GPU_WHITE_folder}"
+                            env.docker_images_destination_folder_HQ_WHITE = "${env.WORKSPACE}/docker_${docker_compose_HQ_WHITE_folder}"
                             env.docker_images_destination_folder_CPU_WHITE = "${env.WORKSPACE}/docker_${docker_compose_CPU_WHITE_folder}"
                             env.docker_images_destination_folder_ELK_WHITE = "${env.WORKSPACE}/docker_${docker_compose_ELK_WHITE_folder}"
                             env.docker_images_destination_folder_ELK_NODE_WHITE = "${env.WORKSPACE}/docker_${docker_compose_ELK_NODE_WHITE_folder}"
@@ -156,6 +162,7 @@ def generic_pipeline_method() {
 
                             //set compose files directories and extensions
                             COMPOSE_FILE_NAME_GPU = "docker-compose-gpu.yml"
+                            COMPOSE_FILE_NAME_HQ = "docker-compose-hq-addon.yml"
                             COMPOSE_FILE_NAME_CPU = "docker-compose-cpu.yml"
                             COMPOSE_FILE_NAME_ELK = "docker-compose-elk-stack.yml"
                             COMPOSE_FILE_NAME_ELK_NODE = "docker-compose-filebeat.yml"
@@ -167,6 +174,11 @@ def generic_pipeline_method() {
                             env.compose_extension_GPU = env.compose_extension_GPU.minus("docker-compose-")
                             env.compose_extension_GPU = env.compose_extension_GPU.minus(".yml")
                             echo "Compose file extension for GPU: ${env.compose_extension_GPU}"
+                            //hq
+                            env.compose_extension_HQ = COMPOSE_FILE_NAME_HQ
+                            env.compose_extension_HQ = env.compose_extension_HQ.minus("docker-compose-")
+                            env.compose_extension_HQ = env.compose_extension_HQ.minus(".yml")
+                            echo "Compose file extension for HQ: ${env.compose_extension_HQ}"
                             //cpu
                             env.compose_extension_CPU = COMPOSE_FILE_NAME_CPU
                             env.compose_extension_CPU = env.compose_extension_CPU.minus("docker-compose-")
@@ -205,6 +217,7 @@ def generic_pipeline_method() {
 
                             //copy for the docker-compose.yml files to build white label parallel to the regular build
                             sh("cp ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU} ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE")
+                            sh("cp ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ} ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE")
                             sh("cp ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU} ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU}-WHITE")
                             sh("cp ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK} ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK}-WHITE")
                             sh("cp ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE} ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE}-WHITE")                            
@@ -219,6 +232,9 @@ def generic_pipeline_method() {
                             sh("gcloud docker --authorize-only")
                             parallel airgap_GPU: {
                                         sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU} ${docker_images_destination_folder_GPU}")
+                                    },
+                                    airgap_HQ: {
+                                        sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ} ${docker_images_destination_folder_HQ}")
                                     },
                                     airgap_CPU: {
                                         sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU} ${docker_images_destination_folder_CPU}")
@@ -236,6 +252,11 @@ def generic_pipeline_method() {
                                         sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE")
                                         sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE")
                                         sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE ${docker_images_destination_folder_GPU_WHITE}")
+                                    },
+                                    airgap_HQ_WHITE: {
+                                        sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE")
+                                        sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE")
+                                        sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE ${docker_images_destination_folder_HQ_WHITE}")
                                     },
                                     airgap_CPU_WHITE: {
                                         sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU}-WHITE")
