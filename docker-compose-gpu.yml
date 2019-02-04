@@ -89,9 +89,9 @@ services:
 #    hostname: kafka-hq
 #    image:  gcr.io/anyvision-training/kafkahq:19.01
 #    ports:
-#      - "8888:8080"
+#      - "8765:8080"
 #    environment:
-#      KAFKAHQ_CONFIGURATION: "{ kafka { connections { my_kafka_cluster { bootstrap.servers: "kafka.tls.ai:9092" }}}}"
+#      KAFKAHQ_CONFIGURATION: "{ kafka { connections { my_kafka_cluster { bootstrap.servers: \"kafka.tls.ai:9092\" }}}}"
 #    networks:
 #      prod:
 #        aliases:
