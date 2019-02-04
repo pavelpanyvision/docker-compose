@@ -126,8 +126,23 @@
                     </actionList>
                 </showProgressDialog>
                 <runProgram>
+                    <program>chmod</program>
+                    <programArguments>+x ${installdir}/remove_docker_and_network.sh</programArguments>
+                    <show>0</show>
+                    <useMSDOSPath>0</useMSDOSPath>
+                </runProgram>
+                <runProgram>
+                    <customErrorMessage>Cannot stop or remove docker containers and network</customErrorMessage>
+                    <program>${installdir}/remove_docker_and_network.sh</program>
+                    <programArguments></programArguments>
+                    <progressText>removing docker continers and removing prod and defauit networks before checking license</progressText>
+                    <show>0</show>
+                    <useMSDOSPath>0</useMSDOSPath>
+                    <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
+                </runProgram>
+                <runProgram>
                     <program>docker-compose</program>
-                    <programArguments>-f docker-compose.yml -p ${product_version} up --no-start consul consul-agent backend</programArguments>
+                    <programArguments>-f docker-compose.yml -p network up --no-start consul consul-agent backend</programArguments>
                     <progressText>Getting license version - create backend container</progressText>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
@@ -135,7 +150,7 @@
                 </runProgram>
                 <runProgram>
                     <program>docker-compose</program>
-                    <programArguments>-f docker-compose.yml -p ${product_version} start consul consul-agent backend</programArguments>
+                    <programArguments>-f docker-compose.yml -p network start consul consul-agent backend</programArguments>
                     <progressText>Getting license version - start backend container</progressText>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
@@ -143,7 +158,7 @@
                 </runProgram>
                 <setInstallerVariableFromScriptOutput>
                     <exec>docker</exec>
-                    <execArgs>exec -it ${network_name}_backend_1 /bin/bash -c "license-ver -o"</execArgs>
+                    <execArgs>exec -it network_backend_1 /bin/bash -c "license-ver -o"</execArgs>
                     <name>hw_fingerprint</name>
                     <progressText>Getting license version</progressText>
                     <show>0</show>
@@ -151,7 +166,7 @@
                 </setInstallerVariableFromScriptOutput>
                 <runProgram>
                     <program>docker-compose</program>
-                    <programArguments>-f docker-compose.yml -p ${product_version} stop consul consul-agent backend</programArguments>
+                    <programArguments>-f docker-compose.yml -p network stop consul consul-agent backend</programArguments>
                     <progressText>Getting license version - stop backend container</progressText>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
@@ -160,6 +175,15 @@
                 <runProgram>
                     <program>echo</program>
                     <programArguments>"${hw_fingerprint}" &gt; /home/${username}/hw_fingerprint.txt</programArguments>
+                </runProgram>
+                <runProgram>
+                    <customErrorMessage>Cannot remove docker or network after checking license</customErrorMessage>
+                    <program>${installdir}/remove_docker_and_network.sh</program>
+                    <programArguments></programArguments>
+                    <progressText>removing docker continers and removing prod and defauit networks before checking license</progressText>
+                    <show>0</show>
+                    <useMSDOSPath>0</useMSDOSPath>
+                    <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
                 </runProgram>
             </postInstallationActionList>
             <readyToInstallActionList>
