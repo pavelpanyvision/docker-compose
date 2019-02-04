@@ -352,6 +352,97 @@
                 </throwError>
             </readyToInstallActionList>
         </component>
+         <component>
+            <name>hq</name>
+            <description>HQ</description>
+            <canBeEdited>1</canBeEdited>
+            <detailedDescription>HQ server.</detailedDescription>
+            <selected>0</selected>
+            <show>1</show>
+            <folderList>
+                <folder>
+                    <description>HQ Images</description>
+                    <destination>${installdir}/hq</destination>
+                    <name>hq_images</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/docker_${hq_compose_name}/images</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Docker Compose</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>dockercompose</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>${env(WORKSPACE)}/docker_${hq_compose_name}/compose/*</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>HQ Files</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>hq_files</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/${project.version}/hq</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+            </folderList>
+            <postInstallationActionList>
+                <showProgressDialog>
+                    <title>Finalizing Installation</title>
+                    <width>400</width>
+                    <actionList>
+                        <runProgram>
+                            <program>${installdir}/airgap</program>
+                            <programArguments>load ${installdir}/hq/images</programArguments>
+                            <progressText>Importing Docker Images, please wait...</progressText>
+                            <useMSDOSPath>0</useMSDOSPath>
+                        </runProgram>
+                    </actionList>
+                </showProgressDialog>
+            </postInstallationActionList>
+            <readyToInstallActionList>
+                <throwError text="Please install Docker first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker"/>
+                    </ruleList>
+                </throwError>
+                <throwError text="Please install Docker-Compose first and then run the installer">
+                    <ruleList>
+                        <programTest condition="is_not_in_path" name="docker-compose"/>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>User ${username} does not exist, please use a username that exists on the system.</customErrorMessage>
+                    <text>Error: User does not exist.</text>
+                    <ruleList>
+                        <userTest>
+                            <logic>not_exists</logic>
+                            <username>${username}</username>
+                        </userTest>
+                    </ruleList>
+                </throwError>
+                <throwError>
+                    <customErrorMessage>Using root as the target user is prohibited.</customErrorMessage>
+                    <text>Error: Cannot use root as target user</text>
+                    <ruleList>
+                        <compareText>
+                            <logic>equals</logic>
+                            <text>${username}</text>
+                            <value>root</value>
+                        </compareText>
+                    </ruleList>
+                </throwError>
+            </readyToInstallActionList>
+        </component>
         <component>
             <name>elk_node</name>
             <description>ELK (Node)</description>
