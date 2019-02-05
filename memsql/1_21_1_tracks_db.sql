@@ -97,7 +97,7 @@ BEGIN
     INSERT INTO save_tracks_result (track_id,is_success,error_msg) VALUES (current_track_id,"failed",err_msg);
    END;
   END LOOP; 
-  ECHO SELECT track_id,is_success,error_msg as save_tracks_result;
+  ECHO SELECT track_id,is_success,error_msg from save_tracks_result;
   DROP TABLE IF EXISTS save_tracks_result;
 END //
 DELIMITER ;
