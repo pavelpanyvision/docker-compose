@@ -293,17 +293,6 @@
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
-                <folder>
-                    <description>HQ Files</description>
-                    <destination>/home/${username}/docker-compose/${product_version}</destination>
-                    <name>hq_files</name>
-                    <platforms>all</platforms>
-                    <distributionFileList>
-                        <distributionDirectory>
-                            <origin>${env(WORKSPACE)}/${project.version}/hq</origin>
-                        </distributionDirectory>
-                    </distributionFileList>
-                </folder>
             </folderList>
             <postInstallationActionList>
                 <showProgressDialog>
