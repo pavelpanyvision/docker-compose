@@ -86,25 +86,25 @@ BEGIN
 		BEGIN
 			current_json = JSON_EXTRACT_JSON(_array_of_tracks,i);
 			current_poi_id = current_json::$poi_id;
-            current_detection_type = current_json::%detection_type;
-			current_is_ignored = current_feature_data::is_ignored;
+                        current_detection_type = current_json::%detection_type;
+			current_is_ignored = current_json::is_ignored;
 			current_features_data = current_json::features_data;
-            array_features_data_length = JSON_LENGTH(current_features_data);
-			START TRANSACTION;
-				# clean exists
-                DELETE FROM poi
-                WHERE poi_id = current_poi_id;
+                        array_features_data_length = JSON_LENGTH(current_features_data);
+		        START TRANSACTION;
+		        # clean exists
+                        DELETE FROM poi
+                        WHERE poi_id = current_poi_id;
                 # Insert new
                 FOR z IN 0 .. (array_features_data_length-1) LOOP
 					current_feature_data = JSON_EXTRACT_JSON(current_features_data,z);
 					INSERT INTO poi
-									(poi_id, detection_type, is_ignored, feature_id, features) VALUES (
-									current_poi_id,
-                                    current_detection_type,
-                                    current_is_ignored,
-                                    current_feature_data::$feature_id,
-                                    JSON_ARRAY_PACK(current_feature_data::features)
-                                    );
+					(poi_id, detection_type, is_ignored, feature_id, features) VALUES (
+					current_poi_id,
+                                        current_detection_type,
+                                        current_is_ignored,
+                                        current_feature_data::$feature_id,
+                                        JSON_ARRAY_PACK(current_feature_data::features)
+					);
 				END LOOP;
 			COMMIT;
 			INSERT INTO save_poi_result (poi_id,is_success,error_msg) VALUES (current_poi_id,"success","");
@@ -253,6 +253,3 @@ UPDATE db_schema_version
 SET deploy_end = NOW(),
 is_success = 'true'
 WHERE version_num = 1;
-
-
-
