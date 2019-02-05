@@ -289,7 +289,7 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_GPU} " +
-                                                "hq_compose_name=${env.compose_extension_HQ_folder} " +
+                                                "hq_compose_name=${docker_compose_HQ_folder} " +
                                                 "elk_compose_name=${docker_compose_ELK_folder} " +
                                                 "elk_node_compose_name=${docker_compose_ELK_NODE_folder} " +
                                                 "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
@@ -302,7 +302,7 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_CPU} " +
-                                                "hq_compose_name=${env.compose_extension_HQ_folder} " +
+                                                "hq_compose_name=${docker_compose_HQ_folder} " +
                                                 "elk_compose_name=${docker_compose_ELK_folder} " +
                                                 "elk_node_compose_name=${docker_compose_ELK_NODE_folder} " +
                                                 "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
@@ -315,7 +315,7 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_GPU} " +
-                                                "hq_compose_name=${env.compose_extension_HQ_WHITE_folder} " +
+                                                "hq_compose_name=${docker_compose_HQ_WHITE_folder} " +
                                                 "elk_compose_name=${docker_compose_ELK_WHITE_folder} " +
                                                 "elk_node_compose_name=${docker_compose_ELK_NODE_WHITE_folder} " +
                                                 "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_WHITE_folder} " +
@@ -330,7 +330,7 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_CPU} " +
-                                                "hq_compose_name=${env.compose_extension_HQ_WHITE_folder} " +
+                                                "hq_compose_name=${docker_compose_HQ_WHITE_folder} " +
                                                 "elk_compose_name=${docker_compose_ELK_WHITE_folder} " +
                                                 "elk_node_compose_name=${docker_compose_ELK_NODE_WHITE_folder} " +
                                                 "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
