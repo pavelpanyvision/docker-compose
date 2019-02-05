@@ -97,13 +97,13 @@ BEGIN
     INSERT INTO save_tracks_result (track_id,is_success,error_msg) VALUES (current_track_id,"failed",err_msg);
    END;
   END LOOP; 
-  ECHO SELECT track_id,is_success,error_msg as save_tracks_result;
+  ECHO SELECT track_id,is_success,error_msg FROM save_tracks_result;
   DROP TABLE IF EXISTS save_tracks_result;
 END //
 DELIMITER ;
 
 DELIMITER //
-CREATE OR REPLACE PROCEDURE get_track(_track_id VARCHAR(36),_source_id VARCHAR(24),_detection_type TINYINT,_creation_date DATE) 
+CREATE OR REPLACE PROCEDURE get_track(_track_id VARCHAR(36),_source_id VARCHAR(24),_detection_type TINYINT) 
 AS
 DECLARE
 BEGIN
@@ -111,25 +111,20 @@ BEGIN
   FROM tracks_in_memory
   WHERE track_id = _track_id
   AND source_id = _source_id
-  AND detection_type = _detection_type
-  AND creation_date = _creation_date;
+  AND detection_type = _detection_type;
 END //
 DELIMITER ;
 
 
 
 DELIMITER //
-CREATE OR REPLACE PROCEDURE search_by_features(_features_hex VARCHAR(4096),_start_datetime DATETIME,_end_datetime DATETIME,_detection_type TINYINT,_source_id VARCHAR(24),_score_threshold FLOAT, _top_results INT) 
+CREATE OR REPLACE PROCEDURE search_by_features(_features_hex VARCHAR(4096),_detection_type TINYINT,_source_id VARCHAR(24),_score_threshold FLOAT, _top_results INT) 
 AS
 BEGIN
   IF _source_id = "" THEN
         ECHO SELECT track_id,source_id,DOT_PRODUCT(features,unhex(_features_hex)) as score
 		  FROM tracks_in_memory
 		  WHERE detection_type = _detection_type
-		  AND creation_date >= DATE(_start_datetime)
-		  AND creation_date <= DATE(_end_datetime)
-		  AND creation_datetime >= _start_datetime
-		  AND creation_datetime <= _end_datetime
 		  AND DOT_PRODUCT(features,unhex(_features_hex)) >= _score_threshold
           ORDER BY score DESC 
           LIMIT _top_results;		
@@ -137,10 +132,6 @@ BEGIN
         ECHO SELECT track_id,source_id,DOT_PRODUCT(features,unhex(_features_hex)) as score
 		  FROM tracks_in_memory
 		  WHERE detection_type = _detection_type
-		  AND creation_date >= DATE(_start_datetime)
-		  AND creation_date <= DATE(_end_datetime)
-		  AND creation_datetime >= _start_datetime
-		  AND creation_datetime <= _end_datetime
           AND source_id = _source_id
 		  AND DOT_PRODUCT(features,unhex(_features_hex)) >= _score_threshold
           ORDER BY score DESC 
@@ -151,7 +142,7 @@ DELIMITER ;
 
 
 DELIMITER // 
-CREATE OR REPLACE PROCEDURE delete_track(_track_id VARCHAR(36),_source_id VARCHAR(24),_detection_type TINYINT,_creation_date DATE)
+CREATE OR REPLACE PROCEDURE delete_track(_track_id VARCHAR(36),_source_id VARCHAR(24),_detection_type TINYINT)
 AS 
 DECLARE
 err_msg VARCHAR(512) = '';
@@ -162,7 +153,6 @@ BEGIN
     
   DELETE FROM tracks_in_memory 
   WHERE detection_type = _detection_type
-  AND creation_date = _creation_date
   AND track_id = _track_id
   AND source_id = _source_id;
   row_c += row_count();
