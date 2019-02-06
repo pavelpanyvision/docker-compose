@@ -293,6 +293,20 @@
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
+                <folder>
+                    <description>HQ Migration Files</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>hq_migration_files</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/${project.version}/migration_manager</origin>
+                        </distributionDirectory>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/${project.version}/docker-compose-migration-db.yml</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
             </folderList>
             <postInstallationActionList>
                 <showProgressDialog>
