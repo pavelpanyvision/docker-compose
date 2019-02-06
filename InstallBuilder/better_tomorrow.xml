@@ -306,7 +306,7 @@
                             <origin>${env(WORKSPACE)}/${project.version}/docker-compose-migration-db.yml</origin>
                         </distributionDirectory>
                         <distributionDirectory>
-                            <origin>{env(WORKSPACE)}/docker_${hq_migration_compose_name}/images</origin>
+                            <origin>${env(WORKSPACE)}/docker_${hq_migration_compose_name}/images</origin>
                         </distributionDirectory>
                         <distributionDirectory>
                             <origin>${env(WORKSPACE)}/docker_${hq_migration_compose_name}/compose/*</origin>
