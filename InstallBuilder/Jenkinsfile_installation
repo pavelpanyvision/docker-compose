@@ -109,6 +109,7 @@ def generic_pipeline_method() {
                             env.docker_compose_GPU_WHITE_type = "GPU_WHITE"                        
                             env.docker_compose_CPU_WHITE_type = "CPU_WHITE"
                             env.docker_compose_HQ_WHITE_type = "HQ_WHITE"
+                            env.docker_compose_HQ_migration_WHITE_type = "HQ_migration_WHITE"
                             env.docker_compose_ELK_WHITE_type = "ELK_WHITE"
                             env.docker_compose_ELK_NODE_WHITE_type = "ELK_NODE_WHITE"
                             env.docker_compose_MONITOR_MASTER_WHITE_type = "MONITOR_MASTER_WHITE"
