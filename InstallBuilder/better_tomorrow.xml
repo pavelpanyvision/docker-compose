@@ -305,6 +305,12 @@
                         <distributionDirectory>
                             <origin>${env(WORKSPACE)}/${project.version}/docker-compose-migration-db.yml</origin>
                         </distributionDirectory>
+                        <distributionDirectory>
+                            <origin>{env(WORKSPACE)}/docker_${hq_migration_compose_name}/images</origin>
+                        </distributionDirectory>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/docker_${hq_migration_compose_name}/compose/*</origin>
+                        </distributionDirectory>
                     </distributionFileList>
                 </folder>
             </folderList>
@@ -321,6 +327,13 @@
                         </runProgram>
                     </actionList>
                 </showProgressDialog>
+                <runProgram>
+                    <program>${installdir}/airgap</program>
+                    <programArguments>load ${installdir}/images</programArguments>
+                    <progressText>Importing Docker Images, please wait...</progressText>
+                    <show>0</show>
+                    <useMSDOSPath>0</useMSDOSPath>
+                </runProgram>
             </postInstallationActionList>
             <readyToInstallActionList>
                 <throwError text="Please install Docker first and then run the installer">

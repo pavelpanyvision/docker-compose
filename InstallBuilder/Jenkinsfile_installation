@@ -101,6 +101,7 @@ def generic_pipeline_method() {
                             env.docker_compose_GPU_type = "GPU"                           
                             env.docker_compose_CPU_type = "CPU"
                             env.docker_compose_HQ_type = "HQ"
+                            env.docker_compose_HQ_migration_type = "HQ-migration"
                             env.docker_compose_ELK_type = "ELK"
                             env.docker_compose_ELK_NODE_type = "ELK_NODE"
                             env.docker_compose_MONITOR_MASTER_type = "MONITOR_MASTER"
@@ -117,6 +118,7 @@ def generic_pipeline_method() {
                             env.docker_compose_GPU_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_GPU_type}"
                             env.docker_compose_CPU_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_CPU_type}"
                             env.docker_compose_HQ_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_HQ_type}"
+                            env.docker_compose_HQ_migration_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_HQ_migration_type}"
                             env.docker_compose_ELK_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_type}"
                             env.docker_compose_ELK_NODE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_NODE_type}"
                             env.docker_compose_MONITOR_MASTER_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_MONITOR_MASTER_type}"
@@ -124,6 +126,7 @@ def generic_pipeline_method() {
                             env.docker_compose_GPU_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_GPU_WHITE_type}"                            
                             env.docker_compose_CPU_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_CPU_WHITE_type}"
                             env.docker_compose_HQ_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_HQ_WHITE_type}"
+                            env.docker_compose_HQ_migration_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_HQ_migration_WHITE_type}"
                             env.docker_compose_ELK_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_WHITE_type}"
                             env.docker_compose_ELK_NODE_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_NODE_WHITE_type}"
                             env.docker_compose_MONITOR_MASTER_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_MONITOR_MASTER_WHITE_type}"
@@ -133,6 +136,7 @@ def generic_pipeline_method() {
                             env.docker_images_destination_folder_GPU = "${env.WORKSPACE}/docker_${docker_compose_GPU_folder}"                           
                             env.docker_images_destination_folder_CPU = "${env.WORKSPACE}/docker_${docker_compose_CPU_folder}"
                             env.docker_images_destination_folder_HQ = "${env.WORKSPACE}/docker_${docker_compose_HQ_folder}"
+                            env.docker_images_destination_folder_HQ_migration = "${env.WORKSPACE}/docker_${docker_compose_HQ_migration_folder}"
                             env.docker_images_destination_folder_ELK = "${env.WORKSPACE}/docker_${docker_compose_ELK_folder}"
                             env.docker_images_destination_folder_ELK_NODE = "${env.WORKSPACE}/docker_${docker_compose_ELK_NODE_folder}"
                             env.docker_images_destination_folder_MONITOR_MASTER = "${env.WORKSPACE}/docker_${docker_compose_MONITOR_MASTER_folder}"
@@ -140,6 +144,7 @@ def generic_pipeline_method() {
                             env.docker_images_destination_folder_GPU_WHITE = "${env.WORKSPACE}/docker_${docker_compose_GPU_WHITE_folder}"                           
                             env.docker_images_destination_folder_CPU_WHITE = "${env.WORKSPACE}/docker_${docker_compose_CPU_WHITE_folder}"
                             env.docker_images_destination_folder_HQ_WHITE = "${env.WORKSPACE}/docker_${docker_compose_HQ_WHITE_folder}"
+                            env.docker_images_destination_folder_HQ_migration_WHITE = "${env.WORKSPACE}/docker_${docker_compose_HQ_migration_WHITE_folder}"
                             env.docker_images_destination_folder_ELK_WHITE = "${env.WORKSPACE}/docker_${docker_compose_ELK_WHITE_folder}"
                             env.docker_images_destination_folder_ELK_NODE_WHITE = "${env.WORKSPACE}/docker_${docker_compose_ELK_NODE_WHITE_folder}"
                             env.docker_images_destination_folder_MONITOR_MASTER_WHITE = "${env.WORKSPACE}/docker_${docker_compose_MONITOR_MASTER_WHITE_folder}"
@@ -149,6 +154,7 @@ def generic_pipeline_method() {
                             COMPOSE_FILE_NAME_GPU = "docker-compose-gpu.yml"                           
                             COMPOSE_FILE_NAME_CPU = "docker-compose-cpu.yml"
                             COMPOSE_FILE_NAME_HQ = "docker-compose-hq-addon.yml"
+                            COMPOSE_FILE_NAME_HQ_migration = "docker-compose-migration-db.yml"
                             COMPOSE_FILE_NAME_ELK = "docker-compose-elk-stack.yml"
                             COMPOSE_FILE_NAME_ELK_NODE = "docker-compose-filebeat.yml"
                             COMPOSE_FILE_NAME_MONITOR_MASTER = "docker-compose-monitor-master.yml"
@@ -169,6 +175,11 @@ def generic_pipeline_method() {
                             env.compose_extension_HQ = env.compose_extension_HQ.minus("docker-compose-")
                             env.compose_extension_HQ = env.compose_extension_HQ.minus(".yml")
                             echo "Compose file extension for HQ: ${env.compose_extension_HQ}"
+                            //hq migration
+                            env.compose_extension_HQ_migration = COMPOSE_FILE_NAME_HQ_migration
+                            env.compose_extension_HQ_migration = env.compose_extension_HQ_migration.minus("docker-compose-")
+                            env.compose_extension_HQ_migration = env.compose_extension_HQ_migration.minus(".yml")
+                            echo "Compose file extension for HQ_migration: ${env.compose_extension_HQ_migration}"
                             //elk stack
                             env.compose_extension_ELK = COMPOSE_FILE_NAME_ELK
                             env.compose_extension_ELK = env.compose_extension_ELK.minus("docker-compose-")
@@ -204,6 +215,7 @@ def generic_pipeline_method() {
                             sh("cp ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU} ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE")
                             sh("cp ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU} ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU}-WHITE")
                             sh("cp ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ} ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE")
+                            sh("cp ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration} ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration}-WHITE")
                             sh("cp ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK} ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK}-WHITE")
                             sh("cp ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE} ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE}-WHITE")                            
                             sh("cp ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_MASTER} ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_MASTER}-WHITE")
@@ -223,6 +235,7 @@ def generic_pipeline_method() {
                                     },
                                     airgap_HQ: {
                                         sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ} ${docker_images_destination_folder_HQ}")
+                                        sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration} ${docker_images_destination_folder_HQ_migration}")
                                     },
                                     airgap_ELK: {
                                         sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK} ${docker_images_destination_folder_ELK}")
@@ -245,8 +258,11 @@ def generic_pipeline_method() {
                                     },
                                     airgap_HQ_WHITE: {
                                         sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE")
-                                        sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE")
+                                        sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE")                                       
+                                        sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration}-WHITE")
+                                        sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration}-WHITE")
                                         sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE ${docker_images_destination_folder_HQ_WHITE}")
+                                        sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration}-WHITE ${docker_images_destination_folder_HQ_migration_WHITE}")
                                     },
                                     airgap_ELK_WHITE: {
                                         sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK}-WHITE")
@@ -288,6 +304,7 @@ def generic_pipeline_method() {
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_GPU} " +
                                                 "hq_compose_name=${docker_compose_HQ_folder} " +
+                                                "hq_migration_compose_name=${docker_compose_HQ_migration_folder} " +
                                                 "elk_compose_name=${docker_compose_ELK_folder} " +
                                                 "elk_node_compose_name=${docker_compose_ELK_NODE_folder} " +
                                                 "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
@@ -301,6 +318,7 @@ def generic_pipeline_method() {
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_CPU} " +
                                                 "hq_compose_name=${docker_compose_HQ_folder} " +
+                                                "hq_migration_compose_name=${docker_compose_HQ_migration_folder} " +
                                                 "elk_compose_name=${docker_compose_ELK_folder} " +
                                                 "elk_node_compose_name=${docker_compose_ELK_NODE_folder} " +
                                                 "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
@@ -314,6 +332,7 @@ def generic_pipeline_method() {
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_GPU} " +
                                                 "hq_compose_name=${docker_compose_HQ_WHITE_folder} " +
+                                                "hq_migration_compose_name=${docker_compose_HQ_migration_WHITE_folder} " +
                                                 "elk_compose_name=${docker_compose_ELK_WHITE_folder} " +
                                                 "elk_node_compose_name=${docker_compose_ELK_NODE_WHITE_folder} " +
                                                 "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_WHITE_folder} " +
@@ -329,6 +348,7 @@ def generic_pipeline_method() {
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_CPU} " +
                                                 "hq_compose_name=${docker_compose_HQ_WHITE_folder} " +
+                                                "hq_migration_compose_name=${docker_compose_HQ_migration_WHITE_folder} " +
                                                 "elk_compose_name=${docker_compose_ELK_WHITE_folder} " +
                                                 "elk_node_compose_name=${docker_compose_ELK_NODE_WHITE_folder} " +
                                                 "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
