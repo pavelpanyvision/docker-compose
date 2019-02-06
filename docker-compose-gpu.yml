@@ -417,7 +417,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.21.0
+    image: gcr.io/anyvision-production/api:on-demand-1.21.0-return-rect
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -469,7 +469,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-pyconcrete:1.21.0
+    image: gcr.io/anyvision-production/backend-pyconcrete:on-demand-1.21.0-return-rect
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
