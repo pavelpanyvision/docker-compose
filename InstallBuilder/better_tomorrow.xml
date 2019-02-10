@@ -294,9 +294,31 @@
                     </distributionFileList>
                 </folder>
                 <folder>
-                    <description>HQ Migration Files</description>
+                    <description>HQ Migration Images</description>
+                    <destination>${installdir}/hq_migration</destination>
+                    <name>hq_migration_images</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/docker_${hq_migration_compose_name}/images</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Migration Docker Compose</description>
                     <destination>/home/${username}/docker-compose/${product_version}</destination>
-                    <name>hq_migration_files</name>
+                    <name>migration_docker_compose</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/docker_${hq_migration_compose_name}/compose/*</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>HQ Files</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>hq_files</name>
                     <platforms>all</platforms>
                     <distributionFileList>
                         <distributionDirectory>
@@ -304,12 +326,6 @@
                         </distributionDirectory>
                         <distributionDirectory>
                             <origin>${env(WORKSPACE)}/${project.version}/docker-compose-migration-db.yml</origin>
-                        </distributionDirectory>
-                        <distributionDirectory>
-                            <origin>${env(WORKSPACE)}/docker_${hq_migration_compose_name}/images</origin>
-                        </distributionDirectory>
-                        <distributionDirectory>
-                            <origin>${env(WORKSPACE)}/docker_${hq_migration_compose_name}/compose/*</origin>
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
@@ -329,7 +345,7 @@
                 </showProgressDialog>
                 <runProgram>
                     <program>${installdir}/airgap</program>
-                    <programArguments>load ${installdir}/images</programArguments>
+                    <programArguments>load ${installdir}/hq_migration/images</programArguments>
                     <progressText>Importing Docker Images, please wait...</progressText>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
