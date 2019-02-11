@@ -51,7 +51,8 @@ services:
           - memsqlmig.tls.ai
     volumes:
       # need to mount the root of track_archive_service_data in old server 
-      - /storage/track_archive_service_data:/old_tracks
+      - /storage/track_archive_service_data:/storage
+      - /ssd/track_archive_service_data:/ssd
     #environment:
       # these are the defaults in the script, can be change with ENV
       #- MEMSQL_HOST=memsql.tls.ai
