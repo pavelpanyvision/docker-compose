@@ -311,6 +311,7 @@
                     <platforms>all</platforms>
                     <distributionFileList>
                         <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
                             <origin>${env(WORKSPACE)}/docker_${hq_migration_compose_name}/compose/*</origin>
                         </distributionDirectory>
                     </distributionFileList>
