@@ -64,41 +64,23 @@ CREATE TABLE IF NOT EXISTS `tracks_in_memory` (
 );
 
 DELIMITER //
-CREATE OR REPLACE PROCEDURE save_tracks(_array_of_tracks json) 
+CREATE OR REPLACE PROCEDURE save_tracks(_track_id VARCHAR(36), _source_id VARCHAR(24), _creation_datetime VARCHAR(50), _detection_type TINYINT, _features JSON) 
 AS
 DECLARE 
-    current_json JSON;
-    current_track_id VARCHAR(36);
-    array_length INTEGER = JSON_LENGTH(_array_of_tracks);
    	err_msg VARCHAR(512) = '';
 BEGIN
-  DROP TABLE IF EXISTS save_tracks_result;
-  CREATE TEMPORARY TABLE save_tracks_result(track_id VARCHAR(36),is_success VARCHAR(10),error_msg VARCHAR(512));
-  FOR i in 0 .. (array_length-1) LOOP
   BEGIN
-  current_json = JSON_EXTRACT_JSON(_array_of_tracks,i);
-  current_track_id = current_json::$track_id;
-  START TRANSACTION;
-  INSERT INTO tracks_in_memory
-    (track_id, source_id, creation_datetime, detection_type, features)
-    VALUES(
-        current_track_id,
-        current_json::$source_id,
-        STR_TO_DATE(current_json::$creation_datetime,'%Y%m%d%H%i%S'),
-        current_json::%detection_type,
-        JSON_ARRAY_PACK(current_json::features)  
-    );
+    INSERT INTO tracks_in_memory
+      (track_id, source_id, creation_datetime, detection_type, features)
+    VALUES (_track_id,_source_id,STR_TO_DATE(_creation_datetime,'%Y%m%d%H%i%S'),_detection_type, JSON_ARRAY_PACK(_features))
     COMMIT;
-	INSERT INTO save_tracks_result (track_id,is_success,error_msg) VALUES (current_track_id,"success","");
-   EXCEPTION WHEN OTHERS THEN
+    ECHO SELECT _track_id as track_id,'success' as is_success, '' as error_msg;
+  EXCEPTION WHEN OTHERS THEN
 	ROLLBACK;
 	err_msg = exception_message();
 	CALL insert_error_row('save_tracks',err_msg);
-    INSERT INTO save_tracks_result (track_id,is_success,error_msg) VALUES (current_track_id,"failed",err_msg);
+    ECHO SELECT _track_id as track_id,'failed' as is_success, err_msg as error_msg;
    END;
-  END LOOP; 
-  ECHO SELECT track_id,is_success,error_msg FROM save_tracks_result;
-  DROP TABLE IF EXISTS save_tracks_result;
 END //
 DELIMITER ;
 
@@ -211,6 +193,24 @@ BEGIN
 END //
 DELIMITER ;
 
+DELIMITER // 
+CREATE OR REPLACE PROCEDURE delete_tracks_older_than_creation_date(_creation_date DATE)
+AS
+DECLARE 
+    row_count INTEGER;
+    total_row_count INTEGER=0;
+BEGIN
+  row_count = 1;
+  WHILE row_count > 0 LOOP
+    DELETE FROM tracks_in_memory 
+    WHERE creation_date <= _creation_date
+    LIMIT 50000;
+    row_count = row_count();
+   	total_row_count += row_count;
+  END LOOP;
+  ECHO SELECT total_row_count as rows_deleted;
+END //
+DELIMITER ;
 
 # Automatic Purge Date by Memory Limit
 DELIMITER // 
