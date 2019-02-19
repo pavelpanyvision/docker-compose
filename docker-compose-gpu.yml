@@ -552,6 +552,29 @@ services:
       options:
         max-size: 1g
 
+  push-notification:
+    image: gcr.io/anyvision-training/push-notification-service:master
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity
+    networks:
+      prod:
+        aliases:
+        - push-notification.tls.ai
+    ports:
+    - "7443:7443"
+    volumes:
+    - /storage:/var/www/html
+    - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+    - /etc/localtime:/etc/localtime:ro
+    environment:
+    - FIREBASE_ADMIN_TOKEN=key=AAAA
+    - RUN_AS_USER=user
+    - ENABLE_CHOWN=false
+    env_file:
+    - env/global.env
+    logging:
+      options:
+        max-size: 1g
 
 
   # dashboard-updater:
@@ -575,3 +598,6 @@ services:
   #   logging:
   #     options:
   #       max-size: 1g
+
+
+
