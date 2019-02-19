@@ -74,7 +74,7 @@ services:
     ports:
       - 2181:2181
     environment:
-      - CONSUL_SERVER="consul.tls.ai"
+      - CONSUL_SERVER=consul.tls.ai
       - ZOO_MY_ID=1
       - ZOO_SERVERS='server.1=zookeeper.tls.ai:2888:3888'
     env_file:
@@ -103,20 +103,20 @@ services:
     image: gcr.io/anyvision-training/kafka:19.02
     restart: always
     depends_on:
-      - "zookeeper"
+      - zookeeper
     ports:
-       - "9092:9092"
+       - 9092:9092
     volumes:
       - /storage/kafka:/kafka
       - /etc/hostname:/etc/host_hostname:ro
     environment:
       #HOSTNAME_COMMAND: "docker info | grep ^Name: | cut -d' ' -f 2"
-      - CONSUL_SERVER="consul-agent.tls.ai"
-      - ZOOKEEPER_SERVER="zookeeper.tls.ai"
+      - CONSUL_SERVER=consul-agent.tls.ai
+      - ZOOKEEPER_SERVER=zookeeper.tls.ai
       - ZOOKEEPER_PORT=2181
       - KAFKA_PORT=9092
       - KAFKA_BROKER_ID=1
-      - KAFKA_ADVERTISED_HOST_NAME="kafka.tls.ai"
+      - KAFKA_ADVERTISED_HOST_NAME=kafka.tls.ai
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper.tls.ai:2181
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       #KAFKA_ADVERTISED_LISTENERS=INSIDE://kafka-localnode.tls.ai:9092,OUTSIDE://kafka-localnode.tls.ai:9092
@@ -148,6 +148,31 @@ services:
       prod:
         aliases:
          - kafka.tls.ai
+
+  kafka-mirror:
+    image: gcr.io/anyvision-training/kafka:19.02
+    restart: always
+    environment:
+        # PKMM_BOOTSTRAP_SERVERS -- Producer broker bootstrap - kafka server to copy records into
+      - PKMM_BOOTSTRAP_SERVERS=kafka.tls.ai:9092
+        # PKMM_ACKS -- default -1, wait for all ISR
+        # PKMM_BATCH_SIZE= default 100, batching records to reduce network traffic increasing throughput
+        # CKMM_BOOTSTRAP_SERVERS -- Consumer broker bootstrap - kafka server to copy records from
+      - CKMM_BOOTSTRAP_SERVERS=kafka-edge.tls.ai:9092
+        # CKMM_GROUP_ID= default Edge2CenterMM, must use same groupid when running in parallel
+        # CKMM_CLIENT_ID= default KMM_Consumer, must update the consumer limit per client id in source kafka
+        # KMM_TOPICS_WHITELIST= comma seperated list of topic to copy, can be regex 
+      - KMM_TOPICS_WHITELIST=detections
+        # KMM_THREADS= default 2, how many consumer threads to start.
+      - KMM_THREADS=2
+        # CKMM_AUTO_OFFSET_RESET= default earliest, latest / earliest
+    command: 'anv_kmm.sh'
+    healthcheck:
+            disable: true
+    networks:
+      prod:
+        rliases:              
+         - kafka-mirror.tls.ai
 
 
 
