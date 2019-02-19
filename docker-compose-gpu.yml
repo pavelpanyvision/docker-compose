@@ -131,7 +131,7 @@ services:
       # keep old detection for 2GB if time is not greater than 48H
       - KAFKA_LOG_RETENTION_BYTES=2147483648
       # create detection topic with 3 partitions and 1 replica (all in one config)
-      - KAFKA_CREATE_TOPICS=detections:3:1,camera_statuses:1:1
+      - KAFKA_CREATE_TOPICS=detections:3:1,camera_statuses:1:1,collated_detections:3:1
       # set broker max size message 2MB
       - KAFKA_MESSAGE_MAX_BYTES=2097152
       # default broker network threads is 3
