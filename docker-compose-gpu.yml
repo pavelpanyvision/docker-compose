@@ -149,30 +149,30 @@ services:
         aliases:
          - kafka.tls.ai
 
-  kafka-mirror:
-    image: gcr.io/anyvision-training/kafka:19.02
-    restart: always
-    environment:
-        # PKMM_BOOTSTRAP_SERVERS -- Producer broker bootstrap - kafka server to copy records into
-      - PKMM_BOOTSTRAP_SERVERS=kafka.tls.ai:9092
-        # PKMM_ACKS -- default -1, wait for all ISR
-        # PKMM_BATCH_SIZE= default 100, batching records to reduce network traffic increasing throughput
-        # CKMM_BOOTSTRAP_SERVERS -- Consumer broker bootstrap - kafka server to copy records from
-      - CKMM_BOOTSTRAP_SERVERS=kafka-edge.tls.ai:9092
-        # CKMM_GROUP_ID= default Edge2CenterMM, must use same groupid when running in parallel
-        # CKMM_CLIENT_ID= default KMM_Consumer, must update the consumer limit per client id in source kafka
-        # KMM_TOPICS_WHITELIST= comma seperated list of topic to copy, can be regex 
-      - KMM_TOPICS_WHITELIST=detections
-        # KMM_THREADS= default 2, how many consumer threads to start.
-      - KMM_THREADS=2
-        # CKMM_AUTO_OFFSET_RESET= default earliest, latest / earliest
-    command: 'anv_kmm.sh'
-    healthcheck:
-            disable: true
-    networks:
-      prod:
-        aliases:              
-         - kafka-mirror.tls.ai
+#  kafka-mirror:
+#    image: gcr.io/anyvision-training/kafka:19.02
+#    restart: always
+#    environment:
+#        # PKMM_BOOTSTRAP_SERVERS -- Producer broker bootstrap - kafka server to copy records into
+#      - PKMM_BOOTSTRAP_SERVERS=kafka.tls.ai:9092
+#        # PKMM_ACKS -- default -1, wait for all ISR
+#        # PKMM_BATCH_SIZE= default 100, batching records to reduce network traffic increasing throughput
+#        # CKMM_BOOTSTRAP_SERVERS -- Consumer broker bootstrap - kafka server to copy records from
+#      - CKMM_BOOTSTRAP_SERVERS=kafka-edge.tls.ai:9092
+#        # CKMM_GROUP_ID= default Edge2CenterMM, must use same groupid when running in parallel
+#        # CKMM_CLIENT_ID= default KMM_Consumer, must update the consumer limit per client id in source kafka
+#        # KMM_TOPICS_WHITELIST= comma seperated list of topic to copy, can be regex 
+#      - KMM_TOPICS_WHITELIST=detections
+#        # KMM_THREADS= default 2, how many consumer threads to start.
+#      - KMM_THREADS=2
+#        # CKMM_AUTO_OFFSET_RESET= default earliest, latest / earliest
+#    command: 'anv_kmm.sh'
+#    healthcheck:
+#            disable: true
+#    networks:
+#      prod:
+#        aliases:              
+#         - kafka-mirror.tls.ai
 
 
 
