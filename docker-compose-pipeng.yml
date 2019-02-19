@@ -34,7 +34,7 @@ services:
       - model_path=/root/pipeng/models/
       - frame_store_path=/data/frame_store/
       - redis_ip=backend
-      - CMD=--config /root/pipeng/pipeNG.json --mode V5
+      - CMD=--config /root/pipeng/pipeNG.json
     logging:
       options:
         max-size: 1g
