@@ -12,6 +12,22 @@ networks:
 
 
 services:
+  postgres:
+    image: gcr.io/anyvision-training/postgres:19.02
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - /ssd/postgres:/var/lib/postgresql/data
+      - /storage/backup_postgres:/backup
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      prod:
+        aliases:
+          - postgres.tls.ai
+    logging:
+      options:
+        max-size: 1g
 
   memsql:
     image: gcr.io/anyvision-training/memsql:19.02
