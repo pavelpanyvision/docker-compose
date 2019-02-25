@@ -257,7 +257,7 @@ def generic_pipeline_method() {
                                         sh("wget https://s3.eu-central-1.amazonaws.com/anyvision-dashboard/latest/on-demand-backend-for-pipeng/AnyVision-1.21.0-linux-x86_64.AppImage -O ${env.WORKSPACE}/AnyVision-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
 
                                     },
-                                    download_dashboard_GPU_WHITE: {                                       
+                                    download_dashboard_WHITE: {                                       
                                         sh("wget https://s3.eu-central-1.amazonaws.com/facesearch-dashboard/latest/on-demand-backend-for-pipeng/FaceSearch-1.21.0-linux-x86_64.AppImage -O ${env.WORKSPACE}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
                                     }
 
