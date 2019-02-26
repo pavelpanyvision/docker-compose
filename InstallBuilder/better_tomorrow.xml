@@ -116,7 +116,7 @@
                 </folder>
                 <folder>
                     <description>PipeNG Images</description>
-                    <destination>${installdir}/pipeng</destination>
+                    <destination>${installdir}/main</destination>
                     <name>pipeng_images</name>
                     <platforms>all</platforms>
                     <distributionFileList>
