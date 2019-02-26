@@ -148,6 +148,17 @@
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
+                <folder>
+                    <description>memSQL Files</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>memsql_files</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/${product_version}/memsql</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
             </folderList>
             <postInstallationActionList>
                 <showProgressDialog>
