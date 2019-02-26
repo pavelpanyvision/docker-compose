@@ -290,7 +290,7 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_GPU} " +
-                                                "pipeng_compose_name=${env.compose_extension_PIPENG} ")
+                                                "pipeng_compose_name=${docker_compose_PIPENG_folder} ")
                                     },
                                     build_CPU: {
                                         sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
@@ -299,7 +299,7 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_CPU} " +
-                                                "pipeng_compose_name=${env.compose_extension_PIPENG} ")
+                                                "pipeng_compose_name=${docker_compose_PIPENG_folder} ")
                                     },
                                     build_GPU_WHITE: {
                                         sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
@@ -308,7 +308,7 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_GPU} " +
-                                                "pipeng_compose_name=${env.compose_extension_PIPENG} " +
+                                                "pipeng_compose_name=${docker_compose_PIPENG_WHITE_folder} " +
                                                 "project.leftImage='' project.logoImage='' project.splashImage='' project.disableSplashScreen=1 " +
                                                 "project.vendor='FaceSearch' project.shortName='FaceRec' project.fullName='FaceRec'")
                                     },
@@ -319,7 +319,7 @@ def generic_pipeline_method() {
                                                 "build_number=${BUILD_NUMBER} " +
                                                 "network_name=${repo_extension_branch_name} " +
                                                 "compose_name=${env.compose_extension_CPU} " +
-                                                "pipeng_compose_name=${env.compose_extension_PIPENG} " +
+                                                "pipeng_compose_name=${docker_compose_PIPENG_WHITE_folder} " +
                                                 "project.leftImage='' project.logoImage='' project.splashImage='' project.disableSplashScreen=1 " +
                                                 "project.vendor='FaceSearch' project.shortName='FaceRec' project.fullName='FaceRec'")
                                     }
