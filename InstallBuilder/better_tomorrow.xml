@@ -114,6 +114,40 @@
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
+                <folder>
+                    <description>PipeNG Images</description>
+                    <destination>${installdir}/pipeng</destination>
+                    <name>pipeng_images</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/docker_${pipeng_compose_name}/images</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>PipNG Compose</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>pipeng_compose</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>${env(WORKSPACE)}/docker_${pipeng_compose_name}/compose/*</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>PipeNG YAML</description>
+                    <destination>/home/${username}/docker-compose/${product_version}</destination>
+                    <name>pipeng_yaml</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>${env(WORKSPACE)}/${product_version}/docker-compose-pipeng.yml</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
             </folderList>
             <postInstallationActionList>
                 <showProgressDialog>
