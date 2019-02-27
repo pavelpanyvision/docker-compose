@@ -20,7 +20,6 @@ services:
     volumes:
       - /ssd/postgres:/var/lib/postgresql/data
       - /storage/backup_postgres:/backup
-      - /etc/localtime:/etc/localtime:ro
     networks:
       prod:
         aliases:
@@ -41,7 +40,6 @@ services:
     volumes:
       - /ssd/memsql:/var/lib/memsql
       - /storage/backup_memsql:/backup
-      - /etc/localtime:/etc/localtime:ro
       - ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
       # if need to deploy reid comment tracks db line and uncomment reid line
       #- ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
