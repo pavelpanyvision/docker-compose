@@ -14,8 +14,8 @@ services:
       prod:
         aliases:
           - reid_service.tls.ai
-    volumes:
-      - /home/dima/dev_sandbox/backend-ng:/root/backend-ng
+    #volumes:
+      #- /home/dima/dev_sandbox/backend-ng:/root/backend-ng
     environment:
       - START_CMD=python3 /root/backend-ng/src/reid_DAL/kafka_worker.py
       #- START_CMD=python3 /root/backend-ng/src/reid_DAL/reid_config_creator.py    ## use it first time to create consul sections
