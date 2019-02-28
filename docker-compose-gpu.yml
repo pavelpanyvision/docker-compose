@@ -40,9 +40,9 @@ services:
     volumes:
       - /ssd/memsql:/var/lib/memsql
       - /storage/backup_memsql:/backup
-      - ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
+      #- ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
       # if need to deploy reid comment tracks db line and uncomment reid line
-      #- ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
+      - ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
     environment:
       - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
       - MEMSQL_NODE_ROLE=AIO
@@ -145,7 +145,7 @@ services:
       # keep old detection for 2GB if time is not greater than 48H
       - KAFKA_LOG_RETENTION_BYTES=2147483648
       # create detection topic with 3 partitions and 1 replica (all in one config)
-      - KAFKA_CREATE_TOPICS=detections:3:1,camera_statuses:1:1,collated_detections:3:1
+      - KAFKA_CREATE_TOPICS=detections:3:1,api_detections:3:1,camera_statuses:1:1,collated_detections:3:1,subjects:3:1,subjects.reid:3:1
       # set broker max size message 2MB
       - KAFKA_MESSAGE_MAX_BYTES=2097152
       # default broker network threads is 3

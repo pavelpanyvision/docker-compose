@@ -1,0 +1,26 @@
+version: '3.3'
+
+networks:
+  prod:
+
+services:
+
+  reid_service:
+    image: gcr.io/anyvision-training/backend-ng:development
+    restart: always
+    #entrypoint: sleep infinity     ### uncoment if you dont have compiled projet in realease folder and commnent next "command" and "working_dir" section
+    ipc: host
+    networks:
+      prod:
+        aliases:
+          - reid_service.tls.ai
+    volumes:
+      - /home/dima/dev_sandbox/backend-ng:/root/backend-ng
+    environment:
+      - START_CMD=python3 /root/backend-ng/src/reid_DAL/kafka_worker.py
+      #- START_CMD=python3 /root/backend-ng/src/reid_DAL/reid_config_creator.py    ## use it first time to create consul sections
+    logging:
+      options:
+        max-size: 1g
+    
+
