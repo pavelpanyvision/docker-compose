@@ -17,6 +17,7 @@ services:
       - /sys:/host/sys:ro
       - /:/rootfs:ro
       - nvidia_dcgm_exporter_date:/etc/node-exporter:ro
+      - /var/www/html/monitor_metrics:/etc/node-exporter:ro
       #- /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
     command:
       - '--path.procfs=/host/proc'
