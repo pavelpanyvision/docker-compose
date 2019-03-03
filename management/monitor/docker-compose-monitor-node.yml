@@ -16,8 +16,8 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
-      - nvidia_dcgm_exporter_date:/etc/node-exporter:ro
-      - /var/www/html/monitor_metrics:/etc/node-exporter:ro
+      - /storage/monitor_metrics:/etc/node-exporter:ro
+      #- nvidia_dcgm_exporter_date:/etc/node-exporter:ro
       #- /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
     command:
       - '--path.procfs=/host/proc'
@@ -74,7 +74,8 @@ services:
     networks:
     - monitor-net
     volumes:
-      - nvidia_dcgm_exporter_date:/run/prometheus
+      #- nvidia_dcgm_exporter_date:/run/prometheus
+      - /storage/monitor_metrics:/run/prometheus
     deploy:
       resources:
         limits:
