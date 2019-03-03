@@ -720,8 +720,11 @@ services:
   #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
   #     - /etc/localtime:/etc/localtime:ro
   #    #- /etc/timezone:/etc/timezone:ro
+  #     - ./logs:$APP_DIR/logs:rw
   #   environment:
-  #     - ENABLE_CAMERA_SERVICE=true
+  #     - ENABLE_ANV_CAMERA_SERVICE=true
+  #     - LOG_DIR_PATH=./logs
+  #     - LOG_LEVEL=debug
   #   logging:
   #     options:
   #       max-size: 1g
