@@ -642,3 +642,93 @@ services:
 #      logging:
 #        options:
 #          max-size: 1g
+
+
+
+  # anv-groups-service:
+  #   image: gcr.io/anyvision-training/anv-groups-service:development
+  #   restart: on-failure
+  #   volumes:
+  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+  #     - /etc/localtime:/etc/localtime:ro
+  #    #- /etc/timezone:/etc/timezone:ro
+  #   environment:
+  #     - ENABLE_ANV_GROUPS_SERVICE=true
+  #   logging:
+  #     options:
+  #       max-size: 1g
+
+
+
+  # anv-notifications-service:
+  #   image: gcr.io/anyvision-training/anv-notifications-service:development
+  #   restart: on-failure
+  #   volumes:
+  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+  #     - /etc/localtime:/etc/localtime:ro
+  #    #- /etc/timezone:/etc/timezone:ro
+  #   environment:
+  #     - ENABLE_ANV_NOTIFICATIONS_SERVICE=true
+  #   logging:
+  #     options:
+  #       max-size: 1g
+
+
+
+  # anv-subjects-service:
+  #   image: gcr.io/anyvision-training/anv-subjects-service:development
+  #   restart: on-failure
+  #   volumes:
+  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+  #     - /etc/localtime:/etc/localtime:ro
+  #    #- /etc/timezone:/etc/timezone:ro
+  #   environment:
+  #     - ENABLE_ANV_SUBJECTS_SERVICE=true
+  #   logging:
+  #     options:
+  #       max-size: 1g
+
+
+
+  # camera-service:
+  #   image: gcr.io/anyvision-training/camera-service:developemnt
+  #   restart: on-failure
+  #   volumes:
+  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+  #     - /etc/localtime:/etc/localtime:ro
+  #    #- /etc/timezone:/etc/timezone:ro
+  #   environment:
+  #     - ENABLE_CAMERA_SERVICE=true
+  #   logging:
+  #     options:
+  #       max-size: 1g
+
+
+
+  #  anv-search-service:
+  #   image: gcr.io/anyvision-training/anv-search-service:developemnt
+  #   restart: on-failure
+  #   volumes:
+  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+  #     - /etc/localtime:/etc/localtime:ro
+  #    #- /etc/timezone:/etc/timezone:ro
+  #   environment:
+  #     - ENABLE_ANV_SEARCH_SERVICE=true
+  #   logging:
+  #     options:
+  #       max-size: 1g
+
+
+
+  # anv-detections-service:
+  #   image: gcr.io/anyvision-training/anv-detections-service:developemnt
+  #   restart: on-failure
+  #   volumes:
+  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+  #     - /etc/localtime:/etc/localtime:ro
+  #    #- /etc/timezone:/etc/timezone:ro
+  #   environment:
+  #     - ENABLE_ANV_DETECTIONS_SERVICE=true
+  #   logging:
+  #     options:
+  #       max-size: 1g
