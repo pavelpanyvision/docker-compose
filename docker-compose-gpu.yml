@@ -17,6 +17,11 @@ services:
     restart: always
     ports:
       - 5432:5432
+    environment:
+      # estimate the total MAX memory postgres will use (general estimate :)), can't set below 4 (ignoring)
+      - PG_MAX_MEMORY_GB=8
+      # max cpu's to use, can't set below 4 (ignoring)
+      - PG_MAX_CPU=8
     volumes:
       - /ssd/postgres:/var/lib/postgresql/data
       - /storage/backup_postgres:/backup
@@ -157,7 +162,7 @@ services:
       # default 100MB but better smaller with "small" kafka like ours :) 25MB
       - KAFKA_OFFSETS_TOPIC_SEGMENT_BYTES=26214400
       # setting kafka maxmemory, default is 1GB, prod max probably up to 6-8GB
-      - KAFKA_HEAP_OPTS=-Xmx3G -Xms3G
+      - KAFKA_HEAP_OPTS=-Xmx2G -Xms2G
     env_file:
       - env/global.env
     networks:
