@@ -2,6 +2,10 @@
 version: '3.3'
 
 
+volumes:
+  ift3_redis_data:  
+
+
 networks:
   prod:
     ipam:
@@ -35,6 +39,7 @@ services:
       - MONGO_DB_PORT=27017
       - PORT=3005
       - DISPLAY_TYPE=AC
+      #- DISPLAY_TYPE=IFT3
       - MONGO_DB_NAME=third_party_db
       - REDIS_HOST=ift3-redis.tls.ai
       - REDIS_PORT=6379
