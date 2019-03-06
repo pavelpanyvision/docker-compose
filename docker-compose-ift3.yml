@@ -26,6 +26,7 @@ services:
           - ift3-be.tls.ai
     ports:
       - 3005:3005
+      - 3022:3022
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
