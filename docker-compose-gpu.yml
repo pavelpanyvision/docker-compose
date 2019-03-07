@@ -87,7 +87,7 @@ services:
         aliases:
           - reid_service.tls.ai
     environment:
-      - START_CMD=python3 /root/backend-ng/src/reid_DAL/kafka_worker.py
+      - START_CMD=python3 /root/backend-ng/src/reid_DAL/reid_worker.py
     logging:
       options:
         max-size: 1g
@@ -105,7 +105,7 @@ services:
         aliases:
           - tracks_reid_service.tls.ai
     environment:
-      - START_CMD=python3 /root/backend-ng/src/reid_kafka_worker.py
+      - START_CMD=python3 /root/backend-ng/src/tracks_reid_worker.py
     logging:
       options:
         max-size: 1g
