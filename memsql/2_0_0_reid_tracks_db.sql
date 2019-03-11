@@ -87,12 +87,13 @@ CREATE TABLE `tracks_pipeline_errors` (
 
 
 DELIMITER //
-CREATE OR REPLACE PROCEDURE load_detection(batch QUERY(track json))
+CREATE OR REPLACE PROCEDURE load_tracks(batch QUERY(track json))
 AS
 DECLARE
 	err_msg VARCHAR(512) = '';
 BEGIN
 	BEGIN
+
 		INSERT IGNORE INTO `tracks`
 		(`track_id`,
 		`source_id`,
@@ -104,10 +105,10 @@ BEGIN
 		`collate_id`,
 		`gender`)
 		SELECT
-			track::$track_id,
+			track::$id,
 			track::$source_id,
-			track::%detection_type,
-			STR_TO_DATE(track::$creation_datetime,'%Y%m%d%H%i%S'),
+			track::%type,
+			STR_TO_DATE(track::$creation_timestamp,'%Y-%m-%dT%H:%i:%SZ'),
 			JSON_ARRAY_PACK(track::features),
 			track::%fe_quality,
 			track::detections,
@@ -122,15 +123,15 @@ BEGIN
 		`creation_datetime`,
 		`features`)
 		SELECT
-			track::$track_id,
+			track::$id,
 			track::$source_id,
-			track::%detection_type,
-			STR_TO_DATE(track::$creation_datetime,'%Y%m%d%H%i%S'),
+			track::%type,
+			STR_TO_DATE(track::$creation_timestamp,'%Y-%m-%dT%H:%i:%SZ'),
 			JSON_ARRAY_PACK(track::features)
 		FROM batch;
 	EXCEPTION WHEN OTHERS THEN
 			err_msg = exception_message();
-			CALL insert_error_row('load_detection',err_msg);
+			CALL insert_error_row('load_tracks',err_msg);
 			INSERT INTO `tracks_db`.`tracks_pipeline_errors`
 			(`guid`,
 			`creation_datetime`,
