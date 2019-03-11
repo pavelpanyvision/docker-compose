@@ -35,6 +35,8 @@ services:
       - frame_store_path=/data/frame_store/
       - redis_ip=backend
       - CMD=--config /root/pipeng/pipeNG.json
+    env_file:
+      - env/global.env
     logging:
       options:
         max-size: 1g
