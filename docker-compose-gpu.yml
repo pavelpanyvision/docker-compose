@@ -45,9 +45,9 @@ services:
     volumes:
       - /ssd/memsql:/var/lib/memsql
       - /storage/backup_memsql:/backup
-      - ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
-      # if need to deploy reid comment tracks db line and uncomment reid line
-      #- ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
+      - ./memsql/2_0_0_reid_tracks_db.sql:/mnt/setup_db.sql
+      #- /home/dima/dev_sandbox/protobuf-contract/build/python:/pipeline/protos/:ro
+      #- /home/dima/dev_sandbox/backend-ng/src/memsql_pipelines/tracks_from_kafka:/pipeline/scripts/
     environment:
       - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
       - MEMSQL_NODE_ROLE=AIO
@@ -117,14 +117,6 @@ services:
       - reid_consule_config_creator
       - memsql
 
-#TROUBLESHOOTING
-#MASTER_ID=$(gosu memsql memsql-admin list-nodes -q -r master | grep -vi 'listing')
-#gosu memsql memsql-admin stop-node --memsql-id $MASTER_ID -y
-#gosu memsql memsql-admin start-node --memsql-id $MASTER_ID -y
-#OR stop container and run
-#rm -rf /ssd/memsql  #now start memsql
-
-
 
 #  memsql-migrator:
 #    image: gcr.io/anyvision-training/memsql-migrator:19.02
@@ -169,17 +161,17 @@ services:
         aliases:
          - zookeeper.tls.ai
 
-#  kafka-hq:
-#    hostname: kafka-hq
-#    image:  gcr.io/anyvision-training/kafkahq:19.02
-#    ports:
-#      - "8765:8080"
-#    environment:
-#      KAFKAHQ_CONFIGURATION: "{ kafka { connections { my_kafka_cluster { bootstrap.servers: \"kafka.tls.ai:9092\" }}}}"
-#    networks:
-#      prod:
-#        aliases:
-#         - kafka-hq.tls.ai
+  kafka-hq:
+    hostname: kafka-hq
+    image:  gcr.io/anyvision-training/kafkahq:19.02
+    ports:
+      - "8765:8080"
+    environment:
+      KAFKAHQ_CONFIGURATION: "{ kafka { connections { my_kafka_cluster { bootstrap.servers: \"kafka.tls.ai:9092\" }}}}"
+    networks:
+      prod:
+        aliases:
+         - kafka-hq.tls.ai
 
 
   kafka:

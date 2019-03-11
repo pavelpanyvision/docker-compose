@@ -154,7 +154,6 @@ BEGIN
   AND creation_date = _creation_date;
 END //
 DELIMITER ;
-commit
 
 
 DELIMITER //
@@ -165,8 +164,8 @@ DECLARE
     max_memory_day DATE;
 BEGIN
 
-  min_memory_day = SCALAR('SELECT MIN(creation_date) FROM tracks_in_memory', QUERY(a INT));
-  max_memory_day = SCALAR('SELECT MAX(creation_date) FROM tracks_in_memory', QUERY(a INT));
+  min_memory_day = SCALAR('SELECT MIN(creation_date) FROM tracks_in_memory', QUERY(a DATE));
+  max_memory_day = SCALAR('SELECT MAX(creation_date) FROM tracks_in_memory', QUERY(a DATE));
 
   DROP TABLE IF EXISTS temp_search_results;
   CREATE TEMPORARY TABLE temp_search_results (track_id VARCHAR(36),source_id VARCHAR(36),score float);
