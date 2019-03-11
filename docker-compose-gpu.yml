@@ -40,9 +40,10 @@ services:
     volumes:
       - /ssd/memsql:/var/lib/memsql
       - /storage/backup_memsql:/backup
-      - ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
-      # if need to deploy reid comment tracks db line and uncomment reid line
+      # Choose only one option from below
       #- ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
+      #- ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
+      - ./memsql/1_21_1_reid_tracks_db.sql:/mnt/setup_db.sql
     environment:
       - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
       - MEMSQL_NODE_ROLE=AIO
@@ -56,6 +57,70 @@ services:
     logging:
       options:
         max-size: 1g
+
+  reid_consule_config_creator:
+    image: gcr.io/anyvision-training/backend-ng:development
+    #entrypoint: sleep infinity
+    restart: on-failure
+    ipc: host
+    networks:
+      prod:
+        aliases:
+          - reid_consule_config_creator.tls.ai
+    environment:
+      - START_CMD=python3 /root/backend-ng/src/reid_DAL/reid_config_creator.py    ## use it first time to create consul sections
+    logging:
+      options:
+        max-size: 1m
+    depends_on:
+      - consul
+      - consul-agent
+      - backend
+
+  reid_service:
+    image: gcr.io/anyvision-training/backend-ng:development
+    restart: always
+    #entrypoint: sleep infinity     ### uncoment if you dont have compiled projet in realease folder and commnent next "command" and "working_dir" section
+    ipc: host
+    networks:
+      prod:
+        aliases:
+          - reid_service.tls.ai
+    environment:
+      - START_CMD=python3 /root/backend-ng/src/reid_DAL/reid_worker.py
+    logging:
+      options:
+        max-size: 1g
+    depends_on:
+      - reid_consule_config_creator
+      - memsql
+
+  tracks_reid_service:
+    image: gcr.io/anyvision-training/backend-ng:development
+    restart: always
+    #entrypoint: sleep infinity     ### uncoment if you dont have compiled projet in realease folder and commnent next "command" and "working_dir" section
+    ipc: host
+    networks:
+      prod:
+        aliases:
+          - tracks_reid_service.tls.ai
+    environment:
+      - START_CMD=python3 /root/backend-ng/src/tracks_reid_worker.py
+    logging:
+      options:
+        max-size: 1g
+    depends_on:
+      - reid_consule_config_creator
+      - memsql
+
+#TROUBLESHOOTING
+#MASTER_ID=$(gosu memsql memsql-admin list-nodes -q -r master | grep -vi 'listing')
+#gosu memsql memsql-admin stop-node --memsql-id $MASTER_ID -y
+#gosu memsql memsql-admin start-node --memsql-id $MASTER_ID -y
+#OR stop container and run
+#rm -rf /ssd/memsql  #now start memsql
+
+
 
 #  memsql-migrator:
 #    image: gcr.io/anyvision-training/memsql-migrator:19.02
@@ -145,7 +210,7 @@ services:
       # keep old detection for 2GB if time is not greater than 48H
       - KAFKA_LOG_RETENTION_BYTES=2147483648
       # create detection topic with 3 partitions and 1 replica (all in one config)
-      - KAFKA_CREATE_TOPICS=detections:3:1,camera_statuses:1:1,collated_detections:3:1
+      - KAFKA_CREATE_TOPICS=anv.tracks.pipeng.new-tracks:3:1,anv.tracks.reid.new-tracks:3:1,camera_statuses:1:1,collated_detections:3:1,anv.poi.reid.actions:3:1,anv.poi.reid.responses:3:1
       # set broker max size message 2MB
       - KAFKA_MESSAGE_MAX_BYTES=2097152
       # default broker network threads is 3
@@ -156,6 +221,8 @@ services:
       - KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS=6
       # default 100MB but better smaller with "small" kafka like ours :) 25MB
       - KAFKA_OFFSETS_TOPIC_SEGMENT_BYTES=26214400
+      # setting kafka maxmemory, default is 1GB, prod max probably up to 6-8GB
+      - KAFKA_HEAP_OPTS=-Xmx3G -Xms3G
     env_file:
       - env/global.env
     networks:
@@ -685,8 +752,6 @@ services:
       options:
         max-size: 1g
 
-
-
   backend:
     image: gcr.io/anyvision-training/backend:on-demand-backend-for-pipeng
     restart: always
@@ -744,7 +809,6 @@ services:
       options:
         max-size: 1g
     ipc: host
-
 
 
   dante-proxy:
