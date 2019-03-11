@@ -130,7 +130,7 @@ BEGIN
 		FROM batch;
 	EXCEPTION WHEN OTHERS THEN
 			err_msg = exception_message();
-			CALL insert_error_row('delete_poi_groups',err_msg);
+			CALL insert_error_row('load_detection',err_msg);
 			INSERT INTO `tracks_db`.`tracks_pipeline_errors`
 			(`guid`,
 			`creation_datetime`,
