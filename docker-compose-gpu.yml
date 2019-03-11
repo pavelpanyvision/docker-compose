@@ -34,7 +34,7 @@ services:
         max-size: 1g
 
   memsql:
-    image: gcr.io/anyvision-training/memsql:19.02
+    image: gcr.io/anyvision-training/memsql:19.03
     restart: always
     networks:
       prod:
