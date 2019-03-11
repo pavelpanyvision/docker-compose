@@ -444,6 +444,17 @@ BEGIN
 END //
 DELIMITER ;
 
+
+CREATE OR REPLACE PIPELINE load_kafka_tracks
+AS LOAD DATA kafka "kafka.tls.ai:9092/anv.tracks.pipeng.new-tracks"
+BATCH_INTERVAL 500
+WITH TRANSFORM ("file:///pipelines/scripts/track_transform.py","", "")
+INTO PROCEDURE load_tracks;
+
+ALTER PIPELINE load_kafka_tracks SET OFFSETS EARLIEST;
+
+START PIPELINE load_kafka_tracks;
+
 #update finishe of first version
 UPDATE db_schema_version
 SET deploy_end = NOW(),

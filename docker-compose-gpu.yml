@@ -46,6 +46,7 @@ services:
       - /ssd/memsql:/var/lib/memsql
       - /storage/backup_memsql:/backup
       - ./memsql/2_0_0_reid_tracks_db.sql:/mnt/setup_db.sql
+      - ./memsql/pipelines:/pipelines
     environment:
       - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
       - MEMSQL_NODE_ROLE=AIO
