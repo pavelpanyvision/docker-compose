@@ -65,6 +65,7 @@ services:
     ports:
       - "1120:1120"
     environment:
+      - HTTP_PORT=1120
       - api_service_ip=api.tls.ai
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
       - RUN_AS_USER=user
@@ -80,7 +81,7 @@ services:
         max-size: 1g
 
   tracks-service:
-    image: gcr.io/anyvision-training/tracks-service:on-demand-jenkins-build
+    image: gcr.io/anyvision-training/tracks-service:development
     restart: always
     networks:
       prod:
@@ -91,7 +92,8 @@ services:
     ports:
       - "1121:1121"
     environment:
-      - SERVICE_NAME=tracks-service
+    - HTTP_PORT=1121
+    - SERVICE_NAME=tracks-service
       - api_service_ip=api.tls.ai
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
       - RUN_AS_USER=user
@@ -106,7 +108,7 @@ services:
         max-size: 1g
 
   permission-groups-service:
-    image: gcr.io/anyvision-training/permission-groups-service:on-demand-jenkins-build
+    image: gcr.io/anyvision-training/permission-groups-service:development
     restart: always
     networks:
       prod:
@@ -117,7 +119,8 @@ services:
     ports:
       - "1122:1122"
     environment:
-      - SERVICE_NAME=permission-groups-service
+    - HTTP_PORT=1122
+    - SERVICE_NAME=permission-groups-service
       - api_service_ip=api.tls.ai
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
       - RUN_AS_USER=user
@@ -128,31 +131,32 @@ services:
       options:
         max-size: 1g
 
-#  socket-service:
-#    image: gcr.io/anyvision-training/socket-service:on-demand-jenkins-build
-#    restart: always
-#    networks:
-#      prod:
-#        aliases:
-#        - socket-service.tls.ai
-#    volumes:
-#    - /etc/localtime:/etc/localtime:ro
-#    ports:
-#      - "1123:1123"
-#    environment:
-#    - SERVICE_NAME=socket-service
-#    - api_service_ip=api.tls.ai
-#    - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
-#    - RUN_AS_USER=user
-#    - ENABLE_CHOWN=false
-#    env_file:
-#    - env/global.env
-#    logging:
-#      options:
-#        max-size: 1g
+  socket-service:
+    image: gcr.io/anyvision-training/socket-service:development
+    restart: always
+    networks:
+      prod:
+        aliases:
+        - socket-service.tls.ai
+    volumes:
+    - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "1123:1123"
+    environment:
+    - HTTP_PORT=1123
+    - SERVICE_NAME=socket-service
+    - api_service_ip=api.tls.ai
+    - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
+    - RUN_AS_USER=user
+    - ENABLE_CHOWN=false
+    env_file:
+    - env/global.env
+    logging:
+      options:
+        max-size: 1g
 
   subjects-service:
-    image: gcr.io/anyvision-training/subjects-service:on-demand-jenkins-build
+    image: gcr.io/anyvision-training/subjects-service:development
     restart: always
     networks:
       prod:
@@ -163,7 +167,8 @@ services:
     ports:
       - "1124:1124"
     environment:
-      - SERVICE_NAME=subjects-service
+    - HTTP_PORT=1124
+    - SERVICE_NAME=subjects-service
       - api_service_ip=api.tls.ai
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
       - RUN_AS_USER=user
@@ -178,6 +183,16 @@ services:
       - S3_API_VERSION=2006-03-01
     env_file:
       - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+  docker-hoster:
+    image: gcr.io/anyvision-training/docker-hoster
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+      - /etc/hosts:/tmp/hosts
     logging:
       options:
         max-size: 1g
