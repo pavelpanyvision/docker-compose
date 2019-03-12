@@ -89,6 +89,9 @@ services:
       prod:
         aliases:
           - reid_service.tls.ai
+    volumes:
+      - /storage/logs/backend:/var/logs
+      #- /home/user/Projects/backend-ng:/root/backend-ng ### mount your local project directory to the container
     environment:
       - START_CMD=python3 /root/backend-ng/src/reid_DAL/reid_worker.py
     logging:
@@ -107,6 +110,9 @@ services:
       prod:
         aliases:
           - tracks_reid_service.tls.ai
+    volumes:
+      - /storage/logs/backend:/var/logs
+      #- /home/user/Projects/backend-ng:/root/backend-ng ### mount your local project directory to the container
     environment:
       - START_CMD=python3 /root/backend-ng/src/tracks_reid_worker.py
     logging:
