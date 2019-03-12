@@ -658,13 +658,13 @@ services:
     environment:
     - HTTP_PORT=1121
     - SERVICE_NAME=tracks-service
-      - api_service_ip=api.tls.ai
-      - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
-      - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-      - KAFKA_TOPICS_SOCKET=anv.socket.subject-service.push
-      - KAFKA_TOPICS_NEW_TRACK_ACTION=anv.tracks.track-service.actions
-      - FETCH_LAST_DAYS=5
+    - api_service_ip=api.tls.ai
+    - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
+    - RUN_AS_USER=user
+    - ENABLE_CHOWN=false
+    - KAFKA_TOPICS_SOCKET=anv.socket.subject-service.push
+    - KAFKA_TOPICS_NEW_TRACK_ACTION=anv.tracks.track-service.actions
+    - FETCH_LAST_DAYS=5
     env_file:
     - env/global.env
     logging:
