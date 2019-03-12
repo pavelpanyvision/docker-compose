@@ -1,0 +1,183 @@
+#filename: docker-compose-gpu.yml
+version: '3.3'
+volumes:
+  consul_data:
+  consul_agent_data:
+networks:
+  prod:
+services:
+  consul:
+    image: gcr.io/anyvision-production/consul:18.12
+    restart: always
+    networks:
+      prod:
+        aliases:
+        - consul.tls.ai
+    ports:
+      - "8500:8500"
+    volumes:
+      -  consul_data:/consul/data
+      - /etc/hostname:/etc/host_hostname:ro
+    environment:
+      - CMD=agent -server -bootstrap -ui
+      - CONSUL_SERVER=127.0.0.1
+      - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_ADDRESS=0.0.0.0
+      - JOB_NAME=consul
+      - DATACENTER=dc1
+      - SITE_NAME=local
+      - RUN_AS_USER=root
+    logging:
+      options:
+        max-size: 1g
+  consul-agent:
+    image: gcr.io/anyvision-production/consul:18.12
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - consul-agent.tls.ai
+    volumes:
+      - consul_agent_data:/consul/data
+      - /etc/hostname:/etc/host_hostname:ro
+    environment:
+      - CMD=agent -rejoin -retry-join consul.tls.ai -retry-max 10 -retry-interval 15s -disable-host-node-id
+      - CONSUL_SERVER=consul.tls.ai
+      - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_ADDRESS=0.0.0.0
+      - JOB_NAME=consul-agent
+      - DATACENTER=dc1
+      - SITE_NAME=local
+      - RUN_AS_USER=root
+    logging:
+      options:
+        max-size: 1g
+  camera-service:
+    image: gcr.io/anyvision-training/camera-service:development
+    restart: always
+    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
+    networks:
+      prod:
+        aliases:
+          - camera-service.tls.ai
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "1120:1120"
+    environment:
+      - api_service_ip=api.tls.ai
+      - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+      - KAFKA_GROUP=camera-service-kafka-group
+      - SEARCH_COLUMNS_NAMES=deviceName,cameraStatus,cameraGroup,createdAt,gpu,pipe
+      - PIPENG_HOST=pipeng-localnode.tls.ai
+      - PIPENG_PORT=50051
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+  tracks-service:
+    image: gcr.io/anyvision-training/tracks-service:on-demand-jenkins-build
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - tracks-service.tls.ai
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "1121:1121"
+    environment:
+      - SERVICE_NAME=tracks-service
+      - api_service_ip=api.tls.ai
+      - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+      - KAFKA_TOPICS_SOCKET=anv.socket.subject-service.push
+      - KAFKA_TOPICS_NEW_TRACK_ACTION=anv.tracks.track-service.actions
+      - FETCH_LAST_DAYS=5
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+  permission-groups-service:
+    image: gcr.io/anyvision-training/permission-groups-service:on-demand-jenkins-build
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - permission-groups-service.tls.ai
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "1122:1122"
+    environment:
+      - SERVICE_NAME=permission-groups-service
+      - api_service_ip=api.tls.ai
+      - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+#  socket-service:
+#    image: gcr.io/anyvision-training/socket-service:on-demand-jenkins-build
+#    restart: always
+#    networks:
+#      prod:
+#        aliases:
+#        - socket-service.tls.ai
+#    volumes:
+#    - /etc/localtime:/etc/localtime:ro
+#    ports:
+#      - "1123:1123"
+#    environment:
+#    - SERVICE_NAME=socket-service
+#    - api_service_ip=api.tls.ai
+#    - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
+#    - RUN_AS_USER=user
+#    - ENABLE_CHOWN=false
+#    env_file:
+#    - env/global.env
+#    logging:
+#      options:
+#        max-size: 1g
+
+  subjects-service:
+    image: gcr.io/anyvision-training/subjects-service:on-demand-jenkins-build
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - subjects-service.tls.ai
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "1124:1124"
+    environment:
+      - SERVICE_NAME=subjects-service
+      - api_service_ip=api.tls.ai
+      - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+      - S3_TEMP_BUCKET_NAME=tempBucket
+      - S3_ACCESS_KEY_ID=accessKey1
+      - S3_SECRET_ACCESS_KEY=verySecretKey1
+      - S3_ENDPOINT=seaweedfs-s3-localnode.tls.ai:8333
+      - S3_WEB_ACCESS_PROTOCOL=http
+      - S3_IS_FORCE_PATH_STYLE=true
+      - S3_SSL_IS_ENABLED=false
+      - S3_API_VERSION=2006-03-01
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
