@@ -733,18 +733,18 @@ services:
     environment:
     - HTTP_PORT=1124
     - SERVICE_NAME=subjects-service
-      - api_service_ip=api.tls.ai
-      - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
-      - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-      - S3_TEMP_BUCKET_NAME=tempBucket
-      - S3_ACCESS_KEY_ID=accessKey1
-      - S3_SECRET_ACCESS_KEY=verySecretKey1
-      - S3_ENDPOINT=seaweedfs-s3-localnode.tls.ai:8333
-      - S3_WEB_ACCESS_PROTOCOL=http
-      - S3_IS_FORCE_PATH_STYLE=true
-      - S3_SSL_IS_ENABLED=false
-      - S3_API_VERSION=2006-03-01
+    - api_service_ip=api.tls.ai
+    - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
+    - RUN_AS_USER=user
+    - ENABLE_CHOWN=false
+    - S3_TEMP_BUCKET_NAME=tempBucket
+    - S3_ACCESS_KEY_ID=accessKey1
+    - S3_SECRET_ACCESS_KEY=verySecretKey1
+    - S3_ENDPOINT=seaweedfs-s3-localnode.tls.ai:8333
+    - S3_WEB_ACCESS_PROTOCOL=http
+    - S3_IS_FORCE_PATH_STYLE=true
+    - S3_SSL_IS_ENABLED=false
+    - S3_API_VERSION=2006-03-01
     env_file:
     - env/global.env
     logging:
