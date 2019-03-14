@@ -20,7 +20,7 @@ groups:
     expr: sum by (instance) (node_load1) / count by(instance)(count by(instance, cpu)(node_cpu_seconds_total)) > 0.6
     for: 180s
     labels:
-      severity: warning
+      severity: critical
     annotations:
       summary: "Server under high load"
       description: "Docker host is under high load, the avg load 1m is at {{ $value}}. Reported by instance {{ $labels.instance }} of job {{ $labels.job }}."
@@ -29,7 +29,7 @@ groups:
     expr: (sum by (instance) (node_memory_MemTotal_bytes) - sum by (instance) (node_memory_MemFree_bytes + node_memory_Buffers_bytes + node_memory_Cached_bytes)) / sum by (instance) (node_memory_MemTotal_bytes) * 100 > 85
     for: 180s
     labels:
-      severity: warning
+      severity: critical
     annotations:
       summary: "Server memory is almost full"
       description: "Docker host memory usage is {{ humanize $value}}%. Reported by instance {{ $labels.instance }} of job {{ $labels.job }}."
@@ -38,7 +38,7 @@ groups:
     expr: sum by (instance,device) (sum by (instance,device) (node_filesystem_size_bytes{fstype=~"ext4|xfs"}) - sum by (instance,device) (node_filesystem_free_bytes{fstype=~"ext4|xfs"}))  / sum by (instance,device) (node_filesystem_size_bytes{fstype=~"ext4|xfs"}) * 100 > 85
     for: 180s
     labels:
-      severity: warning
+      severity: critical
     annotations:
       summary: "Server storage is almost full"
       description: "Docker host storage usage is {{ humanize $value}}%. Reported by instance {{ $labels.instance }} of job {{ $labels.job }}."

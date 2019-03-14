@@ -5,10 +5,17 @@ version: '3.3'
 volumes:
   redis_db_data:
   #api_gateway_keys:
+  consul_data:
+  consul_agent_data:
 
 
 networks:
   prod:
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 172.30.30.0/24
 
 
 services:
@@ -196,6 +203,34 @@ services:
 #         - kafka-mirror.tls.ai
 
 
+  memsql:
+    image: gcr.io/anyvision-training/memsql:19.02
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - memsql.tls.ai
+    ports:
+      - "3306:3306"
+    volumes:
+      - /ssd/memsql:/var/lib/memsql
+      - /storage/backup_memsql:/backup
+      - ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
+      # if need to deploy reid comment tracks db line and uncomment reid line
+      #- ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
+    environment:
+      - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
+      - MEMSQL_NODE_ROLE=AIO
+      - JOB_NAME=memsql
+      - MEMSQL_PASSWORD=password
+      - AGG_MEMORY_LIMIT=4g
+      - LEAF_MEMORY_LIMIT=124g
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
 
   node-rtsp-rtmp-server:
     image: gcr.io/anyvision-training/node-rtsp-rtmp-server:18.12
@@ -367,7 +402,7 @@ services:
     ports:
       - "8500:8500"
     volumes:
-      - /storage/consul-data:/consul/data
+      -  consul_data:/consul/data
       - /etc/hostname:/etc/host_hostname:ro
     environment:
       - CMD=agent -server -bootstrap -ui
@@ -393,10 +428,8 @@ services:
       prod:
         aliases:
           - consul-agent.tls.ai
-    ports:
-      - "8501:8500"
     volumes:
-      #- /storage/consul-agent-data:/consul/data
+      - consul_agent_data:/consul/data
       - /etc/hostname:/etc/host_hostname:ro
     environment:
       - CMD=agent -rejoin -retry-join consul.tls.ai -retry-max 10 -retry-interval 15s -disable-host-node-id
@@ -555,7 +588,6 @@ services:
       - RUN_AS_USER=user
       #- ENABLE_DOCKERIZE=false
       - ENABLE_CHOWN=false
-      - APP_DIR=/home/user/Broadcaster/
     env_file:
       - env/global.env
       - env/broadcaster.env
@@ -630,7 +662,6 @@ services:
       - REDIS_HOST=redis.tls.ai
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
-      - APP_DIR=/home/user/api-gateway
     env_file:
       - env/api-gateway.env
       - env/global.env
@@ -667,8 +698,6 @@ services:
       - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - RUN_AS_USER=user
       - ENABLE_CHOWN=false
-      - APP_DIR=/home/user/Dash-API/
-      - FEATURE_TOGGLE_KAFKA=true ### Requires running pipeng with s3 mode; only works when adding cameras/videos with dashboard
     env_file:
       - env/global.env
       - env/api.env
@@ -779,8 +808,6 @@ services:
     logging:
       options:
         max-size: 1g
-
-
 
   # dashboard-updater:
   #   image: gcr.io/anyvision-training/dashboard-updater:latest

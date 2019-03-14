@@ -1,0 +1,68 @@
+#me: docker-compose-track-archive-migration.yml
+version: '3.3'
+
+networks:
+  prod:
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 172.30.30.0/24
+
+
+services:
+
+  memsql:
+    image: gcr.io/anyvision-training/memsql:19.02
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - memsql.tls.ai
+    ports:
+      - "3306:3306"
+    volumes:
+      - /ssd/memsql:/var/lib/memsql
+      - /storage/backup_memsql:/backup
+      - /etc/localtime:/etc/localtime:ro
+      - ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
+      # if need to deploy reid comment tracks db line and uncomment reid line
+      #- ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
+    environment:
+      - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
+      - MEMSQL_NODE_ROLE=AIO
+      - JOB_NAME=memsql
+      - MEMSQL_PASSWORD=password
+      - AGG_MEMORY_LIMIT=4g
+      - LEAF_MEMORY_LIMIT=124g
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+  memsqlmig:
+    image: gcr.io/anyvision-training/memsql-migrator:19.02
+    depends_on:
+      - "memsql"
+    networks:
+      prod:
+        aliases:
+          - memsqlmig.tls.ai
+    volumes:
+      # need to mount the root of track_archive_service_data in old server 
+      - /storage/track_archive_service_data:/storage
+      - /ssd/track_archive_service_data:/ssd
+    #environment:
+      # these are the defaults in the script, can be change with ENV
+      #- MEMSQL_HOST=memsql.tls.ai
+      #- MEMSQL_PORT=3306
+      #- MEMSQL_USER=root
+      #- MEMSQL_PASSWORD=password
+      #- MEMSQL_DATABASE=tracks_db
+      #- MEMSQL_IMPORT_THREADS=4
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g

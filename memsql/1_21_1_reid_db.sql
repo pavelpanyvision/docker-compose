@@ -90,10 +90,10 @@ BEGIN
 			current_is_ignored = current_json::is_ignored;
 			current_features_data = current_json::features_data;
                         array_features_data_length = JSON_LENGTH(current_features_data);
-		        START TRANSACTION;
-		        # clean exists
-                        DELETE FROM poi
-                        WHERE poi_id = current_poi_id;
+			START TRANSACTION;
+		# clean exists
+                DELETE FROM poi
+                WHERE poi_id = current_poi_id;
                 # Insert new
                 FOR z IN 0 .. (array_features_data_length-1) LOOP
 					current_feature_data = JSON_EXTRACT_JSON(current_features_data,z);
@@ -253,3 +253,4 @@ UPDATE db_schema_version
 SET deploy_end = NOW(),
 is_success = 'true'
 WHERE version_num = 1;
+

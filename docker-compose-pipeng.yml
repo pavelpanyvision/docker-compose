@@ -3,7 +3,13 @@ version: '3.3'
 
 networks:
   prod:
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 172.30.30.0/24
 
+        
 services:
 
   pipeng:
@@ -25,6 +31,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
+      - /storage/pipe_logs:/root/pipeng/pipe_logs
       #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
       #- /root/pipeNG:/root/pipeng                           ### mount your local project directory to the container
     environment:
@@ -37,6 +44,7 @@ services:
       - CMD=--config /root/pipeng/pipeNG.json
     env_file:
       - env/global.env
+
     logging:
       options:
         max-size: 1g

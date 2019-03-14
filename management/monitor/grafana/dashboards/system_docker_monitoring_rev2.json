@@ -462,7 +462,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(dcgm_gpu_utilization{instance=~\"$server:.*\"}) * 100",
+          "expr": "sum(irate(dcgm_gpu_utilization{instance=~\"$server:.*\"}[2m]))",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -1925,7 +1925,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "GPU Usage",
+      "title": "GPU Memory Usage",
       "tooltip": {
         "msResolution": false,
         "shared": true,
