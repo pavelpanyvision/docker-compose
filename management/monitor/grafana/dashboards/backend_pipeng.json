@@ -139,12 +139,14 @@
           "expr": "sum(dcgm_fb_used * 1024 * 1024) by (gpu)",
           "format": "time_series",
           "intervalFactor": 1,
+          "legendFormat": "GPU Memory Usage",
           "refId": "A"
         },
         {
           "expr": "sum(dcgm_fb_free * 1024 * 1024) by (gpu)",
           "format": "time_series",
           "intervalFactor": 1,
+          "legendFormat": "GPU Free Memory",
           "refId": "B"
         }
       ],
