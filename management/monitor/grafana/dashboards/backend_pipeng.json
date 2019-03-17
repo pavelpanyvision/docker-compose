@@ -18,6 +18,177 @@
   "links": [],
   "panels": [
     {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "prometheus",
+      "decimals": 1,
+      "format": "percent",
+      "gauge": {
+        "maxValue": 1,
+        "minValue": 0,
+        "show": true,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 47,
+      "interval": "1s",
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "expr": "dcgm_gpu_temp",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "refId": "A"
+        }
+      ],
+      "thresholds": "0.85, 0.90",
+      "title": "GPU Utilization",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "prometheus",
+      "fill": 1,
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 49,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum(dcgm_fb_used * 1024 * 1024) by (gpu)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "refId": "A"
+        },
+        {
+          "expr": "sum(dcgm_fb_free * 1024 * 1024) by (gpu)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "refId": "B"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "GPU Usage",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "bytes",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -28,7 +199,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 0
+        "y": 9
       },
       "id": 17,
       "interval": "1s",
@@ -112,7 +283,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 0
+        "y": 9
       },
       "id": 20,
       "interval": "1s",
@@ -196,7 +367,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 0
+        "y": 9
       },
       "id": 16,
       "interval": "1s",
@@ -280,7 +451,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 0
+        "y": 9
       },
       "id": 33,
       "interval": "1s",
@@ -364,7 +535,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 8
+        "y": 17
       },
       "hideTimeOverride": false,
       "id": 2,
@@ -449,7 +620,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 8
+        "y": 17
       },
       "hideTimeOverride": false,
       "id": 14,
@@ -534,7 +705,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 8
+        "y": 17
       },
       "id": 4,
       "interval": "1s",
@@ -618,7 +789,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 8
+        "y": 17
       },
       "id": 12,
       "interval": "1s",
@@ -702,7 +873,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 16
+        "y": 25
       },
       "id": 8,
       "interval": "1s",
@@ -786,7 +957,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 16
+        "y": 25
       },
       "id": 15,
       "interval": "1s",
@@ -870,7 +1041,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 16
+        "y": 25
       },
       "id": 6,
       "interval": "1s",
@@ -954,7 +1125,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 16
+        "y": 25
       },
       "id": 13,
       "interval": "1s",
@@ -1039,7 +1210,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 24
+        "y": 33
       },
       "id": 10,
       "interval": "0.01m",
@@ -1124,7 +1295,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 24
+        "y": 33
       },
       "id": 11,
       "interval": "1s",
@@ -1209,7 +1380,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 24
+        "y": 33
       },
       "id": 36,
       "interval": "0.01m",
@@ -1294,7 +1465,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 24
+        "y": 33
       },
       "id": 39,
       "interval": "0.01m",
@@ -1379,7 +1550,7 @@
         "h": 8,
         "w": 9,
         "x": 3,
-        "y": 32
+        "y": 41
       },
       "id": 31,
       "interval": "0.01m",
@@ -1464,7 +1635,7 @@
         "h": 8,
         "w": 9,
         "x": 12,
-        "y": 32
+        "y": 41
       },
       "id": 32,
       "interval": "0.01m",
@@ -1548,7 +1719,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 40
+        "y": 49
       },
       "hideTimeOverride": false,
       "id": 21,
@@ -1633,7 +1804,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 40
+        "y": 49
       },
       "hideTimeOverride": false,
       "id": 22,
@@ -1718,7 +1889,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 40
+        "y": 49
       },
       "hideTimeOverride": false,
       "id": 24,
@@ -1803,7 +1974,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 40
+        "y": 49
       },
       "hideTimeOverride": false,
       "id": 23,
@@ -1888,7 +2059,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 48
+        "y": 57
       },
       "hideTimeOverride": false,
       "id": 25,
@@ -1973,7 +2144,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 48
+        "y": 57
       },
       "hideTimeOverride": false,
       "id": 28,
@@ -2058,7 +2229,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 48
+        "y": 57
       },
       "hideTimeOverride": false,
       "id": 26,
@@ -2143,7 +2314,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 48
+        "y": 57
       },
       "hideTimeOverride": false,
       "id": 29,
@@ -2228,7 +2399,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 56
+        "y": 65
       },
       "hideTimeOverride": false,
       "id": 30,
@@ -2313,7 +2484,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 56
+        "y": 65
       },
       "hideTimeOverride": false,
       "id": 27,
@@ -2398,7 +2569,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 56
+        "y": 65
       },
       "hideTimeOverride": false,
       "id": 40,
@@ -2483,7 +2654,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 56
+        "y": 65
       },
       "hideTimeOverride": false,
       "id": 41,
