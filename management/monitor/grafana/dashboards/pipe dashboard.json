@@ -1,7 +1,7 @@
 {
   "__inputs": [
     {
-      "name": "prometheus",
+      "name": "DS_PROMETHEUS",
       "label": "prometheus",
       "description": "",
       "type": "datasource",
@@ -1168,7 +1168,7 @@
         "x": 8,
         "y": 32
       },
-      "id": 25,
+      "id": 26,
       "legend": {
         "avg": false,
         "current": false,
@@ -1192,7 +1192,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "pipe_redis_server_cpu_ram",
+          "expr": "pipe_objectdetection_cpu_percent",
           "format": "time_series",
           "interval": "1s",
           "intervalFactor": 1,
@@ -1203,7 +1203,7 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "pipe_redis_server_cpu_ram",
+      "title": "pipe_objectdetection_cpu_percent",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1338,7 +1338,7 @@
         "x": 0,
         "y": 40
       },
-      "id": 28,
+      "id": 25,
       "legend": {
         "avg": false,
         "current": false,
@@ -1362,7 +1362,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "pipe_featureextraction_cpu_percent",
+          "expr": "pipe_redis_server_cpu_ram",
           "format": "time_series",
           "interval": "1s",
           "intervalFactor": 1,
@@ -1373,7 +1373,7 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "pipe_featureextraction_cpu_percent",
+      "title": "pipe_redis_server_cpu_ram",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1423,7 +1423,7 @@
         "x": 8,
         "y": 40
       },
-      "id": 26,
+      "id": 28,
       "legend": {
         "avg": false,
         "current": false,
@@ -1447,7 +1447,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "pipe_objectdetection_cpu_percent",
+          "expr": "pipe_featureextraction_cpu_percent",
           "format": "time_series",
           "interval": "1s",
           "intervalFactor": 1,
@@ -1458,7 +1458,7 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "pipe_objectdetection_cpu_percent",
+      "title": "pipe_featureextraction_cpu_percent",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1593,6 +1593,176 @@
         "x": 0,
         "y": 48
       },
+      "id": 32,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "pipe_processvideofile_cpu_ram",
+          "format": "time_series",
+          "interval": "1s",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "pipe_processvideofile_cpu_ram",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "prometheus",
+      "fill": 1,
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 48
+      },
+      "id": 31,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "pipe_processvideofile_cpu_percent",
+          "format": "time_series",
+          "interval": "1s",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "pipe_processvideofile_cpu_percent",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "prometheus",
+      "fill": 1,
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 48
+      },
       "id": 30,
       "legend": {
         "avg": false,
@@ -1705,5 +1875,5 @@
   "timezone": "",
   "title": "pipe dashboard",
   "uid": "bdwtSNqik",
-  "version": 4
+  "version": 3
 }
