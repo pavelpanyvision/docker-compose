@@ -616,8 +616,6 @@ services:
       options:
         max-size: 1g
 
-
-
   # dashboard-updater:
   #   image: gcr.io/anyvision-training/dashboard-updater:latest
   #   restart: always
