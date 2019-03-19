@@ -33,6 +33,22 @@ services:
       options:
         max-size: 1g
 
+  memsql-schema:
+    image: gcr.io/anyvision-training/db-migrator:19.03
+    restart: on-failure
+    networks:
+      prod:
+        aliases:
+          - memsql-schema.tls.ai
+    environment:
+      - DB=mysql
+      - DB_ACTION=update
+      - DB_NAME=tracks_db,reid_db
+      - DB_HOST=memsql.tls.ai
+    logging:
+      options:
+        max-size: 1g      
+
   memsql:
     image: gcr.io/anyvision-training/memsql:19.03
     restart: always
@@ -45,16 +61,15 @@ services:
     volumes:
       - /ssd/memsql:/var/lib/memsql
       - /storage/backup_memsql:/backup
-      - ./memsql/2_0_0_reid_tracks_db.sql:/mnt/setup_db.sql
+      # need to start working with db-migrator
+      #- ./memsql/2_0_0_reid_tracks_db.sql:/mnt/setup_db.sql
       - ./memsql/pipelines:/pipelines
     environment:
       - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
       - MEMSQL_NODE_ROLE=AIO
-      - JOB_NAME=memsql
       - MEMSQL_PASSWORD=password
-      - AGG_MEMORY_LIMIT=4g
-      - LEAF_MEMORY_LIMIT=60g
-      - log_level_containerpilot=DEBUG
+      - AGG_MEMORY_LIMIT=4
+      - LEAF_MEMORY_LIMIT=124
     env_file:
       - env/global.env
     logging:
