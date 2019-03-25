@@ -35,7 +35,7 @@ services:
 
   migration_manager:
     image: gcr.io/anyvision-training/migration_manager:development
-    #restart: always
+    restart: "no"
     networks:
       prod:
         aliases:
@@ -55,7 +55,7 @@ services:
       - MONGO_DB_DUMP_PATH=/data/db_backups/
       - MONGO_DB_IP=mongodb
       - MONGO_DB_PORT=27017
-      #- ENABLE_CHOWN=false
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
     logging:

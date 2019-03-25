@@ -13,7 +13,7 @@ networks:
 services:
 
   memsql:
-    image: gcr.io/anyvision-training/memsql:19.02
+    image: gcr.io/anyvision-training/memsql:19.03
     restart: always
     networks:
       prod:
@@ -24,17 +24,12 @@ services:
     volumes:
       - /ssd/memsql:/var/lib/memsql
       - /storage/backup_memsql:/backup
-      - /etc/localtime:/etc/localtime:ro
-      - ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
-      # if need to deploy reid comment tracks db line and uncomment reid line
-      #- ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
     environment:
       - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
       - MEMSQL_NODE_ROLE=AIO
-      - JOB_NAME=memsql
       - MEMSQL_PASSWORD=password
-      - AGG_MEMORY_LIMIT=4g
-      - LEAF_MEMORY_LIMIT=124g
+      - AGG_MEMORY_LIMIT=4
+      - LEAF_MEMORY_LIMIT=124
     env_file:
       - env/global.env
     logging:
@@ -42,7 +37,7 @@ services:
         max-size: 1g
 
   memsqlmig:
-    image: gcr.io/anyvision-training/memsql-migrator:19.02
+    image: gcr.io/anyvision-training/memsql-migrator:19.03
     depends_on:
       - "memsql"
     networks:
@@ -66,3 +61,22 @@ services:
     logging:
       options:
         max-size: 1g
+
+
+  memsql-schema:
+    image: gcr.io/anyvision-training/db-migrator:19.03
+    restart: "no"
+    networks:
+      prod:
+        aliases:
+          - memsql-schema.tls.ai
+    environment:
+      - DB_HOST=memsql.tls.ai
+      - DB_ACTION=update
+      - DB=mysql
+      - DB_NAME=tracks_db:1.21.1
+    logging:
+      options:
+        max-size: 5m
+    depends_on:
+      - memsql
