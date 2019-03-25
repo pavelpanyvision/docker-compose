@@ -539,7 +539,7 @@ services:
     ports:
       - "5555:5555"
     volumes:
-      - /home/ori/Projects/insights-backend:/insights-backend
+      - /home/user/repos/insights-backend:/insights-backend
     depends_on:
       - backend
       - memsql
@@ -567,7 +567,7 @@ services:
       - "9022:9022" #ssh
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
-      - /home/ori/license:/home/user/license:ro
+      - /home/user/license:/home/user/license:ro
       - /ssd/backend_data:/root/pipe_data
       - /ssd/track_archive_service_data:/root/track_archive_service_data
       - /ssd/reid_service_data:/root/reid_service_data
@@ -577,7 +577,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
-      - /home/ori/Projects/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+      #- /home/ori/Projects/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
