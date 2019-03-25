@@ -528,6 +528,25 @@ services:
       options:
         max-size: 1g
 
+  insights-schema-builder:
+    image: gcr.io/anyvision-training/db-migrator:latest
+    restart: on-failure
+    networks:
+      prod:
+        aliases:
+          - insights-schema-builder.tls.ai
+    environment:
+      - PG_HOST=memsql.tls.ai
+      - DB_ACTION=update
+      - DB=mysql
+      - DB_NAME=insights_db
+    logging:
+      options:
+        max-size: 5m
+    depends_on:
+      - memsql
+  
+        
   insights:
     image: insights-backend
     #entrypoint: sleep infinity
