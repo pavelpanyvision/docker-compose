@@ -421,7 +421,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:development
+    image: gcr.io/anyvision-production/api-gateway:1.21.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -495,7 +495,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend:development
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.21.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -516,7 +516,7 @@ services:
       - "9067:9067"
       - "9068:9068"
       - "9069:9069"
-      - "9022:9022" #ssh
+      #- "9022:9022" #ssh
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /ssd/license:/home/user/license:ro
@@ -557,7 +557,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:development
+    image: gcr.io/anyvision-production/broadcaster:1.21.1
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -588,7 +588,7 @@ services:
 
 
   # master-sync-service:
-  #   image: gcr.io/anyvision-production/master-sync-service:development
+  #   image: gcr.io/anyvision-production/master-sync-service:1.21.1
   #   restart: always
   #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
   #   hostname: master-sync-service

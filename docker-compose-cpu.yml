@@ -421,7 +421,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:development
+    image: gcr.io/anyvision-production/api-gateway:1.21.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -495,7 +495,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-cpu:development
+    image: gcr.io/anyvision-production/backend-cpu-pyconcrete:1.21.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -561,7 +561,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:development
+    image: gcr.io/anyvision-production/broadcaster:1.21.1
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -592,7 +592,7 @@ services:
 
 
   # master-sync-service:
-  #   image: gcr.io/anyvision-production/master-sync-service:development
+  #   image: gcr.io/anyvision-production/master-sync-service:1.21.1
   #   restart: always
   #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
   #   hostname: master-sync-service
