@@ -140,7 +140,6 @@ services:
   webrtc-streamer:
     image: gcr.io/anyvision-training/webrtc-streamer:19.03
     restart: always
-    entrypoint: sleep 1d
     networks:
       prod:
         aliases:

@@ -1,12 +1,12 @@
-#filename: docker-compose-cpu.yml
+#filename: docker-compose-gpu.yml
 version: '3.3'
 
 
-volumes:
-  redis_db_data:
+#volumes:
+  #redis_db_data:
   #api_gateway_keys:
-  consul_data:
-  consul_agent_data:
+  #consul_data:
+  #consul_agent_data:
 
 
 networks:
@@ -17,16 +17,117 @@ networks:
       -
         subnet: 172.30.30.0/24
 
+
 services:
 
 
-  node-rtsp-rtmp-server:
+  consul:
+    image: gcr.io/anyvision-training/consul:18.12
+    restart: always
+    networks:
+      prod:
+        aliases:
+        - consul.tls.ai
+    ports:
+      - "8500:8500"
+    volumes:
+      -  /ssd/consul_data:/consul/data
+      - /etc/hostname:/etc/host_hostname:ro
+    environment:
+      - CMD=agent -server -bootstrap -ui
+      - CONSUL_SERVER=127.0.0.1
+      - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_ADDRESS=0.0.0.0
+      - JOB_NAME=consul
+      - DATACENTER=dc1
+      - SITE_NAME=local
+      - RUN_AS_USER=root
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  consul-agent:
+    image: gcr.io/anyvision-training/consul:18.12
+    restart: always
+    networks:
+      #host_network:
+      prod:
+        aliases:
+          - consul-agent.tls.ai
+    volumes:
+      - /ssd/consul_agent_data:/consul/data
+      - /etc/hostname:/etc/host_hostname:ro
+    environment:
+      - CMD=agent -rejoin -retry-join consul.tls.ai -retry-max 10 -retry-interval 15s -disable-host-node-id
+      - CONSUL_SERVER=consul.tls.ai
+      - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_ADDRESS=0.0.0.0
+      - JOB_NAME=consul-agent
+      - DATACENTER=dc1
+      - SITE_NAME=local
+      - RUN_AS_USER=root
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+  memsql:
+    image: gcr.io/anyvision-training/memsql:19.03
+    restart: always
+    networks:
+      prod:
+        aliases:
+          - memsql.tls.ai
+    ports:
+      - "3306:3306"
+    volumes:
+      - /ssd/memsql:/var/lib/memsql
+      - /storage/backup_memsql:/backup
+    environment:
+      - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
+      - MEMSQL_NODE_ROLE=AIO
+      - MEMSQL_PASSWORD=password
+      - AGG_MEMORY_LIMIT=4
+      - LEAF_MEMORY_LIMIT=124
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+  memsql-schema:
+    image: gcr.io/anyvision-training/db-migrator:19.03
+    restart: "no"
+    networks:
+      prod:
+        aliases:
+          - memsql-schema.tls.ai
+    environment:
+      - DB_HOST=memsql.tls.ai
+      - DB_ACTION=update
+      - DB=mysql
+      - DB_NAME=tracks_db:1.21.1
+    logging:
+      options:
+        max-size: 5m
+    depends_on:
+      - memsql
+
+
+  rtstreamer:
     image: gcr.io/anyvision-training/node-rtsp-rtmp-server:18.12
     restart: always
     networks:
       prod:
         aliases:
          - node-rtsp-rtmp-server-localnode.tls.ai
+         - rtstreamer.tls.ai
     # ports:
     #   - "80:80"
     #   - "1935:1935"
@@ -37,29 +138,30 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-training/webrtc-streamer:18.12
+    image: gcr.io/anyvision-training/webrtc-streamer:19.03
     restart: always
     networks:
       prod:
         aliases:
           - webrtc-localnode.tls.ai
+          - webrtc.tls.ai
     ports:
       - "8000:8000"
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
       - WEBRTC_STREAMER_OPTIONS=-H0.0.0.0:8000s -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
-      - CONSUL_AGENT=consul-agent.tls.ai
+      #- HOST_IP=<ip of the host>
+      - WAN_MODE=false
+      - WAN_STUN_URL=stun.l.google.com:19302
       - APIGATEWAY_IP=apigateway.tls.ai
       - APIGATEWAY_PROTOCOL=https
       - APIGATEWAY_PORT=9443
-      - NODE_RTSP_IP=node-rtsp-rtmp-server-localnode.tls.ai
+      - NODE_RTSP_IP=rtstreamer.tls.ai
       - NODE_RTSP_PROTOCOL=rtsp
       - NODE_RTSP_PORT=80
       - CAMERA_INT_REQ_TIME=1000
       - CRT_CA_BUNDLE=/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
-      #- WAN_MODE=true
-      #- WAN_STUN_URL=stun.l.google.com:19302
     logging:
       options:
         max-size: 1g
@@ -70,14 +172,19 @@ services:
     image: gcr.io/anyvision-training/coturn:18.12
     restart: always
     network_mode: host
+    #ports:
+    #  - "3478:3478"
+    #  - "50000-50100:50000-50100/udp"
+    # networks: 
+    #   prod:
+    #     aliases:
+    #       - coturn.tls.ai    
     volumes:
       - /ssd/coturn:/var/lib/coturn
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
-      - COTURN_CMD=-v -n --log-file stdout --min-port 50000 --max-port 50050 --no-stun --no-multicast-peers --no-loopback-peers --fingerprint --user webrtc:webrtc --lt-cred-mech --realm tls.ai --cert /usr/local/share/ca-certificates/tls.ai/tls.ai.full.pem --pkey /usr/local/share/ca-certificates/tls.ai/tls.ai.key
+      - COTURN_CMD=-v -n --log-file stdout --min-port 50000 --max-port 50100 --no-stun --no-multicast-peers --no-loopback-peers --fingerprint --user webrtc:webrtc --lt-cred-mech --realm tls.ai --cert /usr/local/share/ca-certificates/tls.ai/tls.ai.full.pem --pkey /usr/local/share/ca-certificates/tls.ai/tls.ai.key
       #- EXTERNAL_IP=
-      - CONSUL_AGENT=127.0.0.1
-      - CONSUL_AGENT_PORT=8501
     logging:
       options:
         max-size: 1g
@@ -96,7 +203,7 @@ services:
     environment:
       - SEAWEEDFS_MASTER=1
       - SEAWEEDFS_MASTER_PORT=9333
-      - SEAWEEDFS_MASTER_CMD=-port=9333 -ip=seaweedfs-master-localnode.tls.ai -mdir=/data -peers=seaweedfs-master-localnode.tls.ai:9333
+      - SEAWEEDFS_MASTER_CMD=-port=9333 -ip=seaweedfs-master-localnode.tls.ai -mdir=/data -peers=seaweedfs-master-localnode.tls.ai:9333    
     volumes:
       - /ssd/seaweed-master:/data
     logging:
@@ -115,7 +222,7 @@ services:
     environment:
       - SEAWEEDFS_VOLUME=1
       - SEAWEEDFS_VOLUME_PORT=8080
-      - SEAWEEDFS_VOLUME_CMD=-port=8080 -ip=seaweedfs-volume-localnode.tls.ai -index=memory -max=100000 -mserver=seaweedfs-master-localnode.tls.ai:9333 -dir=/data
+      - SEAWEEDFS_VOLUME_CMD=-port=8080 -ip=seaweedfs-volume-localnode.tls.ai -index=memory -max=10000000 -mserver=seaweedfs-master-localnode.tls.ai:9333 -dir=/data    
     volumes:
       - /storage/seaweed:/data
     logging:
@@ -138,7 +245,7 @@ services:
     environment:
       - SEAWEEDFS_FILER=1
       - SEAWEEDFS_FILER_PORT=8888
-      - SEAWEEDFS_FILER_CMD=-ip=seaweedfs-filer-localnode.tls.ai -master=seaweedfs-master-localnode.tls.ai:9333
+      - SEAWEEDFS_FILER_CMD=-ip=seaweedfs-filer-localnode.tls.ai -master=seaweedfs-master-localnode.tls.ai:9333     
     volumes:
       - ./seaweedfs/filer.toml:/etc/seaweedfs/filer.toml
       - /ssd/seaweed-master:/data
@@ -169,65 +276,8 @@ services:
         max-size: 1g
 
 
-
-  consul:
-    image: gcr.io/anyvision-training/consul:18.12
-    restart: always
-    networks:
-      prod:
-        aliases:
-        - consul.tls.ai
-    ports:
-      - "8500:8500"
-    volumes:
-      -  consul_data:/consul/data
-      - /etc/hostname:/etc/host_hostname:ro
-    environment:
-      - CMD=agent -server -bootstrap -ui
-      - CONSUL_SERVER=127.0.0.1
-      - CONSUL_BIND_INTERFACE=eth0
-      - CONSUL_CLIENT_ADDRESS=0.0.0.0
-      - JOB_NAME=consul
-      - DATACENTER=dc1
-      - SITE_NAME=local
-      - RUN_AS_USER=root
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  consul-agent:
-    image: gcr.io/anyvision-training/consul:18.12
-    restart: always
-    networks:
-      prod:
-        aliases:
-          - consul-agent.tls.ai
-    volumes:
-      - consul_agent_data:/consul/data
-      - /etc/hostname:/etc/host_hostname:ro
-    environment:
-      - CMD=agent -rejoin -retry-join consul.tls.ai -retry-max 10 -retry-interval 15s -disable-host-node-id
-      - CONSUL_SERVER=consul.tls.ai
-      - CONSUL_BIND_INTERFACE=eth0
-      - CONSUL_CLIENT_ADDRESS=0.0.0.0
-      - JOB_NAME=consul-agent
-      - DATACENTER=dc1
-      - SITE_NAME=local
-      - RUN_AS_USER=root
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
   nginx:
-    image: gcr.io/anyvision-training/nginx:18.12
+    image: gcr.io/anyvision-training/nginx:19.03
     restart: always
     networks:
       prod:
@@ -241,10 +291,13 @@ services:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
       - aws_host="seaweedfs-s3-localnode.tls.ai:8333"
+      - error_log_level=info
+      - access_log=on
+      - rewrite_log=on
+      - dns_resolver=127.0.0.1 
     env_file:
       - env/global.env
     logging:
@@ -252,6 +305,19 @@ services:
         max-size: 1g
 
 
+
+  certificator:
+    image: gcr.io/anyvision-training/certificator:latest
+    restart: on-failure
+    #command: --disable-services --no-exitkills --debug sleep infinity
+    volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - ENABLE_COPY_CERT=true
+    logging:
+      options:
+        max-size: 1g
 
   cron:
     image: gcr.io/anyvision-training/supercronic:18.12
@@ -264,9 +330,8 @@ services:
       - /storage:/var/www/html
       - ./crontab/site_crontab:/etc/crontabs/crontab
       - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
     environment:
-      - TO_DATE_TRACK_DELETE=30
+      - TO_DATE_TRACK_DELETE=30   
     env_file:
       - env/global.env
     logging:
@@ -284,15 +349,14 @@ services:
         aliases:
           - rabbitmq.tls.ai
     # these ports should be opened only in development mode
-    #ports:
-    #  - "5671:5671"
-    #  - "5672:5672"
-    #  - "15672:15672"
-    #  - "15671:15671"
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "15672:15672"
+      - "15671:15671"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro      
     env_file:
       - env/global.env
     logging:
@@ -312,8 +376,7 @@ services:
       #- "27017:27017"
     volumes:
       - /ssd/mongo_db_data:/data/db
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro          
     env_file:
       - env/global.env
     logging:
@@ -332,80 +395,28 @@ services:
     sysctls:
       - net.core.somaxconn=511
     volumes:
-      - redis_db_data:/data:rw
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
+      - /ssd/redis_db_data:/data:rw
+      - /etc/localtime:/etc/localtime:ro         
     logging:
       options:
         max-size: 1g
 
 
 
-  broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:development
+  dante-proxy:
+    image: gcr.io/anyvision-training/dante-proxy:18.12
     restart: always
-    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
-    hostname: broadcaster
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
-      prod:
-        aliases:
-          - broadcaster.tls.ai
+      - prod
     ports:
-      - "38392:38392"
+      - "1080:1080"
     volumes:
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    depends_on:
-      - api
-    environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38392
-      - api_service_ip=api.tls.ai
-      - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
-      - RUN_AS_USER=user
-      #- ENABLE_DOCKERIZE=false
-      - ENABLE_CHOWN=false
-      - APP_DIR=/home/user/Broadcaster/
-    env_file:
-      - env/global.env
-      - env/broadcaster.env
+      - ./socks/sockd.conf:/etc/sockd.conf         
     logging:
       options:
         max-size: 1g
 
-
-
-  # master-sync-service:
-  #   image: gcr.io/anyvision-training/master-sync-service:development
-  #   restart: always
-  #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
-  #   hostname: master-sync-service
-  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-  #   #those port should be opened only development mode
-  #   #ports:
-  #   #  - "16180:16180"
-  #   networks:
-  #     prod:
-  #       aliases:
-  #         - master-sync-service.tls.ai
-  #   volumes:
-  #     - /storage:/var/www/html
-  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-  #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
-  #   depends_on:
-  #     - api
-  #   environment:
-  #     #- ENABLE_DOCKERIZE=false
-  #     - ENABLE_CHOWN=false
-  #     - RUN_AS_USER=user
-  #   env_file:
-  #     - env/global.env
-  #     - env/master-sync-service.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
 
 
 
@@ -427,7 +438,6 @@ services:
       - /ssd/apigateway/keys:/home/user/api-gateway/config/keys
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/API-gateway:/home/user/api-gateway         ### mount your local project directory to the container
     depends_on:
       - redis
@@ -440,11 +450,10 @@ services:
       - GATEWAY_URL=http://apigateway.tls.ai:8080
       - REDIS_HOST=redis.tls.ai
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-      - APP_DIR=/home/user/api-gateway
+      - ENABLE_CHOWN=false         
     env_file:
-      - env/api-gateway.env
       - env/global.env
+      - env/api-gateway.env
     logging:
       options:
         max-size: 1g
@@ -468,7 +477,6 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
@@ -476,28 +484,12 @@ services:
       - MONGO_DB_IP=mongodb.tls.ai
       - CA_HOST=apigateway.tls.ai
       - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
+      - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false
-      - APP_DIR=/home/user/Dash-API/
+      - ENABLE_CHOWN=false        
     env_file:
       - env/global.env
       - env/api.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  certificator:
-    image: gcr.io/anyvision-training/certificator:latest
-    restart: on-failure
-    #command: --disable-services --no-exitkills --debug sleep infinity
-    volumes:
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-      - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-    environment:
-      - ENABLE_COPY_CERT=true
     logging:
       options:
         max-size: 1g
@@ -509,6 +501,8 @@ services:
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    depends_on:
+      - memsql
     networks:
       prod:
         aliases:
@@ -527,23 +521,23 @@ services:
       - "9022:9022" #ssh
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
-      - /home/user/license:/home/user/license:ro
-      - /ssd/backend_data:/root/pipe_data
-      - /ssd/track_archive_service_data:/root/track_archive_service_data
+      - /ssd/license:/home/user/license:ro
+      - /ssd/pipe_data:/root/pipe_data
+      #- /ssd/track_archive_service_data:/root/track_archive_service_data
       - /ssd/reid_service_data:/root/reid_service_data
       - /storage:/var/www/html
       #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
-      - ENABLE_OPENSSH_SERVICE=true
-      - BACKEND_OPENSSH_PORT=9022
       - misc_pipe_cpu_mode=true
       - NVIDIA_VISIBLE_DEVICES=
       - NVIDIA_DRIVER_CAPABILITIES=
+      - misc_gpu_encoding=false  
+      - ENABLE_OPENSSH_SERVICE=true
+      - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - external_ip=proc-localnode.tls.ai
       - storage_ip=nginx-localnode.tls.ai
@@ -554,12 +548,14 @@ services:
       - reid_service_ip=reid-localnode.tls.ai
       - collate_service_ip=coll-localnode.tls.ai
       - track_archive_service_ip=arch-localnode.tls.ai
-      - frame_store_rtmp_url=node-rtsp-rtmp-server-localnode.tls.ai
+      - frame_store_rtmp_url=rtstreamer.tls.ai
       - frame_store_rtmp_port=80
-      - misc_gpu_encoding=false      
+      - misc_gpu_encoding=true
+      - memsql_host=memsql.tls.ai
+      - memsql_port=3306
     env_file:
-      - env/backend.env
       - env/global.env
+      - env/backend.env
     logging:
       options:
         max-size: 1g
@@ -567,57 +563,68 @@ services:
 
 
 
-  dante-proxy:
-    image: gcr.io/anyvision-training/dante-proxy:18.12
+
+  broadcaster:
+    image: gcr.io/anyvision-training/broadcaster:development
     restart: always
+    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
+    hostname: broadcaster
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
-      - prod
+      prod:
+        aliases:
+          - broadcaster.tls.ai
     ports:
-      - "1080:1080"
+      - "38392:38392"
     volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
-      - ./socks/sockd.conf:/etc/sockd.conf
+    depends_on:
+      - api
+    environment:
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38392
+      - api_service_ip=api.tls.ai
+      - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
+      - RUN_AS_USER=user
+      #- ENABLE_DOCKERIZE=false
+      - ENABLE_CHOWN=false     
+    env_file:
+      - env/global.env
+      - env/broadcaster.env
     logging:
       options:
         max-size: 1g
 
 
-
-  docker-hoster:
-    image: gcr.io/anyvision-training/docker-hoster
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock
-      - /etc/hosts:/tmp/hosts
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  # dashboard-updater:
-  #   image: gcr.io/anyvision-training/dashboard-updater:latest
+  # master-sync-service:
+  #   image: gcr.io/anyvision-training/master-sync-service:development
   #   restart: always
+  #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
+  #   hostname: master-sync-service
+  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+  #   #those port should be opened only development mode
+  #   #ports:
+  #   #  - "16180:16180"
   #   networks:
-  #     - prod
-  #   ports:
-  #     - "8888:8888"
+  #     prod:
+  #       aliases:
+  #         - master-sync-service.tls.ai
   #   volumes:
-  #     - /ssd/dashboards:/opt/nginx/html:rw
+  #     - /storage:/var/www/html
+  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
   #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
+  #   depends_on:
+  #     - api
   #   environment:
-  #     - limit_rate_speed=0
-  #     - DASHBOARD_VERSION=1.20.0
-  #     - ENABLE_FETCHER=false
-  #     - ENABLE_NGINX=true
+  #     #- ENABLE_DOCKERIZE=false
+  #     - ENABLE_CHOWN=false
+  #     - RUN_AS_USER=user
   #   env_file:
   #     - env/global.env
+  #     - env/master-sync-service.env
   #   logging:
   #     options:
   #       max-size: 1g
-
-
 
 #    push-notification:
 #      image: gcr.io/anyvision-training/push-notification-service:master
@@ -637,8 +644,48 @@ services:
 #      - FIREBASE_ADMIN_TOKEN=AAAA
 #      - RUN_AS_USER=user
 #      - ENABLE_CHOWN=false
+#      - RMQ_API_USER=user
+#      - RMQ_API_PASS=password
+#      - MONGO_DB_NAME=push-notifications
+#      - MONGO_DB_IP=mongodb.tls.ai
+#      - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672
 #      env_file:
 #      - env/global.env
 #      logging:
 #        options:
 #          max-size: 1g
+
+
+
+  # dashboard-updater:
+  #   image: gcr.io/anyvision-training/dashboard-updater:latest
+  #   restart: always
+  #   networks:
+  #     - prod
+  #   ports:
+  #     - "8888:8888"
+  #   volumes:
+  #     - /ssd/dashboards:/opt/nginx/html:rw
+  #     - /etc/localtime:/etc/localtime:ro
+  #   environment:
+  #     - limit_rate_speed=0
+  #     - DASHBOARD_VERSION=1.20.0
+  #     - ENABLE_FETCHER=false
+  #     - ENABLE_NGINX=true
+  #   env_file:
+  #     - env/global.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
+
+
+
+  docker-hoster:
+    image: gcr.io/anyvision-training/docker-hoster
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+      - /etc/hosts:/tmp/hosts
+    logging:
+      options:
+        max-size: 1g
