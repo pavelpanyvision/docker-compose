@@ -1,35 +1,19 @@
-version: '3.3'
-
-volumes:
-  backend_data:
-
-networks:
-  anyvision:
+version: '3'
 
 services:
-
   dslr:
     restart: always
     privileged: true
-    networks:
-      - anyvision
-    image: gcr.io/anyvision-training/dslr:gphoto
+    #image: dslr:latest
+    image: gcr.io/anyvision-training/dslr:master
+
     volumes:
-      - backend_data:/root/pipe_data
-      - /storage:/var/www/html
-      - /storage/dslr:/etc/dslr
-      - /storage/cameraMount:/root/mount
+      - /storage/dslr_db:/root/dslr_db
+      - /storage/dslr_sync:/tmp/dslr_sync
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /dev/bus/usb/:/dev/bus/usb
       - /etc/localtime:/etc/localtime:ro
+
     environment:
       - DISPLAY=${DISPLAY:-:1}
-      - pipe_cpu_mode=true
-      - ENABLE_CHMOD=true
-      - ENABLE_CONFD=true
-      - ENABLE_WATCHER=true
-      - ENABLE_GPHOTO=true
-      - ENABLE_DOCKER_LOG=true
-    env_file:
-      - env/dslr.env
-      - env/backend.env
+      - GLOG_minloglevel=2
