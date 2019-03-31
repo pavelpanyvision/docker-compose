@@ -548,7 +548,7 @@ services:
   
         
   insights-backend:
-    image: gcr.io/anyvision-training/insights-backend:on-demand-ori
+    image: gcr.io/anyvision-training/insights-backend:development
     #entrypoint: sleep infinity
     restart: always
     networks:
