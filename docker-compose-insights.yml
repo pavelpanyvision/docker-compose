@@ -13,15 +13,15 @@ networks:
   prod:
     ipam:
       driver: default
-      config:
-      -
-        subnet: 172.30.30.0/24
+#      config:
+#      -
+#        subnet: 172.30.30.0/24
 
 
 services:
 
   memsql:
-    image: gcr.io/anyvision-training/memsql:19.02
+    image: gcr.io/anyvision-training/memsql:19.03
     restart: always
     networks:
       prod:
@@ -547,7 +547,7 @@ services:
       - memsql
   
         
-  insights:
+  insights-backend:
     image: gcr.io/anyvision-training/insights-backend:on-demand-ori
     #entrypoint: sleep infinity
     restart: always
@@ -557,11 +557,75 @@ services:
           - insights.tls.ai
     ports:
       - "5555:5555"
-    volumes:
-      - /home/ori/Projects/insights-backend:/root/insights-backend
+    environment:
+      - MEMSQL_USERNAME=root
+      - MEMSQL_PASSWORD=password
+      - MEMSQL_HOSTNAME=memsql.tls.ai
+      - MEMSQL_DBNAME=insights_db
+      - INSIGHT_BACKEND_BIND_ADDRESS=0.0.0.0
+      - INSIGHT_BACKEND_BIND_PORT=5555
+      - SERVER_DEBUG=True
+      - INSIGHT_BACKEND_LOG_NAME=insights-logs.log
+      - LOG_LEVEL=10 # {50: 'CRITICAL', 40: 'ERROR', 30: 'WARNING', 20: 'INFO', 10: 'DEBUG', 0: 'NOTSET'
+      - INSIGHT_MAX_BYTES=10 ** 7  # 10 MB
+      - INSIGHT_BACKEND_BACKUP_COUNT=5
+    #volumes:
+    #  - /home/ori/Projects/insights-backend:/root/insights-backend
     depends_on:
       - backend
       - memsql
+
+  insights-service:
+    image: gcr.io/anyvision-training/insights-service:development
+    restart: always
+    networks:
+      prod:
+        aliases:
+        - insights-service.tls.ai
+        - insights-api.tls.ai
+    ports:
+    - 3003:3003
+    volumes:
+    - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: 1g
+
+  insights-webui:
+    image: gcr.io/anyvision-training/insights-webui:development
+    restart: always
+    networks:
+      prod:
+        aliases:
+        - insights-webui.tls.ai
+    ports:
+    - 80:3000
+    volumes:
+    - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: 1g
+
+  postgres:
+    image: gcr.io/anyvision-training/postgres:19.03
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      # estimate the total MAX memory postgres will use (general estimate :)), can't set below 4 (ignoring)
+      - PG_MAX_MEMORY_GB=8
+      # max cpu's to use, can't set below 4 (ignoring)
+      - PG_MAX_CPU=8
+    volumes:
+      - /ssd/postgres:/var/lib/postgresql/data
+      - /storage/backup_postgres:/backup
+    networks:
+      prod:
+        aliases:
+          - postgres.tls.ai
+    logging:
+      options:
+        max-size: 1g
 
   backend:
     image: gcr.io/anyvision-training/backend:on-demand-insights
@@ -703,3 +767,6 @@ services:
 #      logging:
 #        options:
 #          max-size: 1g
+
+
+
