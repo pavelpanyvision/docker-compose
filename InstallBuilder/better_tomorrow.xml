@@ -32,6 +32,9 @@
                         <distributionFile>
                             <origin>${env(WORKSPACE)}/${project.version}/InstallBuilder/scripts/remove_docker_and_network.sh</origin>
                         </distributionFile>
+                        <distributionFile>
+                            <origin>${env(WORKSPACE)}/${project.version}/InstallBuilder/scripts/change_network.sh</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
             </folderList>
@@ -133,6 +136,15 @@
                     <useMSDOSPath>0</useMSDOSPath>
                 </runProgram>
                 <runProgram>
+                    <customErrorMessage>Cannot stop or remove docker containers and network</customErrorMessage>
+                    <program>${installdir}/remove_docker_and_network.sh</program>
+                    <programArguments></programArguments>
+                    <progressText>removing docker container, prod and default networks before checking license </progressText>
+                    <show>0</show>
+                    <useMSDOSPath>0</useMSDOSPath>
+                    <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
+                </runProgram>
+                <runProgram>
                     <program>docker-compose</program>
                     <programArguments>-f docker-compose.yml -p network up --no-start backend</programArguments>
                     <progressText>Getting license version - create backend container</progressText>
@@ -167,6 +179,15 @@
                 <runProgram>
                     <program>echo</program>
                     <programArguments>"${hw_fingerprint}" &gt; /home/${username}/hw_fingerprint.txt</programArguments>
+                </runProgram>
+                <runProgram>
+                    <customErrorMessage>Cannot stop or remove docker containers and network</customErrorMessage>
+                    <program>${installdir}/remove_docker_and_network.sh</program>
+                    <programArguments></programArguments>
+                    <progressText>removing docker container, prod and default networks before checking license </progressText>
+                    <show>0</show>
+                    <useMSDOSPath>0</useMSDOSPath>
+                    <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
                 </runProgram>
             </postInstallationActionList>
             <readyToInstallActionList>
