@@ -366,34 +366,34 @@ def generic_pipeline_method() {
                             env.build_output_dir = "${HOME}/installbuilder-18.12.0/output"
 
                             echo "pushing to aws s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME} and to s3://${BUCKET_NAME}/installbuilder-whitelabel/${DOCKER_COMPOSE_REPO_BRANCH_NAME}"
-                            
+
                             if ( "${INSTALLATION_REPO_BRANCH_NAME}" == 'master') {
                                 parallel push_GPU: {
-                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run --acl public-read")
                                         },
                                         push_CPU: {
-                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run --acl public-read")
                                         },
                                         push_GPU_WHITE: {
-                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
+                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run --acl public-read")
                                         },
                                         push_CPU_WHITE: {
-                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
+                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run --acl public-read")
                                         }
                             }
 
                             else if ( "${INSTALLATION_REPO_BRANCH_NAME}" == 'development') {
                                 parallel push_GPU: {
-                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run s3://${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run --acl public-read")
                                         },
                                         push_CPU: {
-                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run s3://${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run --acl public-read")
                                         },
                                         push_GPU_WHITE: {
-                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
+                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run --acl public-read")
                                         },
                                         push_CPU_WHITE: {
-                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
+                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run --acl public-read")
                                         }
                             }
 
@@ -410,18 +410,18 @@ def generic_pipeline_method() {
                             echo "Cleaning dashboard AppImages..."
                             sh("rm -f ${env.WORKSPACE}/*.AppImage")
                             if ( "${INSTALLATION_REPO_BRANCH_NAME}" == 'master') {
-                                echo "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run"
-                                echo "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run"
+                                echo "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run"
+                                echo "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run"
 
-                                echo "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
-                                echo "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
+                                echo "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run"
+                                echo "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run"
                             }
                             else if ( "${INSTALLATION_REPO_BRANCH_NAME}" == 'development') {
-                                echo "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run"
-                                echo "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run"
+                                echo "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run"
+                                echo "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run"
 
-                                echo "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
-                                echo "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
+                                echo "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run"
+                                echo "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run"
                             }
                             else {
                                 echo "No branch for Installation repository was selected"
@@ -489,10 +489,10 @@ def notification() {
             
             env.sendemail_body="Production: \n" +
                     "New Installer for Better Tomorrow is ready. Please use the following details: \n" +
-                    "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run\n" +
-                    "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run\n" +
-                    "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run\n" +
-                    "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
+                    "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run\n" +
+                    "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run\n" +
+                    "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run\n" +
+                    "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run"
 
             withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'jenkins_gmail_account', usernameVariable: 'EMAIL_USERNAME', passwordVariable: 'EMAIL_PASSWORD']]) {
 
@@ -514,10 +514,10 @@ def notification() {
 
             env.sendemail_body="Development: \n" +
                     "New Installer for Better Tomorrow is ready. Please use the following details: \n" +
-                    "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run\n" +
-                    "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run\n" +
-                    "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run\n" +
-                    "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
+                    "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run\n" +
+                    "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-local-gpu-linux-x64-installer.run\n" +
+                    "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-loca-cpu-linux-x64-installer.run\n" +
+                    "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-local-cpu-linux-x64-installer.run"
             
             
             withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'jenkins_gmail_account', usernameVariable: 'EMAIL_USERNAME', passwordVariable: 'EMAIL_PASSWORD']]) {
