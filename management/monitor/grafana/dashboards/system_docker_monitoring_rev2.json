@@ -1674,50 +1674,38 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(node_disk_read_bytes_total{instance=~\"$server:.*\"}) + sum(node_disk_written_bytes_total{instance=~\"$server:.*\"})",
+          "expr": "sum(irate(node_disk_read_bytes_total{instance=~\"$server:.*\",device!~\"dm.*\"}[2m]))",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "Total",
+          "legendFormat": "Total Read B/s",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(irate(node_disk_written_bytes_total{instance=~\"$server:.*\",device!~\"dm.*\"}[2m]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Total Write B/s",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(irate(node_disk_read_bytes_total{instance=~\"$server:.*\",device!~\"dm.*\"}[2m])) by (device)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Read B/s {{device}}",
           "refId": "C"
         },
         {
-          "expr": "sum(node_disk_read_bytes_total{instance=~\"$server:.*\"}) ",
+          "expr": "sum(irate(node_disk_written_bytes_total{instance=~\"$server:.*\",device!~\"dm.*\"}[2m])) by (device)",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "OUT",
+          "legendFormat": "Write B/s {{device}}",
           "refId": "D"
-        },
-        {
-          "expr": "sum(node_disk_written_bytes_total{instance=~\"$server:.*\"})",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "legendFormat": "IN",
-          "refId": "E"
-        },
-        {
-          "expr": "sum(node_disk_read_bytes_total{instance=~\"$server:.*\",device!~\"sr.*\"}) by (device)",
-          "format": "time_series",
-          "hide": false,
-          "intervalFactor": 2,
-          "legendFormat": "OUT on /{{device}}",
-          "metric": "node_disk_bytes_read",
-          "refId": "A",
-          "step": 600
-        },
-        {
-          "expr": "sum(node_disk_written_bytes_total{instance=~\"$server:.*\",device!~\"sr.*\"}) by (device)",
-          "format": "time_series",
-          "intervalFactor": 2,
-          "legendFormat": "IN on /{{device}}",
-          "metric": "",
-          "refId": "B",
-          "step": 600
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Disk R/W Bps",
+      "title": "Disk R/W",
       "tooltip": {
         "msResolution": true,
         "shared": true,
