@@ -148,6 +148,7 @@
                     <program>docker-compose</program>
                     <programArguments>-f docker-compose.yml -p network up --no-start backend</programArguments>
                     <progressText>Getting license version - create backend container</progressText>
+                    <run>0</run>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
                     <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
@@ -156,13 +157,14 @@
                     <program>docker-compose</program>
                     <programArguments>-f docker-compose.yml -p network start backend</programArguments>
                     <progressText>Getting license version - start backend container</progressText>
+                    <run>0</run>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
                     <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
                 </runProgram>
                 <setInstallerVariableFromScriptOutput>
-                    <exec>docker</exec>
-                    <execArgs>exec network_backend_1 /bin/bash -c "license-ver -o"</execArgs>
+                    <exec>docker-compose</exec>
+                    <execArgs>-f docker-compose.yml run --rm backend --task license-ver -o</execArgs>
                     <name>hw_fingerprint</name>
                     <progressText>Getting license version</progressText>
                     <show>0</show>
@@ -172,6 +174,7 @@
                     <program>docker-compose</program>
                     <programArguments>-f docker-compose.yml -p network stop backend</programArguments>
                     <progressText>Getting license version - stop backend container</progressText>
+                    <run>0</run>
                     <show>0</show>
                     <useMSDOSPath>0</useMSDOSPath>
                     <workingDirectory>/home/${username}/docker-compose/${product_version}</workingDirectory>
