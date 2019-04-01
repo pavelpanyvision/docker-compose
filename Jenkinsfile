@@ -9,18 +9,27 @@ timeout(time: 120, unit: 'MINUTES') {
             // Clean up work space
             step([$class: 'WsCleanup'])
 
+            // if the parapets came from upstream
+            if (!env.GIT_REPO_NAME && !env.GIT_OWNER) {
+                def split = "${JOB_NAME}".split('/')
+                env.GIT_BRANCH_NAME = split[1]
+                echo "the branch name is:${GIT_BRANCH_NAME}"
+                env.DEPLOY_NAME = split[0]
+                echo "the deploy name is:${DEPLOY_NAME}"
+            }
+
             checkout changelog: false, poll: false, scm: [
                     $class: 'GitSCM',
-                    branches: [[name: '*/master']],
-                    extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'jenkins/jenkins-pipeline/Jenkinsfile_installation']]]],
-                    userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/devops.git"]]
+                    branches: [[name: "*/${GIT_BRANCH_NAME}"]],
+                    extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'InstallBuilder/Jenkinsfile_installation']]]],
+                    userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/docker-compose.git"]]
             ]
 
             //load remote jenkins_pipeline
-            def generic_pipeline = load "jenkins/jenkins-pipeline/Jenkinsfile_installation"
+            def generic_pipeline = load "InstallBuilder/Jenkinsfile_installation"
             //start remote jenkins_pipeline
             generic_pipeline.generic_pipeline_method()
-
+            
         } //end catch
         catch(err){
 

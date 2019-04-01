@@ -1,0 +1,596 @@
+#!/usr/bin/env groovy
+import hudson.model.*
+import java.text.SimpleDateFormat
+
+// Global Parameters
+env.BUCKET_NAME = "airgap.anyvision.co"
+env.BUCKET_NAME_WHITE = "facesearch.co"
+
+// Format the date as yyMMddHHmm
+def dateFormat = new SimpleDateFormat("yyMMdd")
+def date = new Date()
+env.TAG_DATE = dateFormat.format(date)
+echo "the date is: ${TAG_DATE}"
+
+def generic_pipeline_method() {
+    timeout(time: 90, unit: 'MINUTES') {
+        timestamps() {
+            node('cicd') {
+
+                ansiColor('xterm') {
+                    try {
+
+                        // set default email value
+                        env.email_default_recipients = 'devops@anyvision.co'
+                        env.EMAIL_SEND = env.email_default_recipients
+
+                        // clean up work space
+                        step([$class: 'WsCleanup'])
+
+                        // if the parapets came from upstream
+                        if (!env.GIT_REPO_NAME && !env.GIT_OWNER) {
+                            def split = "${JOB_NAME}".split('/')
+                            env.GIT_BRANCH_NAME = split[1]
+                            echo "the branch name is:${GIT_BRANCH_NAME}"
+                            env.DEPLOY_NAME = split[0]
+                            echo "the deploy name is:${DEPLOY_NAME}"
+                        }
+
+                        properties([
+                                parameters([
+                                        string(name: 'DOCKER_COMPOSE_REPO_BRANCH_NAME', defaultValue: "${GIT_BRANCH_NAME}", description: 'This is the docker-compose repository branch name'),
+                                        choice(name: 'INSTALLATION_REPO_BRANCH_NAME', choices:['master', 'development'], defaultValue: 'master', description: 'This is the installation repository branch name'),
+                                ]),
+                                [$class: 'jenkins.model.BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '50']],
+                                disableConcurrentBuilds(),
+                                pipelineTriggers([githubPush()]),
+                        ])
+
+
+                        stage('GIT') {
+
+                            env.EMAIL_SEND = 'devops@anyvision.co'
+                            echo "docker compose repo branch name is : ${DOCKER_COMPOSE_REPO_BRANCH_NAME}"
+
+                            //download docker-compose repository
+                            dir("${DOCKER_COMPOSE_REPO_BRANCH_NAME}") {
+
+                                checkout changelog: false, poll: false, scm: [
+                                        $class: 'GitSCM',
+                                        branches: [[name: "*/${DOCKER_COMPOSE_REPO_BRANCH_NAME}"]],
+                                        userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/docker-compose.git"]]
+                                ]
+                            } // end of dir
+
+
+                            //download airgap script
+                            dir ("devops") {
+                                checkout changelog: false, poll: false, scm: [
+                                    $class           : 'GitSCM',
+                                    branches         : [[name: "*/master"]],
+                                    extensions: [
+                                            [$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [
+                                                    [path: "scripts/air_gapped_deployment/airgap"]
+                                            ]
+                                            ],
+                                    ],
+                                    userRemoteConfigs: [[credentialsId: 'av-jenkins-reader', url: "https://github.com/AnyVisionltd/devops.git"]]
+                                ]
+                            }// end of dir
+
+                        } // end of stage GIT
+
+
+                        stage('Parameters & Preparation'){
+
+                            //notifications
+                            env.EMAIL_SEND = 'devops@anyvision.co'
+
+                            //builder
+                            env.builder_dir = "${HOME}/installbuilder-18.12.0/bin"                                                        
+                            env.installbuilder_dir = "${env.WORKSPACE}/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/InstallBuilder"
+                            env.scripts_path = "${env.WORKSPACE}/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/InstallBuilder/scripts"
+                            env.airgap_script_path = "${env.WORKSPACE}/devops/scripts/air_gapped_deployment"
+
+                            //docker compose directories
+                            env.docker_compose_workspace_dir = "${env.WORKSPACE}/${DOCKER_COMPOSE_REPO_BRANCH_NAME}"
+                            env.docker_compose_elk_workspace_dir = "${docker_compose_workspace_dir}/management/elk"
+                            env.docker_compose_monitor_workspace_dir = "${docker_compose_workspace_dir}/management/monitor"
+
+                            //docker compose type
+                            env.docker_compose_GPU_type = "GPU"                           
+                            env.docker_compose_CPU_type = "CPU"
+                            // env.docker_compose_HQ_type = "HQ"
+                            // env.docker_compose_HQ_migration_type = "HQ-migration"
+                            // env.docker_compose_ELK_type = "ELK"
+                            // env.docker_compose_ELK_NODE_type = "ELK_NODE"
+                            // env.docker_compose_MONITOR_MASTER_type = "MONITOR_MASTER"
+                            // env.docker_compose_MONITOR_NODE_type = "MONITOR_NODE"
+                            env.docker_compose_GPU_WHITE_type = "GPU_WHITE"                        
+                            env.docker_compose_CPU_WHITE_type = "CPU_WHITE"
+                            // env.docker_compose_HQ_WHITE_type = "HQ_WHITE"
+                            // env.docker_compose_HQ_migration_WHITE_type = "HQ_migration_WHITE"
+                            // env.docker_compose_ELK_WHITE_type = "ELK_WHITE"
+                            // env.docker_compose_ELK_NODE_WHITE_type = "ELK_NODE_WHITE"
+                            // env.docker_compose_MONITOR_MASTER_WHITE_type = "MONITOR_MASTER_WHITE"
+                            // env.docker_compose_MONITOR_NODE_WHITE_type = "MONITOR_NODE_WHITE"
+
+                            //set docker compose new folders
+                            env.docker_compose_GPU_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_GPU_type}"
+                            env.docker_compose_CPU_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_CPU_type}"
+                            // env.docker_compose_HQ_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_HQ_type}"
+                            // env.docker_compose_HQ_migration_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_HQ_migration_type}"
+                            // env.docker_compose_ELK_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_type}"
+                            // env.docker_compose_ELK_NODE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_NODE_type}"
+                            // env.docker_compose_MONITOR_MASTER_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_MONITOR_MASTER_type}"
+                            // env.docker_compose_MONITOR_NODE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_MONITOR_NODE_type}"
+                            env.docker_compose_GPU_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_GPU_WHITE_type}"                            
+                            env.docker_compose_CPU_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_CPU_WHITE_type}"
+                            // env.docker_compose_HQ_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_HQ_WHITE_type}"
+                            // env.docker_compose_HQ_migration_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_HQ_migration_WHITE_type}"
+                            // env.docker_compose_ELK_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_WHITE_type}"
+                            // env.docker_compose_ELK_NODE_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_ELK_NODE_WHITE_type}"
+                            // env.docker_compose_MONITOR_MASTER_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_MONITOR_MASTER_WHITE_type}"
+                            // env.docker_compose_MONITOR_NODE_WHITE_folder = "${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${docker_compose_MONITOR_NODE_WHITE_type}"
+
+                            //set images destination folders
+                            env.docker_images_destination_folder_GPU = "${env.WORKSPACE}/docker_${docker_compose_GPU_folder}"                           
+                            env.docker_images_destination_folder_CPU = "${env.WORKSPACE}/docker_${docker_compose_CPU_folder}"
+                            // env.docker_images_destination_folder_HQ = "${env.WORKSPACE}/docker_${docker_compose_HQ_folder}"
+                            // env.docker_images_destination_folder_HQ_migration = "${env.WORKSPACE}/docker_${docker_compose_HQ_migration_folder}"
+                            // env.docker_images_destination_folder_ELK = "${env.WORKSPACE}/docker_${docker_compose_ELK_folder}"
+                            // env.docker_images_destination_folder_ELK_NODE = "${env.WORKSPACE}/docker_${docker_compose_ELK_NODE_folder}"
+                            // env.docker_images_destination_folder_MONITOR_MASTER = "${env.WORKSPACE}/docker_${docker_compose_MONITOR_MASTER_folder}"
+                            // env.docker_images_destination_folder_MONITOR_NODE = "${env.WORKSPACE}/docker_${docker_compose_MONITOR_NODE_folder}"
+                            env.docker_images_destination_folder_GPU_WHITE = "${env.WORKSPACE}/docker_${docker_compose_GPU_WHITE_folder}"                           
+                            env.docker_images_destination_folder_CPU_WHITE = "${env.WORKSPACE}/docker_${docker_compose_CPU_WHITE_folder}"
+                            // env.docker_images_destination_folder_HQ_WHITE = "${env.WORKSPACE}/docker_${docker_compose_HQ_WHITE_folder}"
+                            // env.docker_images_destination_folder_HQ_migration_WHITE = "${env.WORKSPACE}/docker_${docker_compose_HQ_migration_WHITE_folder}"
+                            // env.docker_images_destination_folder_ELK_WHITE = "${env.WORKSPACE}/docker_${docker_compose_ELK_WHITE_folder}"
+                            // env.docker_images_destination_folder_ELK_NODE_WHITE = "${env.WORKSPACE}/docker_${docker_compose_ELK_NODE_WHITE_folder}"
+                            // env.docker_images_destination_folder_MONITOR_MASTER_WHITE = "${env.WORKSPACE}/docker_${docker_compose_MONITOR_MASTER_WHITE_folder}"
+                            // env.docker_images_destination_folder_MONITOR_NODE_WHITE = "${env.WORKSPACE}/docker_${docker_compose_MONITOR_NODE_WHITE_folder}"
+
+                            //set compose files directories and extensions
+                            COMPOSE_FILE_NAME_GPU = "docker-compose-local-gpu.yml"                           
+                            COMPOSE_FILE_NAME_CPU = "docker-compose-local-cpu.yml"
+                            // COMPOSE_FILE_NAME_HQ = "docker-compose-hq-addon.yml"
+                            // COMPOSE_FILE_NAME_HQ_migration = "docker-compose-migration-db.yml"
+                            // COMPOSE_FILE_NAME_ELK = "docker-compose-elk-stack.yml"
+                            // COMPOSE_FILE_NAME_ELK_NODE = "docker-compose-filebeat.yml"
+                            // COMPOSE_FILE_NAME_MONITOR_MASTER = "docker-compose-monitor-master.yml"
+                            // COMPOSE_FILE_NAME_MONITOR_NODE = "docker-compose-monitor-node.yml"
+                           
+                            //gpu
+                            env.compose_extension_GPU = COMPOSE_FILE_NAME_GPU
+                            env.compose_extension_GPU = env.compose_extension_GPU.minus("docker-compose-")
+                            env.compose_extension_GPU = env.compose_extension_GPU.minus(".yml")
+                            echo "Compose file extension for GPU: ${env.compose_extension_GPU}"
+                            //cpu
+                            env.compose_extension_CPU = COMPOSE_FILE_NAME_CPU
+                            env.compose_extension_CPU = env.compose_extension_CPU.minus("docker-compose-")
+                            env.compose_extension_CPU = env.compose_extension_CPU.minus(".yml")
+                            echo "Compose file extension for CPU: ${env.compose_extension_CPU}"
+                            // //hq
+                            // env.compose_extension_HQ = COMPOSE_FILE_NAME_HQ
+                            // env.compose_extension_HQ = env.compose_extension_HQ.minus("docker-compose-")
+                            // env.compose_extension_HQ = env.compose_extension_HQ.minus(".yml")
+                            // echo "Compose file extension for HQ: ${env.compose_extension_HQ}"
+                            // //hq migration
+                            // env.compose_extension_HQ_migration = COMPOSE_FILE_NAME_HQ_migration
+                            // env.compose_extension_HQ_migration = env.compose_extension_HQ_migration.minus("docker-compose-")
+                            // env.compose_extension_HQ_migration = env.compose_extension_HQ_migration.minus(".yml")
+                            // echo "Compose file extension for HQ_migration: ${env.compose_extension_HQ_migration}"
+                            //elk stack
+                            // env.compose_extension_ELK = COMPOSE_FILE_NAME_ELK
+                            // env.compose_extension_ELK = env.compose_extension_ELK.minus("docker-compose-")
+                            // env.compose_extension_ELK = env.compose_extension_ELK.minus(".yml")
+                            // echo "Compose file extension for ELK: ${env.compose_extension_ELK}"
+                            // //elk node
+                            // env.compose_extension_ELK_NODE = COMPOSE_FILE_NAME_ELK_NODE
+                            // env.compose_extension_ELK_NODE = env.compose_extension_ELK_NODE.minus("docker-compose-")
+                            // env.compose_extension_ELK_NODE = env.compose_extension_ELK_NODE.minus(".yml")
+                            // echo "Compose file extension for ELK node: ${env.compose_extension_ELK_NODE}"
+                            // //monitoring master
+                            // env.compose_extension_MONITOR_MASTER = COMPOSE_FILE_NAME_MONITOR_MASTER
+                            // env.compose_extension_MONITOR_MASTER = env.compose_extension_MONITOR_MASTER.minus("docker-compose-")
+                            // env.compose_extension_MONITOR_MASTER = env.compose_extension_MONITOR_MASTER.minus(".yml")
+                            // echo "Compose file extension for MONITORING master: ${env.compose_extension_MONITOR_MASTER}"
+                            // //monitoring node
+                            // env.compose_extension_MONITOR_NODE = COMPOSE_FILE_NAME_MONITOR_NODE
+                            // env.compose_extension_MONITOR_NODE = env.compose_extension_MONITOR_NODE.minus("docker-compose-")
+                            // env.compose_extension_MONITOR_NODE = env.compose_extension_MONITOR_NODE.minus(".yml")
+                            // echo "Compose file extension for MONITORING node: ${env.compose_extension_MONITOR_NODE}"
+
+                            //remove dots from repository name
+                            env.repo_extension_branch_name = DOCKER_COMPOSE_REPO_BRANCH_NAME
+                            env.repo_extension_branch_name = repo_extension_branch_name.minus(".")
+                            env.repo_extension_branch_name = repo_extension_branch_name.minus(".")
+                            echo "Docker Compose Repository Branch name without dots: ${env.repo_extension_branch_name}"
+
+
+                            //permissions running airgap script
+                            sh("chmod +x+u ${airgap_script_path}/airgap")
+
+                            //copy for the docker-compose.yml files to build white label parallel to the regular build
+                            sh("cp ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU} ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE")
+                            sh("cp ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU} ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU}-WHITE")
+                            // sh("cp ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ} ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE")
+                            // sh("cp ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration} ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration}-WHITE")
+                            // sh("cp ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK} ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK}-WHITE")
+                            // sh("cp ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE} ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE}-WHITE")                            
+                            // sh("cp ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_MASTER} ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_MASTER}-WHITE")
+                            // sh("cp ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_NODE} ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_NODE}-WHITE")
+
+                        } // end of stage parameters
+
+
+                        stage('Pull-AirGap') {
+                            env.EMAIL_SEND = 'devops@anyvision.co'
+                            sh("gcloud docker --authorize-only")
+                            parallel airgap_GPU: {
+                                        sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU} ${docker_images_destination_folder_GPU}")
+                                    },
+                                    airgap_CPU: {
+                                        sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU} ${docker_images_destination_folder_CPU}")
+                                    },
+                                    // airgap_HQ: {
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ} ${docker_images_destination_folder_HQ}")
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration} ${docker_images_destination_folder_HQ_migration}")
+                                    // },
+                                    // airgap_ELK: {
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK} ${docker_images_destination_folder_ELK}")
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE} ${docker_images_destination_folder_ELK_NODE}")
+                                    // },
+                                    // airgap_MONITOR:{
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_MASTER} ${docker_images_destination_folder_MONITOR_MASTER}")
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_NODE} ${docker_images_destination_folder_MONITOR_NODE}")
+                                    // },
+                                    //remove Anyvision from compose files
+                                    airgap_GPU_WHITE: {
+                                        sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE")
+                                        sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE")
+                                        sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_GPU}-WHITE ${docker_images_destination_folder_GPU_WHITE}")
+                                    },
+                                    airgap_CPU_WHITE: {
+                                        sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU}-WHITE")
+                                        sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU}-WHITE")
+                                        sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_CPU}-WHITE ${docker_images_destination_folder_CPU_WHITE}")
+                                    }
+                                    // airgap_HQ_WHITE: {
+                                    //     sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE")
+                                    //     sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE")                                       
+                                    //     sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration}-WHITE")
+                                    //     sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration}-WHITE")
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ}-WHITE ${docker_images_destination_folder_HQ_WHITE}")
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull ${docker_compose_workspace_dir}/${COMPOSE_FILE_NAME_HQ_migration}-WHITE ${docker_images_destination_folder_HQ_migration_WHITE}")
+                                    // },
+                                    // airgap_ELK_WHITE: {
+                                    //     sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK}-WHITE")
+                                    //     sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK}-WHITE")
+                                    //     sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE}-WHITE")
+                                    //     sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE}-WHITE")
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK}-WHITE ${docker_images_destination_folder_ELK_WHITE}")
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_elk_workspace_dir}/${COMPOSE_FILE_NAME_ELK_NODE}-WHITE ${docker_images_destination_folder_ELK_NODE_WHITE}")
+                                    // },
+                                    // airgap_MONITORING_WHITE:{
+                                    //     sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_MASTER}-WHITE")
+                                    //     sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_MASTER}-WHITE")
+                                    //     sh("sed -i 's/anyvision\\-training/rec\\-repo/g' ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_NODE}-WHITE")
+                                    //     sh("sed -i 's/anyvision\\-production/rec\\-repo/g' ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_NODE}-WHITE")
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_MASTER}-WHITE ${docker_images_destination_folder_MONITOR_MASTER_WHITE}")
+                                    //     sh("cd ${airgap_script_path} && ./airgap pull_without_symlink ${docker_compose_monitor_workspace_dir}/${COMPOSE_FILE_NAME_MONITOR_NODE}-WHITE ${docker_images_destination_folder_MONITOR_NODE_WHITE}")
+                                    // }
+
+                        } // end of stage Pull Air Gap
+
+
+                        stage('BUILD') {
+                            env.EMAIL_SEND = 'devops@anyvision.co'
+                            
+                            //download dashboards for each processor type
+                            parallel download_dashboard_GPU: {
+                                        sh("wget https://s3.eu-central-1.amazonaws.com/anyvision-dashboard/latest/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/AnyVision-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage -O ${env.WORKSPACE}/AnyVision-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
+                                    },
+                                    download_dashboard_CPU_WHITE: {
+                                        sh("wget https://s3.eu-central-1.amazonaws.com/facesearch-dashboard/latest/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage -O ${env.WORKSPACE}/FaceSearch-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-linux-x86_64.AppImage")
+                                    }
+
+                            //build
+                            parallel build_GPU: {
+                                        sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
+                                                "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +                                               
+                                                "product_type=${docker_compose_GPU_type} " +                                                
+                                                "build_number=${BUILD_NUMBER} " +
+                                                "network_name=${repo_extension_branch_name} " +
+                                                "compose_name=${env.compose_extension_GPU} ")
+                                                // "hq_compose_name=${docker_compose_HQ_folder} " +
+                                                // "hq_migration_compose_name=${docker_compose_HQ_migration_folder} " +
+                                                // "elk_compose_name=${docker_compose_ELK_folder} " +
+                                                // "elk_node_compose_name=${docker_compose_ELK_NODE_folder} " +
+                                                // "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
+                                                // "monitor_node_compose_name=${docker_compose_MONITOR_NODE_folder}")
+                                    },
+                                    build_CPU: {
+                                        sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
+                                                "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +
+                                                "product_type=${docker_compose_CPU_type} " +
+                                                "build_number=${BUILD_NUMBER} " +
+                                                "network_name=${repo_extension_branch_name} " +
+                                                "compose_name=${env.compose_extension_CPU} ")
+                                                // "hq_compose_name=${docker_compose_HQ_folder} " +
+                                                // "hq_migration_compose_name=${docker_compose_HQ_migration_folder} " +
+                                                // "elk_compose_name=${docker_compose_ELK_folder} " +
+                                                // "elk_node_compose_name=${docker_compose_ELK_NODE_folder} " +
+                                                // "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
+                                                // "monitor_node_compose_name=${docker_compose_MONITOR_NODE_folder}")
+                                    },
+                                    build_GPU_WHITE: {
+                                        sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
+                                                "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +
+                                                "product_type=${docker_compose_GPU_WHITE_type} " +
+                                                "build_number=${BUILD_NUMBER} " +
+                                                "network_name=${repo_extension_branch_name} " +
+                                                "compose_name=${env.compose_extension_GPU} " +
+                                                // "hq_compose_name=${docker_compose_HQ_WHITE_folder} " +
+                                                // "hq_migration_compose_name=${docker_compose_HQ_migration_WHITE_folder} " +
+                                                // "elk_compose_name=${docker_compose_ELK_WHITE_folder} " +
+                                                // "elk_node_compose_name=${docker_compose_ELK_NODE_WHITE_folder} " +
+                                                // "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_WHITE_folder} " +
+                                                // "monitor_node_compose_name=${docker_compose_MONITOR_NODE_WHITE_folder} " +
+                                                "project.leftImage='' project.logoImage='' project.splashImage='' project.disableSplashScreen=1 " +
+                                                "project.vendor='FaceSearch' project.shortName='FaceRec' project.fullName='FaceRec'")
+                                    },
+                                    build_CPU_WHITE: {
+                                        sh("${builder_dir}/builder build ${installbuilder_dir}/better_tomorrow.xml --verbose --setvars " +
+                                                "project.version=${DOCKER_COMPOSE_REPO_BRANCH_NAME} " +
+                                                "product_type=${docker_compose_CPU_WHITE_type} " +
+                                                "build_number=${BUILD_NUMBER} " +
+                                                "network_name=${repo_extension_branch_name} " +
+                                                "compose_name=${env.compose_extension_CPU} " +
+                                                // "hq_compose_name=${docker_compose_HQ_WHITE_folder} " +
+                                                // "hq_migration_compose_name=${docker_compose_HQ_migration_WHITE_folder} " +
+                                                // "elk_compose_name=${docker_compose_ELK_WHITE_folder} " +
+                                                // "elk_node_compose_name=${docker_compose_ELK_NODE_WHITE_folder} " +
+                                                // "monitor_master_compose_name=${docker_compose_MONITOR_MASTER_folder} " +
+                                                // "monitor_node_compose_name=${docker_compose_MONITOR_NODE_WHITE_folder} " +
+                                                "project.leftImage='' project.logoImage='' project.splashImage='' project.disableSplashScreen=1 " +
+                                                "project.vendor='FaceSearch' project.shortName='FaceRec' project.fullName='FaceRec'")
+                                    }
+
+                        } // end of stage BUILD
+
+
+                        stage('PUSH') {
+                            env.EMAIL_SEND = 'devops@anyvision.co'
+                            env.build_output_dir = "${HOME}/installbuilder-18.12.0/output"
+
+                            echo "pushing to aws s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME} and to s3://${BUCKET_NAME}/installbuilder-whitelabel/${DOCKER_COMPOSE_REPO_BRANCH_NAME}"
+                            
+                            if ( "${INSTALLATION_REPO_BRANCH_NAME}" == 'master') {
+                                parallel push_GPU: {
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
+                                        },
+                                        push_CPU: {
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
+                                        },
+                                        push_GPU_WHITE: {
+                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
+                                        },
+                                        push_CPU_WHITE: {
+                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
+                                        }
+                            }
+
+                            else if ( "${INSTALLATION_REPO_BRANCH_NAME}" == 'development') {
+                                parallel push_GPU: {
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
+                                        },
+                                        push_CPU: {
+                                            sh("aws s3 cp ${build_output_dir}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
+                                        },
+                                        push_GPU_WHITE: {
+                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-gpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run --acl public-read")
+                                        },
+                                        push_CPU_WHITE: {
+                                            sh("aws s3 cp ${build_output_dir}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${BUILD_NUMBER}-cpu-linux-x64-installer.run s3://${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run --acl public-read")
+                                        }
+                            }
+
+                            else {
+                                echo "No branch for Installation repository was selected"
+                            }
+
+                        } //end of stage PUSH
+
+
+                        stage('Cleanup & Prints') {
+                            echo "Cleaning output folder"
+                            sh("rm -rf ${build_output_dir}/bettertomorrow* ${build_output_dir}/FaceRec*")
+                            echo "Cleaning dashboard AppImages..."
+                            sh("rm -f ${env.WORKSPACE}/*.AppImage")
+                            if ( "${INSTALLATION_REPO_BRANCH_NAME}" == 'master') {
+                                echo "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run"
+                                echo "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run"
+
+                                echo "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
+                                echo "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
+                            }
+                            else if ( "${INSTALLATION_REPO_BRANCH_NAME}" == 'development') {
+                                echo "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run"
+                                echo "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run"
+
+                                echo "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
+                                echo "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
+                            }
+                            else {
+                                echo "No branch for Installation repository was selected"
+                            }
+
+                        } // end of stage Cleanup & Prints
+
+                        currentBuild.result = 'SUCCESS'
+                        env.BUILD_STATUS = 'SUCCESS'
+                        env.EMAIL_SEND = "integration@anyvision.co" + "," + env.email_default_recipients
+
+                    } // end of try
+
+                    catch (err) {
+
+                        echo "Something went wrong , Installbuilder job ${JOB_NAME}"
+                        throw err
+                        currentBuild.result = 'FAILURE'
+                        env.BUILD_STATUS = currentBuild.result
+                        env.EMAIL_SEND = 'devops@anyvision.co'
+                        // notification()
+
+                    } // end of catch
+
+                    finally {
+
+                        // notification()
+                        resetParameters()
+
+                    } // end finally
+                } // end of ansiColor
+            } // end of node
+        } // end of timestamps
+    } // end of timeout master
+} // end of generic_pipeline_method
+
+
+// Notification function
+def notification() {
+    stage('Notification') {
+        echo "Sending Mail Notification"
+
+        env.sendemail_headline = "AnyVision - InstallBuilder Better Tommorow Notify On Version: ${DOCKER_COMPOSE_REPO_BRANCH_NAME} - ${INSTALLATION_REPO_BRANCH_NAME}, Build_Number: ${BUILD_NUMBER}"
+        if (env.BUILD_STATUS == "FAILURE") {
+            echo "Build status : ${currentBuild.result}"
+
+            env.sendemail_body = "New Installer job failed on: ${DOCKER_COMPOSE_REPO_BRANCH_NAME} , build_Number: ${BUILD_NUMBER}"
+
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'jenkins_gmail_account', usernameVariable: 'EMAIL_USERNAME', passwordVariable: 'EMAIL_PASSWORD']]) {
+                sh("sendemail " +
+                        "-f \"jenkins-installer@anyvision.co\" " +
+                        "-u \"${env.sendemail_headline}\" " +
+                        "-m \"${env.sendemail_body}\" " +
+                        "-t \"${env.EMAIL_SEND}\" " +
+                        "-s \"smtp.gmail.com:587\" " +
+                        "-o tls=yes " +
+                        "-xu \"$EMAIL_USERNAME\" " +
+                        "-xp \"$EMAIL_PASSWORD\" ")
+            }
+        }
+
+        else if (env.BUILD_STATUS == "SUCCESS" && "${INSTALLATION_REPO_BRANCH_NAME}" == 'master') {
+            echo "Build status : ${currentBuild.result} on branch ${INSTALLATION_REPO_BRANCH_NAME}"
+
+            
+            env.sendemail_body="Production: \n" +
+                    "New Installer for Better Tomorrow is ready. Please use the following details: \n" +
+                    "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run\n" +
+                    "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-gpu-linux-x64-installer.run\n" +
+                    "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run\n" +
+                    "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-${TAG_DATE}-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
+
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'jenkins_gmail_account', usernameVariable: 'EMAIL_USERNAME', passwordVariable: 'EMAIL_PASSWORD']]) {
+
+                sh("sendemail " +
+                        "-f \"jenkins-installer@anyvision.co\" " +
+                        "-u \"${env.sendemail_headline}\" " +
+                        "-m \"${env.sendemail_body}\" " +
+                        "-t \"${env.EMAIL_SEND}\" " +
+                        "-s \"smtp.gmail.com:587\" " +
+                        "-o tls=yes " +
+                        "-xu \"$EMAIL_USERNAME\" " +
+                        "-xp \"$EMAIL_PASSWORD\" ")
+
+            }    // end of withCredentials
+        }
+
+        else if (env.BUILD_STATUS == "SUCCESS" && "${INSTALLATION_REPO_BRANCH_NAME}" == 'development') {
+            echo "Build status : ${currentBuild.result} on branch ${INSTALLATION_REPO_BRANCH_NAME}"
+
+            env.sendemail_body="Development: \n" +
+                    "New Installer for Better Tomorrow is ready. Please use the following details: \n" +
+                    "This is the link to download BetterTomorrow GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run\n" +
+                    "This is the link to download FaceRec GPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-gpu-linux-x64-installer.run\n" +
+                    "This is the link to download BetterTomorrow CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/bettertomorrow-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run\n" +
+                    "This is the link to download FaceRec CPU: https://s3.eu-central-1.amazonaws.com/${BUCKET_NAME_WHITE}/development/installbuilder/${DOCKER_COMPOSE_REPO_BRANCH_NAME}/FaceRec-${DOCKER_COMPOSE_REPO_BRANCH_NAME}-dev-${BUILD_NUMBER}-cpu-linux-x64-installer.run"
+            
+            
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'jenkins_gmail_account', usernameVariable: 'EMAIL_USERNAME', passwordVariable: 'EMAIL_PASSWORD']]) {
+
+                sh("sendemail " +
+                        "-f \"jenkins-installer@anyvision.co\" " +
+                        "-u \"${env.sendemail_headline}\" " +
+                        "-m \"${env.sendemail_body}\" " +
+                        "-t \"${env.EMAIL_SEND}\" " +
+                        "-s \"smtp.gmail.com:587\" " +
+                        "-o tls=yes " +
+                        "-xu \"$EMAIL_USERNAME\" " +
+                        "-xp \"$EMAIL_PASSWORD\" ")
+
+            }    // end of withCredentials
+            
+        }
+
+        else if (env.BUILD_STATUS == "UNKNOWN" || env.BUILD_STATUS == "ABORTED") {
+            echo "Build status : ${currentBuild.result}"
+
+            env.sendemail_body = "New Installer is job failed on: ${DOCKER_COMPOSE_REPO_BRANCH_NAME} , build_Number: ${BUILD_NUMBER}"
+
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'jenkins_gmail_account', usernameVariable: 'EMAIL_USERNAME', passwordVariable: 'EMAIL_PASSWORD']]) {
+
+                sh("sendemail " +
+                        "-f \"jenkins-installer@anyvision.co\" " +
+                        "-u \"${env.sendemail_headline}\" " +
+                        "-m \"${env.sendemail_body}\" " +
+                        "-t \"${env.EMAIL_SEND}\" " +
+                        "-s \"smtp.gmail.com:587\" " +
+                        "-o tls=yes " +
+                        "-xu \"$EMAIL_USERNAME\" " +
+                        "-xp \"$EMAIL_PASSWORD\" ")
+            }
+        }
+
+        else{
+            echo "Unable to detect the build status, status is: $env.BUILD_STATUS"
+
+            env.EMAIL_SEND = 'devops@anyvision.co'
+            env.sendemail_body = "Unable to detect the build status, status is: $env.BUILD_STATUS"
+
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'jenkins_gmail_account', usernameVariable: 'EMAIL_USERNAME', passwordVariable: 'EMAIL_PASSWORD']]) {
+
+                sh("sendemail " +
+                        "-f \"jenkins-installer@anyvision.co\" " +
+                        "-u \"${env.sendemail_headline}\" " +
+                        "-m \"${env.sendemail_body}\" " +
+                        "-t \"${env.EMAIL_SEND}\" " +
+                        "-s \"smtp.gmail.com:587\" " +
+                        "-o tls=yes " +
+                        "-xu \"$EMAIL_USERNAME\" " +
+                        "-xp \"$EMAIL_PASSWORD\" ")
+            }
+        }
+
+    } // end of stage notification
+} // end of function
+
+
+def resetParameters() {
+
+    properties([
+            parameters([
+                    string(name: 'DOCKER_COMPOSE_REPO_BRANCH_NAME', defaultValue: "${GIT_BRANCH_NAME}", description: 'This is the docker-compose repository branch name'),
+                    choice(name: 'INSTALLATION_REPO_BRANCH_NAME', choices:['master', 'development'], defaultValue: 'master', description: 'This is the installation repository branch name'),
+            ]),
+            [$class: 'jenkins.model.BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '50']],
+            disableConcurrentBuilds(),
+            pipelineTriggers([githubPush()]),
+    ])
+
+}
+
+return this
