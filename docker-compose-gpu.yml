@@ -556,6 +556,9 @@ services:
       options:
         max-size: 1g
     ipc: host
+    #entrypoint: sleep 1d
+    working_dir: /root/backend_trunk
+    entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
 
 
 
