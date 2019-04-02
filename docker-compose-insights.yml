@@ -32,16 +32,15 @@ services:
     volumes:
       - /ssd/memsql:/var/lib/memsql
       - /storage/backup_memsql:/backup
-      - ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
+      #- ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
       # if need to deploy reid comment tracks db line and uncomment reid line
       #- ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
     environment:
       - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
       - MEMSQL_NODE_ROLE=AIO
-      - JOB_NAME=memsql
       - MEMSQL_PASSWORD=password
-      - AGG_MEMORY_LIMIT=4g
-      - LEAF_MEMORY_LIMIT=124g
+      - AGG_MEMORY_LIMIT=4
+      - LEAF_MEMORY_LIMIT=124
     env_file:
       - env/global.env
     logging:
@@ -536,10 +535,10 @@ services:
         aliases:
           - insights-schema-builder.tls.ai
     environment:
-      - PG_HOST=memsql.tls.ai
+      - DB_HOST=memsql.tls.ai
       - DB_ACTION=update
       - DB=mysql
-      - DB_NAME=insights_db
+      - DB_NAME=insights_db,tracks_db:1.21.1
     logging:
       options:
         max-size: 5m
@@ -570,7 +569,7 @@ services:
       - INSIGHT_MAX_BYTES=10 ** 7  # 10 MB
       - INSIGHT_BACKEND_BACKUP_COUNT=5
     #volumes:
-    #  - /home/ori/Projects/insights-backend:/root/insights-backend
+    #  - /home/user/repos/insights-backend:/root/insights-backend
     depends_on:
       - backend
       - memsql
@@ -650,7 +649,7 @@ services:
       - "9022:9022" #ssh
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
-      - /home/ori/license:/home/user/license:ro
+      - /home/user/license:/home/user/license:ro
       - /ssd/backend_data:/root/pipe_data
       - /ssd/track_archive_service_data:/root/track_archive_service_data
       - /ssd/reid_service_data:/root/reid_service_data
@@ -660,7 +659,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
-      - /home/ori/Projects/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+      #- /home/user/repos/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
