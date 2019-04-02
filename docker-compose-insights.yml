@@ -586,9 +586,12 @@ services:
     - 3003:3003
     volumes:
     - /etc/localtime:/etc/localtime:ro
+    environment:
+      - API_URL=http://insights.tls.ai:5555/api
     logging:
       options:
         max-size: 1g
+
 
   insights-webui:
     image: gcr.io/anyvision-training/insights-webui:development
@@ -601,6 +604,8 @@ services:
     - 80:3000
     volumes:
     - /etc/localtime:/etc/localtime:ro
+    environment:
+    - SERVER_BASE_URL=http://insights-api.tls.ai:3003
     logging:
       options:
         max-size: 1g
