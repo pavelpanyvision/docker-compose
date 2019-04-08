@@ -545,7 +545,7 @@ services:
   
         
   insights-backend:
-    image: gcr.io/anyvision-production/insights-backend:development
+    image: gcr.io/anyvision-production/insights-backend:0.0.1.1
     #entrypoint: sleep infinity
     restart: always
     networks:
@@ -567,7 +567,7 @@ services:
       - INSIGHT_MAX_BYTES=10 ** 7  # 10 MB
       - INSIGHT_BACKEND_BACKUP_COUNT=5
     #volumes:
-    #  - /home/ori/Projects/insights-backend:/root/insights-backend
+    #  - /home/ori/Projects/insights-backend:0.0.1.1
     depends_on:
       - backend
       - memsql
