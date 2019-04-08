@@ -19,7 +19,7 @@ networks:
 
 
 services:
-
+  
   memsql:
     image: gcr.io/anyvision-training/memsql:19.03
     restart: always
@@ -544,10 +544,10 @@ services:
         max-size: 5m
     depends_on:
       - memsql
-  
-        
+
+
   insights-backend:
-    image: gcr.io/anyvision-training/insights-backend:1.15.0-insights
+    image: gcr.io/anyvision-training/insights-backend:1.15.1-insights
     #entrypoint: sleep infinity
     restart: always
     networks:
@@ -569,13 +569,14 @@ services:
       - INSIGHT_MAX_BYTES=10 ** 7  # 10 MB
       - INSIGHT_BACKEND_BACKUP_COUNT=5
     #volumes:
-    # - /home/ori/Projects/insights-backend:/root/insights-backend
+    #  - /home/user/repos/insights-backend:/root/insights-backend
     depends_on:
       - backend
       - memsql
 
   insights-service:
     image: gcr.io/anyvision-training/insights-service:development
+    #image: insights-service:sharon
     restart: always
     networks:
       prod:
@@ -589,6 +590,11 @@ services:
     environment:
       - API_URL=http://insights.tls.ai
       - API_URL_PORT=5555
+      - DB_DATABASE=insights_db
+      - DB_USERNAME=anv_admin
+      - DB_PASSWORD=password
+      - DB_HOST=postgres.tls.ai
+      - DB_PORT=5432
     logging:
       options:
         max-size: 1g
@@ -606,7 +612,7 @@ services:
     volumes:
     - /etc/localtime:/etc/localtime:ro
     environment:
-    - SERVER_BASE_URL=http://insights-api.tls.ai:3003
+     - SERVER_BASE_URL=http://insights-api.tls.ai:3003
     logging:
       options:
         max-size: 1g
@@ -632,8 +638,26 @@ services:
       options:
         max-size: 1g
 
+  postgres-schema:
+    image: gcr.io/anyvision-training/db-migrator:development
+    restart: on-failure
+    networks:
+      prod:
+        aliases:
+          - postgres-schema.tls.ai
+    environment:
+      - DB=postgresql
+      - DB_ACTION=update
+      - DB_NAME=insights_db
+      - DB_HOST=postgres.tls.ai
+    logging:
+      options:
+        max-size: 1g
+    depends_on:
+      - postgres
+
   backend:
-    image: gcr.io/anyvision-training/backend:1.15.0-insights
+    image: gcr.io/anyvision-training/backend:1.15.1-insights
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -665,7 +689,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
-      #- /home/ori/Projects/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+      #- /home/user/repos/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
@@ -689,11 +713,6 @@ services:
       options:
         max-size: 1g
     ipc: host
-
-
-
-
-
 
 
 
