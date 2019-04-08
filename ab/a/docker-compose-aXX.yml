@@ -75,8 +75,8 @@ services:
 
 
 
-  backend-pyconcrete:
-    image: gcr.io/anyvision-production/backend:development
+  backend:
+    image: gcr.io/anyvision-production/backend:0.0.1.1-insights
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
