@@ -297,7 +297,7 @@ services:
       - error_log_level=info
       - access_log=on
       - rewrite_log=on
-      - dns_resolver=127.0.0.1 
+      #- dns_resolver=127.0.0.1 
     env_file:
       - env/global.env
     logging:
