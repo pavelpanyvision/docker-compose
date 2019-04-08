@@ -48,6 +48,7 @@ services:
         max-size: 1g
 
 
+
   node-rtsp-rtmp-server:
     image: gcr.io/anyvision-training/node-rtsp-rtmp-server:18.12
     restart: always
@@ -65,29 +66,30 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-training/webrtc-streamer:18.12
+    image: gcr.io/anyvision-production/webrtc-streamer:19.03
     restart: always
     networks:
       prod:
         aliases:
           - webrtc-localnode.tls.ai
+          - webrtc.tls.ai
     ports:
       - "8000:8000"
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
       - WEBRTC_STREAMER_OPTIONS=-H0.0.0.0:8000s -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
-      - CONSUL_AGENT=consul-agent.tls.ai
+      #- HOST_IP=<ip of the host>
+      - WAN_MODE=false
+      - WAN_STUN_URL=stun.l.google.com:19302
       - APIGATEWAY_IP=apigateway.tls.ai
       - APIGATEWAY_PROTOCOL=https
       - APIGATEWAY_PORT=9443
-      - NODE_RTSP_IP=node-rtsp-rtmp-server-localnode.tls.ai
+      - NODE_RTSP_IP=rtstreamer.tls.ai
       - NODE_RTSP_PROTOCOL=rtsp
       - NODE_RTSP_PORT=80
       - CAMERA_INT_REQ_TIME=1000
       - CRT_CA_BUNDLE=/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
-      #- WAN_MODE=true
-      #- WAN_STUN_URL=stun.l.google.com:19302
     logging:
       options:
         max-size: 1g
@@ -255,7 +257,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx:18.12
+    image: gcr.io/anyvision-production/nginx:19.03
     restart: always
     networks:
       prod:
@@ -269,10 +271,13 @@ services:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
     environment:
       - limit_rate_speed=0
       - aws_host="seaweedfs-s3-localnode.tls.ai:8333"
+      - error_log_level=info
+      - access_log=on
+      - rewrite_log=on
+      #- dns_resolver=127.0.0.1 
     env_file:
       - env/global.env
     logging:
@@ -370,7 +375,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:development
+    image: gcr.io/anyvision-training/broadcaster:1.21.1
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -403,41 +408,8 @@ services:
 
 
 
-  # master-sync-service:
-  #   image: gcr.io/anyvision-training/master-sync-service:development
-  #   restart: always
-  #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
-  #   hostname: master-sync-service
-  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-  #   #those port should be opened only development mode
-  #   #ports:
-  #   #  - "16180:16180"
-  #   networks:
-  #     prod:
-  #       aliases:
-  #         - master-sync-service.tls.ai
-  #   volumes:
-  #     - /storage:/var/www/html
-  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-  #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
-  #   depends_on:
-  #     - api
-  #   environment:
-  #     #- ENABLE_DOCKERIZE=false
-  #     - ENABLE_CHOWN=false
-  #     - RUN_AS_USER=user
-  #   env_file:
-  #     - env/global.env
-  #     - env/master-sync-service.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-
-
-
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
+    image: gcr.io/anyvision-training/api-gateway:1.21.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -478,7 +450,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-training/api:1.21.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -527,8 +499,10 @@ services:
       options:
         max-size: 1g
 
+
+
   insights-schema-builder:
-    image: gcr.io/anyvision-training/db-migrator:development
+    image: gcr.io/anyvision-training/db-migrator:0.0.5
     restart: on-failure
     networks:
       prod:
@@ -546,8 +520,9 @@ services:
       - memsql
 
 
+
   insights-backend:
-    image: gcr.io/anyvision-training/insights-backend:1.15.1-insights
+    image: gcr.io/anyvision-training/insights-backend:0.0.1.1
     #entrypoint: sleep infinity
     restart: always
     networks:
@@ -574,9 +549,10 @@ services:
       - backend
       - memsql
 
+
+
   insights-service:
-    image: gcr.io/anyvision-training/insights-service:development
-    #image: insights-service:sharon
+    image: gcr.io/anyvision-training/insights-service:0.0.1.1
     restart: always
     networks:
       prod:
@@ -600,8 +576,9 @@ services:
         max-size: 1g
 
 
+
   insights-webui:
-    image: gcr.io/anyvision-training/insights-webui:development
+    image: gcr.io/anyvision-training/insights-webui:0.0.1.1
     restart: always
     networks:
       prod:
@@ -616,6 +593,8 @@ services:
     logging:
       options:
         max-size: 1g
+
+
 
   postgres:
     image: gcr.io/anyvision-training/postgres:19.03
@@ -638,6 +617,8 @@ services:
       options:
         max-size: 1g
 
+
+
   postgres-schema:
     image: gcr.io/anyvision-training/db-migrator:development
     restart: on-failure
@@ -656,8 +637,10 @@ services:
     depends_on:
       - postgres
 
+
+
   backend:
-    image: gcr.io/anyvision-training/backend:1.15.1-insights
+    image: gcr.io/anyvision-training/backend:0.0.1.1-insights
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -741,56 +724,3 @@ services:
     logging:
       options:
         max-size: 1g
-
-
-
-  # dashboard-updater:
-  #   image: gcr.io/anyvision-training/dashboard-updater:latest
-  #   restart: always
-  #   networks:
-  #     - prod
-  #   ports:
-  #     - "8888:8888"
-  #   volumes:
-  #     - /ssd/dashboards:/opt/nginx/html:rw
-  #     - /etc/localtime:/etc/localtime:ro
-  #     #- /etc/timezone:/etc/timezone:ro
-  #   environment:
-  #     - limit_rate_speed=0
-  #     - DASHBOARD_VERSION=1.20.0
-  #     - ENABLE_FETCHER=false
-  #     - ENABLE_NGINX=true
-  #   env_file:
-  #     - env/global.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-
-
-
-#    push-notification:
-#      image: gcr.io/anyvision-training/push-notification-service:master
-#      restart: always
-#      #command: --disable-services --no-exitkills --debug sleep infinity
-#      networks:
-#        prod:
-#          aliases:
-#          - push-notification.tls.ai
-#      ports:
-#      - "7443:7443"
-#      volumes:
-#      - /storage:/var/www/html
-#      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-#      - /etc/localtime:/etc/localtime:ro
-#      environment:
-#      - FIREBASE_ADMIN_TOKEN=AAAA
-#      - RUN_AS_USER=user
-#      - ENABLE_CHOWN=false
-#      env_file:
-#      - env/global.env
-#      logging:
-#        options:
-#          max-size: 1g
-
-
-
