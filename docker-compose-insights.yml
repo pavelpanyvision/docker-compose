@@ -589,7 +589,7 @@ services:
         max-size: 1g
 
   insights-webui:
-    image: gcr.io/anyvision-production/insights-webui:development
+    image: gcr.io/anyvision-production/insights-webui:0.0.1.1
     restart: always
     networks:
       prod:
