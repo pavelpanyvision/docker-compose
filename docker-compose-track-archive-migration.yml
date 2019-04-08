@@ -13,7 +13,7 @@ networks:
 services:
 
   memsql:
-    image: gcr.io/anyvision-training/memsql:19.03
+    image: gcr.io/anyvision-production/memsql:19.03
     restart: always
     networks:
       prod:
@@ -37,7 +37,7 @@ services:
         max-size: 1g
 
   memsqlmig:
-    image: gcr.io/anyvision-training/memsql-migrator:19.03
+    image: gcr.io/anyvision-production/memsql-migrator:19.03
     depends_on:
       - "memsql"
     networks:
@@ -64,7 +64,7 @@ services:
 
 
   memsql-schema:
-    image: gcr.io/anyvision-training/db-migrator:19.03
+    image: gcr.io/anyvision-production/db-migrator:0.0.4
     restart: "no"
     networks:
       prod:
