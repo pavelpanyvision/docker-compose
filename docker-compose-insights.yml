@@ -547,7 +547,7 @@ services:
   
         
   insights-backend:
-    image: gcr.io/anyvision-training/insights-backend:1.15.0-insights
+    image: gcr.io/anyvision-training/insights-backend:1.15.1-insights
     #entrypoint: sleep infinity
     restart: always
     networks:
@@ -632,7 +632,7 @@ services:
         max-size: 1g
 
   backend:
-    image: gcr.io/anyvision-training/backend:1.15.0-insights
+    image: gcr.io/anyvision-training/backend:1.15.1-insights
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
