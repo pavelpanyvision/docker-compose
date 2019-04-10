@@ -561,8 +561,8 @@ services:
         - insights-api.tls.ai
     ports:
     - 3003:3003
-    volumes:
-    - /etc/localtime:/etc/localtime:ro
+    #volumes:
+    #- /etc/localtime:/etc/localtime:ro
     environment:
       - API_URL=http://insights.tls.ai
       - API_URL_PORT=5555
@@ -574,6 +574,8 @@ services:
     logging:
       options:
         max-size: 1g
+    depends_on:
+      - insights-backend
 
 
 
@@ -640,7 +642,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:0.0.1.1-insights
+    image: gcr.io/anyvision-production/backend-pyconcrete:0.0.1.1-insights
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
