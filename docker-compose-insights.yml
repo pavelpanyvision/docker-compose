@@ -620,7 +620,7 @@ services:
 
 
   postgres-schema:
-    image: gcr.io/anyvision-training/db-migrator:development
+    image: gcr.io/anyvision-training/db-migrator:0.0.5
     restart: on-failure
     networks:
       prod:
