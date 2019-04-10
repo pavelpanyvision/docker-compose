@@ -66,7 +66,7 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-production/webrtc-streamer:19.03
+    image: gcr.io/anyvision-training/webrtc-streamer:19.03
     restart: always
     networks:
       prod:
@@ -257,7 +257,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-production/nginx:19.03
+    image: gcr.io/anyvision-training/nginx:19.03
     restart: always
     networks:
       prod:
@@ -561,8 +561,6 @@ services:
         - insights-api.tls.ai
     ports:
     - 3003:3003
-    #volumes:
-    #- /etc/localtime:/etc/localtime:ro
     environment:
       - API_URL=http://insights.tls.ai
       - API_URL_PORT=5555
