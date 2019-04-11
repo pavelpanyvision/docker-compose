@@ -502,7 +502,7 @@ services:
 
 
   insights-schema-builder:
-    image: gcr.io/anyvision-training/db-migrator:0.0.5
+    image: gcr.io/anyvision-training/db-migrator:0.0.6
     restart: on-failure
     networks:
       prod:
@@ -522,7 +522,7 @@ services:
 
 
   insights-backend:
-    image: gcr.io/anyvision-training/insights-backend:0.0.1.1
+    image: gcr.io/anyvision-training/insights-backend:0.0.1.2
     #entrypoint: sleep infinity
     restart: always
     networks:
@@ -544,7 +544,7 @@ services:
       - INSIGHT_MAX_BYTES=10 ** 7  # 10 MB
       - INSIGHT_BACKEND_BACKUP_COUNT=5
     #volumes:
-    #  - /home/user/repos/insights-backend:/root/insights-backend
+    #  - /home/ori/Projects/insights-backend:/root/insights-backend
     depends_on:
       - backend
       - memsql
@@ -642,7 +642,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-pyconcrete:0.0.1.1-insights
+    image: gcr.io/anyvision-production/backend-pyconcrete:0.0.1.2-insights
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -674,7 +674,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
-      #- /home/user/repos/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+      #- /home/ori/Projects/backend_trunk/package/services:/root/backend_trunk/package/services ### mount your local project directory to the container
     environment:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
