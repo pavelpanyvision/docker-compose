@@ -552,7 +552,8 @@ services:
 
 
   insights-service:
-    image: gcr.io/anyvision-training/insights-service:0.0.1.1
+    image: gcr.io/anyvision-training/insights-service:0.0.1.3
+    #image: insights-service:niv
     restart: always
     networks:
       prod:
@@ -569,6 +570,10 @@ services:
       - DB_PASSWORD=password
       - DB_HOST=postgres.tls.ai
       - DB_PORT=5432
+      - BOUNCE_RATE_TIME_LIMIT_IN_SECONDS=120
+      - START_OF_DAY=5
+      - END_OF_DAY=15
+      - INSTALLATION_DATE='02-25-2019'
     logging:
       options:
         max-size: 1g
@@ -578,7 +583,7 @@ services:
 
 
   insights-webui:
-    image: gcr.io/anyvision-training/insights-webui:0.0.1.1
+    image: gcr.io/anyvision-training/insights-webui:0.0.1.4
     restart: always
     networks:
       prod:
@@ -640,7 +645,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-pyconcrete:0.0.1.2-insights
+    image: gcr.io/anyvision-training/backend:0.0.1.2-insights
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
