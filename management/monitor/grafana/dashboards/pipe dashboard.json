@@ -262,7 +262,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "pipe_total_gpu_load",
+          "expr": "pipe_total_gpu_memory",
           "format": "time_series",
           "interval": "1s",
           "intervalFactor": 1,
