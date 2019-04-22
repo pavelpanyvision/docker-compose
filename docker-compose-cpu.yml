@@ -561,7 +561,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:development
+    image: gcr.io/anyvision-production/broadcaster:1.22.0.2
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
