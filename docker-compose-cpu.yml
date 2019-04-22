@@ -460,7 +460,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:development
+    image: gcr.io/anyvision-production/api:1.22.0.2
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
