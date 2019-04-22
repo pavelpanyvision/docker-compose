@@ -64,7 +64,7 @@ services:
 
 
   memsql-schema:
-    image: gcr.io/anyvision-production/db-migrator:19.03
+    image: gcr.io/anyvision-production/db-migrator:1.22.0.1
     restart: "no"
     networks:
       prod:
