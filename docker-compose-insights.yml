@@ -740,7 +740,7 @@ services:
 
 
 #    push-notification:
-#      image: gcr.io/anyvision-production/push-notification-service:master
+#      image: gcr.io/anyvision-production/push-notification-service:1.22.0.2
 #      restart: always
 #      #command: --disable-services --no-exitkills --debug sleep infinity
 #      networks:
