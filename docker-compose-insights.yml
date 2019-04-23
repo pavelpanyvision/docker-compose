@@ -21,7 +21,7 @@ networks:
 services:
   
   memsql:
-    image: gcr.io/anyvision-training/memsql:19.03
+    image: gcr.io/anyvision-training/memsql:19.04
     restart: always
     networks:
       prod:
@@ -32,9 +32,6 @@ services:
     volumes:
       - /ssd/memsql:/var/lib/memsql
       - /storage/backup_memsql:/backup
-      #- ./memsql/1_21_1_tracks_db.sql:/mnt/setup_db.sql
-      # if need to deploy reid comment tracks db line and uncomment reid line
-      #- ./memsql/1_21_1_reid_db.sql:/mnt/setup_db.sql
     environment:
       - LICENSE_KEY=BDk3ZmFhNGU3YmJmOTQ5N2I5N2RmY2E4ZWEzZTAxYjVlAAAAAAAAAAAAAAIAAAAAAAQwNQIZAJGgtcrXzs18QzlKPsIo5SNnwVxqxH6gEwIYbWq/m+E3/flYcFfIm3ERvsxjtlbaz7O5AA==
       - MEMSQL_NODE_ROLE=AIO
@@ -502,7 +499,7 @@ services:
 
 
   insights-schema-builder:
-    image: gcr.io/anyvision-training/db-migrator:0.0.6
+    image: gcr.io/anyvision-training/db-migrator:0.0.2.0
     restart: on-failure
     networks:
       prod:
@@ -522,7 +519,7 @@ services:
 
 
   insights-backend:
-    image: gcr.io/anyvision-training/insights-backend:0.0.1.2
+    image: gcr.io/anyvision-training/insights-backend:0.0.2.0
     #entrypoint: sleep infinity
     restart: always
     networks:
@@ -552,8 +549,8 @@ services:
 
 
   insights-service:
-    image: gcr.io/anyvision-training/insights-service:0.0.1.3
     #image: insights-service:niv
+    image: gcr.io/anyvision-training/insights-service:0.0.2.0
     restart: always
     networks:
       prod:
@@ -571,9 +568,9 @@ services:
       - DB_HOST=postgres.tls.ai
       - DB_PORT=5432
       - BOUNCE_RATE_TIME_LIMIT_IN_SECONDS=120
-      - START_OF_DAY=5
-      - END_OF_DAY=15
-      - INSTALLATION_DATE='02-25-2019'
+      - START_OF_DAY=12
+      - END_OF_DAY=22
+      - INSTALLATION_DATE='04-15-2019'
     logging:
       options:
         max-size: 1g
@@ -583,7 +580,7 @@ services:
 
 
   insights-webui:
-    image: gcr.io/anyvision-training/insights-webui:0.0.1.4
+    image: gcr.io/anyvision-training/insights-webui:0.0.2.0
     restart: always
     networks:
       prod:
@@ -602,7 +599,7 @@ services:
 
 
   postgres:
-    image: gcr.io/anyvision-training/postgres:19.03
+    image: gcr.io/anyvision-training/postgres:19.04
     restart: always
     ports:
       - 5432:5432
@@ -625,7 +622,7 @@ services:
 
 
   postgres-schema:
-    image: gcr.io/anyvision-training/db-migrator:0.0.5
+    image: gcr.io/anyvision-training/db-migrator:0.0.2.0
     restart: on-failure
     networks:
       prod:
@@ -645,7 +642,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:0.0.1.2-insights
+    image: gcr.io/anyvision-training/backend:0.0.2.0-insights
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
