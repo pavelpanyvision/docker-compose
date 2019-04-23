@@ -18,7 +18,7 @@ services:
 
 
   ift3-be:
-    image: gcr.io/anyvision-training/ift3-be:development
+    image: gcr.io/anyvision-production/ift3-be:development
     restart: always
     networks:
       prod:
@@ -53,7 +53,7 @@ services:
         max-size: 1g
 
   ift3-fe:
-    image: gcr.io/anyvision-training/ift3-fe:development
+    image: gcr.io/anyvision-production/ift3-fe:development
     restart: always
     networks:
       prod:
@@ -71,7 +71,7 @@ services:
         max-size: 1g
  
   ift3-mongodb:
-    image: gcr.io/anyvision-training/mongo:18.12
+    image: gcr.io/anyvision-production/mongo:18.12
     restart: always
     networks:
       prod:
@@ -85,7 +85,7 @@ services:
         max-size: 1g
 
   ift3-redis:
-    image: gcr.io/anyvision-training/redis:18.12
+    image: gcr.io/anyvision-production/redis:18.12
     restart: always
     networks:
       prod:
