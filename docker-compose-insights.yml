@@ -499,7 +499,7 @@ services:
 
 
   insights-schema-builder:
-    image: gcr.io/anyvision-training/db-migrator:development
+    image: gcr.io/anyvision-training/db-migrator:0.0.2.0
     restart: on-failure
     networks:
       prod:
@@ -617,7 +617,7 @@ services:
 
 
   postgres-schema:
-    image: gcr.io/anyvision-training/db-migrator:development
+    image: gcr.io/anyvision-training/db-migrator:0.0.2.0
     restart: on-failure
     networks:
       prod:
