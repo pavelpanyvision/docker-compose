@@ -21,7 +21,7 @@ networks:
 services:
 
   memsql:
-    image: gcr.io/anyvision-training/memsql:19.03
+    image: gcr.io/anyvision-training/memsql:19.04
     restart: always
     networks:
       prod:
@@ -528,7 +528,7 @@ services:
         max-size: 1g
 
   insights-schema-builder:
-    image: gcr.io/anyvision-training/db-migrator:latest
+    image: gcr.io/anyvision-training/db-migrator:development
     restart: on-failure
     networks:
       prod:
