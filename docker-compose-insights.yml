@@ -575,7 +575,7 @@ services:
 
 
   insights-webui:
-    image: gcr.io/anyvision-training/insights-webui:0.0.1.1
+    image: gcr.io/anyvision-training/insights-webui:0.0.2.0
     restart: always
     networks:
       prod:
