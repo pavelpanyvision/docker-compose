@@ -14,7 +14,9 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:orig
+    # why it is mongo:orig??
+    #image: gcr.io/anyvision-training/mongo:orig
+    image: gcr.io/anyvision-training/mongo:19.04
     restart: always
     networks:
       prod:
@@ -24,6 +26,7 @@ services:
       #- "27017:27017"
     volumes:
       - /ssd/mongo_db_data:/data/db
+      - /storage/backup_mongodb:/backup
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - env/global.env
