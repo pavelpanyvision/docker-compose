@@ -327,7 +327,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:18.12
+    image: gcr.io/anyvision-training/mongo:19.04
     restart: always
     networks:
       prod:
@@ -337,6 +337,7 @@ services:
       #- "27017:27017"
     volumes:
       - /ssd/mongo_db_data:/data/db
+      - /storage/backup_mongodb:/backup
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
     env_file:
