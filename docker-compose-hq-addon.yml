@@ -37,6 +37,7 @@ services:
       - master_api_port=2000
       - master_api_username=admin
       - master_api_password=admin
+      - master_api_address=http://api-master.tls.ai:2000      
     env_file:
       - env/global.env
     logging:
