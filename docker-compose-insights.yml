@@ -62,7 +62,7 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-production/webrtc-streamer:18.12
+    image: gcr.io/anyvision-production/webrtc-streamer:1.22.0.4
     restart: always
     networks:
       prod:
