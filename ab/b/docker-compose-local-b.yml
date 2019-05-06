@@ -295,7 +295,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-pyconcrete:1.20.1
+    image: gcr.io/anyvision-production/backend-pyconcrete:on-demand-1.20.1-split-collate
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -304,11 +304,10 @@ services:
         aliases:
           - proc-b.tls.ai
           - reid-b.tls.ai
-          - coll-b.tls.ai
           - arch-b.tls.ai
     ports:
       - "4005:4005"
-      - "9067:9067"
+      #- "9067:9067"
       - "9068:9068"
       - "9069:9069"
       #- "9022:9022" #ssh
@@ -329,8 +328,16 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
-      #- ENABLE_OPENSSH_SERVICE=true
+      - COLLATE_REPLICAS=5
+      - DEPLOY_ARCH=AB
+      - ENABLE_OPENSSH_SERVICE=false
       - BACKEND_OPENSSH_PORT=9022
+      - ENABLE_BUFFER_CLEANER=true
+      - ENABLE_FRAMESTORE_CLEANER=false
+      - ENABLE_PROCESS_SERVICE=false
+      - ENABLE_REID_SERVICE=true
+      - ENABLE_TRACK_ARCHIVE_SERVICE=true
+      - ENABLE_COLLATE_SERVICE=false
       - DISPLAY                                                              ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
       - external_ip=proc-b.tls.ai
       - storage_ip=nginx-b.tls.ai
@@ -339,10 +346,8 @@ services:
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
       - reid_service_ip=reid-b.tls.ai
-      - collate_service_ip=coll-b.tls.ai
+      - collate_service_ip=collate-0.tls.ai
       - track_archive_service_ip=arch-b.tls.ai
-      - ENABLE_FRAMESTORE_CLEANER=false
-      - ENABLE_PROCESS_SERVICE=false
       - ENABLE_XPRA_SERVICE=false
       - ENABLE_CRON_PIPE_IMG_TEMPORARY=false
     env_file:
@@ -352,6 +357,266 @@ services:
       options:
         max-size: 1g
     ipc: host
+
+
+
+  collate-0:
+    image: gcr.io/anyvision-production/backend-pyconcrete:on-demand-1.20.1-split-collate
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+    privileged: false    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      anyvision:
+        aliases:
+          - collate-0.tls.ai
+    extra_hosts:
+      - nginx-a01.tls.ai:<ip of a01 server>
+      #- nginx-a02.tls.ai:<ip of a02 server>
+      #- nginx-a03.tls.ai:<ip of a03 server>
+      #- nginx-a04.tls.ai:<ip of a04 server>
+    ports:
+      - "9067:9067"
+    volumes:
+      - /storage:/var/www/html
+      #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+    environment:
+      - ENABLE_OPENSSH_SERVICE=false
+      - BACKEND_OPENSSH_PORT=9022
+      - ENABLE_BUFFER_CLEANER=false
+      - ENABLE_FRAMESTORE_CLEANER=false
+      - ENABLE_PROCESS_SERVICE=false
+      - ENABLE_REID_SERVICE=false
+      - ENABLE_TRACK_ARCHIVE_SERVICE=false
+      - ENABLE_COLLATE_SERVICE=true
+      - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - external_ip=proc-b.tls.ai
+      - storage_ip=nginx-localnode.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
+      - redis_host=127.0.0.1
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      - reid_service_ip=reid-b.tls.ai
+      - collate_service_ip=collate-0.tls.ai
+      - track_archive_service_ip=arch-b.tls.ai
+    env_file:
+      - ../../env/backend.env
+      - ../../env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  collate-1:
+    image: gcr.io/anyvision-production/backend-pyconcrete:on-demand-1.20.1-split-collate
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+    privileged: false    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      anyvision:
+        aliases:
+          - collate-1.tls.ai
+    extra_hosts:
+      - nginx-a01.tls.ai:<ip of a01 server>
+      #- nginx-a02.tls.ai:<ip of a02 server>
+      #- nginx-a03.tls.ai:<ip of a03 server>
+      #- nginx-a04.tls.ai:<ip of a04 server>
+    ports:
+      - "9167:9067"
+    volumes:
+      - /storage:/var/www/html
+      #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+    environment:
+      - ENABLE_OPENSSH_SERVICE=false
+      - BACKEND_OPENSSH_PORT=9022
+      - ENABLE_BUFFER_CLEANER=false
+      - ENABLE_FRAMESTORE_CLEANER=false
+      - ENABLE_PROCESS_SERVICE=false
+      - ENABLE_REID_SERVICE=false
+      - ENABLE_TRACK_ARCHIVE_SERVICE=false
+      - ENABLE_COLLATE_SERVICE=true
+      - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - external_ip=proc-b.tls.ai
+      - storage_ip=nginx-localnode.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
+      - redis_host=127.0.0.1
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      - reid_service_ip=reid-b.tls.ai
+      - collate_service_ip=collate-1.tls.ai
+      - track_archive_service_ip=arch-b.tls.ai
+    env_file:
+      - ../../env/backend.env
+      - ../../env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  collate-2:
+    image: gcr.io/anyvision-production/backend-pyconcrete:on-demand-1.20.1-split-collate
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+    privileged: false    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      anyvision:
+        aliases:
+          - collate-2.tls.ai
+    extra_hosts:
+      - nginx-a01.tls.ai:<ip of a01 server>
+      #- nginx-a02.tls.ai:<ip of a02 server>
+      #- nginx-a03.tls.ai:<ip of a03 server>
+      #- nginx-a04.tls.ai:<ip of a04 server>
+    ports:
+      - "9267:9067"
+    volumes:
+      - /storage:/var/www/html
+      #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+    environment:
+      - ENABLE_OPENSSH_SERVICE=false
+      - BACKEND_OPENSSH_PORT=9022
+      - ENABLE_BUFFER_CLEANER=fa      - "5000-5250:5000-5250/udp"    lse
+      - ENABLE_FRAMESTORE_CLEANER=false
+      - ENABLE_PROCESS_SERVICE=false
+      - ENABLE_REID_SERVICE=false
+      - ENABLE_TRACK_ARCHIVE_SERVICE=false
+      - ENABLE_COLLATE_SERVICE=true
+      - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - external_ip=proc-b.tls.ai
+      - storage_ip=nginx-localnode.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
+      - redis_host=127.0.0.1
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      - reid_service_ip=reid-b.tls.ai
+      - collate_service_ip=collate-2.tls.ai
+      - track_archive_service_ip=arch-b.tls.ai
+    env_file:
+      - ../../env/backend.env
+      - ../../env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  collate-3:
+    image: gcr.io/anyvision-production/backend-pyconcrete:on-demand-1.20.1-split-collate
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+    privileged: false    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      anyvision:
+        aliases:
+          - collate-3.tls.ai
+    extra_hosts:
+      - nginx-a01.tls.ai:<ip of a01 server>
+      #- nginx-a02.tls.ai:<ip of a02 server>
+      #- nginx-a03.tls.ai:<ip of a03 server>
+      #- nginx-a04.tls.ai:<ip of a04 server>
+    ports:
+      - "9367:9067"
+    volumes:
+      - /storage:/var/www/html
+      #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+    environment:
+      - ENABLE_OPENSSH_SERVICE=false
+      - BACKEND_OPENSSH_PORT=9022
+      - ENABLE_BUFFER_CLEANER=false
+      - ENABLE_FRAMESTORE_CLEANER=false
+      - ENABLE_PROCESS_SERVICE=false
+      - ENABLE_REID_SERVICE=false
+      - ENABLE_TRACK_ARCHIVE_SERVICE=false
+      - ENABLE_COLLATE_SERVICE=true
+      - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - external_ip=proc-b.tls.ai
+      - storage_ip=nginx-localnode.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
+      - redis_host=127.0.0.1
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      - reid_service_ip=reid-b.tls.ai
+      - collate_service_ip=collate-3.tls.ai
+      - track_archive_service_ip=arch-b.tls.ai
+    env_file:
+      - ../../env/backend.env
+      - ../../env/global.env
+    logging:
+      options:
+        max-size: 1g
+
+
+
+  collate-4:
+    image: gcr.io/anyvision-production/backend-pyconcrete:on-demand-1.20.1-split-collate
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+    privileged: false    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    networks:
+      anyvision:
+        aliases:
+          - collate-4.tls.ai
+    extra_hosts:
+      - nginx-a01.tls.ai:<ip of a01 server>
+      #- nginx-a02.tls.ai:<ip of a02 server>
+      #- nginx-a03.tls.ai:<ip of a03 server>
+      #- nginx-a04.tls.ai:<ip of a04 server>
+    ports:
+      - "9467:9067"
+    volumes:
+      - /storage:/var/www/html
+      #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+    environment:
+      - ENABLE_OPENSSH_SERVICE=false
+      - BACKEND_OPENSSH_PORT=9022
+      - ENABLE_BUFFER_CLEANER=false
+      - ENABLE_FRAMESTORE_CLEANER=false
+      - ENABLE_PROCESS_SERVICE=false
+      - ENABLE_REID_SERVICE=false
+      - ENABLE_TRACK_ARCHIVE_SERVICE=false
+      - ENABLE_COLLATE_SERVICE=true
+      - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
+      - external_ip=proc-b.tls.ai
+      - storage_ip=nginx-localnode.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
+      - redis_host=127.0.0.1
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      - reid_service_ip=reid-b.tls.ai
+      - collate_service_ip=collate-4.tls.ai
+      - track_archive_service_ip=arch-b.tls.ai
+    env_file:
+      - ../../env/backend.env
+      - ../../env/global.env
+    logging:
+      options:
+        max-size: 1g
 
 
 

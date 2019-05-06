@@ -310,7 +310,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-pyconcrete:1.20.1
+    image: gcr.io/anyvision-production/backend-pyconcrete:on-demand-1.20.1-split-collate
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -342,6 +342,7 @@ services:
       #- /etc/timezone:/etc/timezone:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
+      - COLLATE_REPLICAS=5
       - ENABLE_OPENSSH_SERVICE=false
       - BACKEND_OPENSSH_PORT=9022
       - ENABLE_BUFFER_CLEANER=true
