@@ -491,7 +491,7 @@ services:
     environment:
       - ENABLE_OPENSSH_SERVICE=false
       - BACKEND_OPENSSH_PORT=9022
-      - ENABLE_BUFFER_CLEANER=fa      - "5000-5250:5000-5250/udp"    lse
+      - ENABLE_BUFFER_CLEANER=false
       - ENABLE_FRAMESTORE_CLEANER=false
       - ENABLE_PROCESS_SERVICE=false
       - ENABLE_REID_SERVICE=false
