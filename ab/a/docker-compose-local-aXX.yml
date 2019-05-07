@@ -113,6 +113,7 @@ services:
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
     environment:
       - COLLATE_REPLICAS=5
+      - DEPLOY_ARCH=AB
       #- ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-1}                                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
