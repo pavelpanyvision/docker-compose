@@ -526,7 +526,7 @@ services:
         max-size: 1g
 
   insights-schema-builder:
-    image: gcr.io/anyvision-production/db-migrator:latest
+    image: gcr.io/anyvision-production/db-migrator:1.22.0.2
     restart: on-failure
     networks:
       prod:
