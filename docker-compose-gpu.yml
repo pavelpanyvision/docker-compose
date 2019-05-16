@@ -529,7 +529,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend:development
+    image: gcr.io/anyvision-production/backend-pyconcrete:on-demand-black-and-white
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -542,7 +542,7 @@ services:
           - arch-localnode.tls.ai
     extra_hosts:
     #The IP here should point to nginx of the master API
-      - "nginx-master-localnode.tls.ai:1.1.1.1"
+      - "nginx-master-localnode.tls.ai:172.30.30.5"
     ports:
       - "4005:4005"
       - "9067:9067"

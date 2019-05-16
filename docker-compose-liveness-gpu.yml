@@ -16,7 +16,7 @@ services:
 
 
   liveness-service:
-    image: gcr.io/anyvision-production/liveness-service:development
+    image: gcr.io/anyvision-production/liveness-service:on-demand-1.21.1
     restart: always
     networks:
       prod:
