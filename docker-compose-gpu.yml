@@ -78,7 +78,7 @@ services:
 
 
   memsql:
-    image: gcr.io/anyvision-training/memsql:19.04
+    image: gcr.io/anyvision-training/memsql:19.05
     restart: always
     networks:
       prod:
