@@ -102,7 +102,7 @@ services:
         max-size: 1g
 
   memsql-schema:
-    image: gcr.io/anyvision-production/db-migrator:development
+    image: gcr.io/anyvision-production/db-migrator:1.22.0.1
     restart: "no"
     networks:
       prod:
@@ -422,7 +422,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:development
+    image: gcr.io/anyvision-production/api-gateway:1.22.0.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -461,7 +461,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:development
+    image: gcr.io/anyvision-production/api:1.22.0.1
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -496,7 +496,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend:1.22.0.11
+    image: gcr.io/anyvision-training/backend:1.22.0.11
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -561,7 +561,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:development
+    image: gcr.io/anyvision-production/broadcaster:1.22.0.1
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
