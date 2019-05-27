@@ -78,7 +78,7 @@ services:
 
 
   memsql:
-    image: gcr.io/anyvision-training/memsql:19.04
+    image: gcr.io/anyvision-training/memsql:19.05
     restart: always
     networks:
       prod:
@@ -121,7 +121,7 @@ services:
 
 
   rtstreamer:
-    image: gcr.io/anyvision-training/node-rtsp-rtmp-server:18.12
+    image: gcr.io/anyvision-training/node-rtsp-rtmp-server:19.05
     restart: always
     networks:
       prod:
@@ -138,7 +138,7 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-training/webrtc-streamer:19.03
+    image: gcr.io/anyvision-training/webrtc-streamer:development
     restart: always
     networks:
       prod:
@@ -169,7 +169,7 @@ services:
 
 
   coturn:
-    image: gcr.io/anyvision-training/coturn:18.12
+    image: gcr.io/anyvision-training/coturn:19.05
     restart: always
     network_mode: host
     #ports:
@@ -192,7 +192,7 @@ services:
 
 
   seaweedfs-master:
-    image: gcr.io/anyvision-training/seaweedfs:19.01
+    image: gcr.io/anyvision-training/seaweedfs:19.05
     restart: always
     networks:
       prod:
@@ -201,9 +201,11 @@ services:
    # ports:
    #   - "9333:9333"
     environment:
+      - SEAWEEDFS_MODE=master
       - SEAWEEDFS_MASTER=1
       - SEAWEEDFS_MASTER_PORT=9333
-      - SEAWEEDFS_MASTER_CMD=-port=9333 -ip=seaweedfs-master-localnode.tls.ai -mdir=/data -peers=seaweedfs-master-localnode.tls.ai:9333    
+      #- SEAWEEDFS_MASTER_CMD=-port=9333 -ip=seaweedfs-master-localnode.tls.ai -mdir=/data -peers=seaweedfs-master-localnode.tls.ai:9333    
+      - SEAWEEDFS_MASTER_CMD=-port=9333 -ip=seaweedfs-master -mdir=/data -peers=seaweedfs-master:9333
     volumes:
       - /ssd/seaweed-master:/data
     logging:
@@ -213,16 +215,18 @@ services:
 
 
   seaweedfs-volume:
-    image: gcr.io/anyvision-training/seaweedfs:19.01
+    image: gcr.io/anyvision-training/seaweedfs:19.05
     restart: always
     networks:
       prod:
         aliases:
          - seaweedfs-volume-localnode.tls.ai
     environment:
+      - SEAWEEDFS_MODE=volume
       - SEAWEEDFS_VOLUME=1
       - SEAWEEDFS_VOLUME_PORT=8080
-      - SEAWEEDFS_VOLUME_CMD=-port=8080 -ip=seaweedfs-volume-localnode.tls.ai -index=memory -max=10000000 -mserver=seaweedfs-master-localnode.tls.ai:9333 -dir=/data    
+      #- SEAWEEDFS_VOLUME_CMD=-port=8080 -ip=seaweedfs-volume-localnode.tls.ai -index=memory -max=10000000 -mserver=seaweedfs-master-localnode.tls.ai:9333 -dir=/data    
+      - SEAWEEDFS_VOLUME_CMD=-port=8080 -ip=seaweedfs-volume -index=memory -max=10000000 -mserver=seaweedfs-master:9333 -dir=/data
     volumes:
       - /storage/seaweed:/data
     logging:
@@ -232,7 +236,7 @@ services:
 
 
   seaweedfs-filer:
-    image: gcr.io/anyvision-training/seaweedfs:19.01
+    image: gcr.io/anyvision-training/seaweedfs:19.05
     restart: always
     networks:
       prod:
@@ -243,9 +247,11 @@ services:
     depends_on:
       - seaweedfs-master
     environment:
+      - SEAWEEDFS_MODE=filer
       - SEAWEEDFS_FILER=1
       - SEAWEEDFS_FILER_PORT=8888
-      - SEAWEEDFS_FILER_CMD=-ip=seaweedfs-filer-localnode.tls.ai -master=seaweedfs-master-localnode.tls.ai:9333     
+      #- SEAWEEDFS_FILER_CMD=-ip=seaweedfs-filer-localnode.tls.ai -master=seaweedfs-master-localnode.tls.ai:9333     
+      - SEAWEEDFS_FILER_CMD=-ip=seaweedfs-filer -master=seaweedfs-master:9333     
     volumes:
       - ./seaweedfs/filer.toml:/etc/seaweedfs/filer.toml
       - /ssd/seaweed-master:/data
@@ -256,7 +262,7 @@ services:
 
 
   seaweedfs-s3:
-    image: gcr.io/anyvision-training/seaweedfs:19.01
+    image: gcr.io/anyvision-training/seaweedfs:19.05
     restart: always
     networks:
       prod:
@@ -267,17 +273,19 @@ services:
     depends_on:
       - seaweedfs-master
     environment:
+      - SEAWEEDFS_MODE=s3      
       - SEAWEEDFS_S3=1
       - SEAWEEDFS_S3_PORT=8333
       #- SEAWEEDFS_S3_CMD=-port=8333 -domainName=tls.ai -filer=seaweedfs-filer-localnode.tls.ai:8888 -filer.grpcPort=18888 -filer.dir.buckets=/buckets
-      - SEAWEEDFS_S3_CMD=-port=8333 -filer=seaweedfs-filer-localnode.tls.ai:8888 -filer.grpcPort=18888 -filer.dir.buckets=/buckets
+      #- SEAWEEDFS_S3_CMD=-port=8333 -filer=seaweedfs-filer-localnode.tls.ai:8888 -filer.grpcPort=18888 -filer.dir.buckets=/buckets
+      - SEAWEEDFS_S3_CMD=-port=8333 -filer=seaweedfs-filer:8888
     logging:
       options:
         max-size: 1g
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx:19.03
+    image: gcr.io/anyvision-training/nginx:19.06
     restart: always
     networks:
       prod:
@@ -297,7 +305,8 @@ services:
       - error_log_level=info
       - access_log=on
       - rewrite_log=on
-      #- dns_resolver=127.0.0.1 
+      - default_dns_resolver=127.0.0.11
+      - dns_resolver=127.0.0.11
     env_file:
       - env/global.env
     logging:
@@ -320,7 +329,7 @@ services:
         max-size: 1g
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:18.12
+    image: gcr.io/anyvision-training/supercronic:19.05
     restart: always
     networks:
       prod:
@@ -341,7 +350,7 @@ services:
 
 
   rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:18.12
+    image: gcr.io/anyvision-training/rabbitmq:19.05
     restart: always
     hostname: rabbitmq
     networks:
@@ -366,7 +375,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:19.04
+    image: gcr.io/anyvision-training/mongo:19.05
     restart: always
     networks:
       prod:
@@ -387,7 +396,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:18.12
+    image: gcr.io/anyvision-training/redis:19.06
     restart: always
     networks:
       prod:
@@ -397,7 +406,9 @@ services:
       - net.core.somaxconn=511
     volumes:
       - /ssd/redis_db_data:/data:rw
-      - /etc/localtime:/etc/localtime:ro         
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - env/global.env               
     logging:
       options:
         max-size: 1g
@@ -405,7 +416,7 @@ services:
 
 
   dante-proxy:
-    image: gcr.io/anyvision-training/dante-proxy:18.12
+    image: gcr.io/anyvision-training/dante-proxy:19.02
     restart: always
     networks:
       - prod
@@ -498,7 +509,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:development
+    image: gcr.io/anyvision-training/backend:on-demand-roleback-cp
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -556,9 +567,9 @@ services:
     logging:
       options:
         max-size: 1g
-    ipc: host
-    #entrypoint: sleep 1d
+    ipc: host   
     working_dir: /root/backend_trunk
+    #entrypoint: sleep 1d
     entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
 
 
@@ -574,8 +585,8 @@ services:
       prod:
         aliases:
           - broadcaster.tls.ai
-    ports:
-      - "38392:38392"
+    #ports:
+    #  - "38392:38392"
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
@@ -595,31 +606,31 @@ services:
       options:
         max-size: 1g
 
-  dslr-dashboard-bt:
-    image: gcr.io/anyvision-training/dslr-dashboard-bt:development
-    restart: always
-    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
-    hostname: dslr-dashboard-bt
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-    networks:
-      prod:
-        aliases:
-          - dslr-dashboard-bt.tls.ai
-    ports:
-      - "38392:38392"
-    volumes:
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38392
-      #- ENABLE_DOCKERIZE=false
-      - ENABLE_CHOWN=false     
-    env_file:
-      - env/global.env
-      - env/broadcaster.env
-    logging:
-      options:
-        max-size: 1g
+  # dslr-dashboard-bt:
+  #   image: gcr.io/anyvision-training/dslr-dashboard-bt:development
+  #   restart: always
+  #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
+  #   hostname: dslr-dashboard-bt
+  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+  #   networks:
+  #     prod:
+  #       aliases:
+  #         - dslr-dashboard-bt.tls.ai
+  #   ports:
+  #     - "38392:38392"
+  #   volumes:
+  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+  #     - /etc/localtime:/etc/localtime:ro
+  #   environment:
+  #     - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38392
+  #     #- ENABLE_DOCKERIZE=false
+  #     - ENABLE_CHOWN=false     
+  #   env_file:
+  #     - env/global.env
+  #     - env/broadcaster.env
+  #   logging:
+  #     options:
+  #       max-size: 1g
 
 
   # master-sync-service:
