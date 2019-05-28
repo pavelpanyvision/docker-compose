@@ -509,7 +509,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:on-demand-roleback-cp
+    image: gcr.io/anyvision-training/backend:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
