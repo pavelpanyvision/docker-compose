@@ -78,7 +78,7 @@ services:
 
 
   memsql:
-    image: gcr.io/anyvision-training/memsql:19.05
+    image: gcr.io/anyvision-training/memsql:19.04
     restart: always
     networks:
       prod:
@@ -102,7 +102,7 @@ services:
         max-size: 1g
 
   memsql-schema:
-    image: gcr.io/anyvision-training/db-migrator:development
+    image: gcr.io/anyvision-training/db-migrator:1.22.0.2
     restart: "no"
     networks:
       prod:
@@ -138,7 +138,7 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-training/webrtc-streamer:development
+    image: gcr.io/anyvision-training/webrtc-streamer:on-demand-support-ingress
     restart: always
     networks:
       prod:
@@ -169,7 +169,7 @@ services:
 
 
   coturn:
-    image: gcr.io/anyvision-training/coturn:19.05
+    image: gcr.io/anyvision-training/coturn:18.12
     restart: always
     network_mode: host
     #ports:
@@ -192,7 +192,7 @@ services:
 
 
   seaweedfs-master:
-    image: gcr.io/anyvision-training/seaweedfs:19.05
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -215,7 +215,7 @@ services:
 
 
   seaweedfs-volume:
-    image: gcr.io/anyvision-training/seaweedfs:19.05
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -236,7 +236,7 @@ services:
 
 
   seaweedfs-filer:
-    image: gcr.io/anyvision-training/seaweedfs:19.05
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -262,7 +262,7 @@ services:
 
 
   seaweedfs-s3:
-    image: gcr.io/anyvision-training/seaweedfs:19.05
+    image: gcr.io/anyvision-training/seaweedfs:19.01
     restart: always
     networks:
       prod:
@@ -329,7 +329,7 @@ services:
         max-size: 1g
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:19.05
+    image: gcr.io/anyvision-training/supercronic:18.12
     restart: always
     networks:
       prod:
@@ -350,7 +350,7 @@ services:
 
 
   rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:19.05
+    image: gcr.io/anyvision-training/rabbitmq:18.12
     restart: always
     hostname: rabbitmq
     networks:
@@ -375,7 +375,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:19.05
+    image: gcr.io/anyvision-training/mongo:18.12
     restart: always
     networks:
       prod:
@@ -396,7 +396,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:19.06
+    image: gcr.io/anyvision-training/redis:18.12
     restart: always
     networks:
       prod:
@@ -433,7 +433,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
+    image: gcr.io/anyvision-training/api-gateway:1.22.0.5
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -473,7 +473,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-training/api:1.22.0.5
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -509,7 +509,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:development
+    image: gcr.io/anyvision-training/backend-pyconcrete:1.22.0.11
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -561,6 +561,8 @@ services:
       - misc_gpu_encoding=true
       - memsql_host=memsql.tls.ai
       - memsql_port=3306
+      - PATH=/pyconcrete:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      - LD_LIBRARY_PATH=/usr/local/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64
     env_file:
       - env/global.env
       - env/backend.env
@@ -576,7 +578,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:development
+    image: gcr.io/anyvision-training/broadcaster:1.22.0.5
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -634,7 +636,7 @@ services:
 
 
   # master-sync-service:
-  #   image: gcr.io/anyvision-training/master-sync-service:development
+  #   image: gcr.io/anyvision-training/master-sync-service:1.1.2.5
   #   restart: always
   #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
   #   hostname: master-sync-service
@@ -664,7 +666,7 @@ services:
   #       max-size: 1g
 
 #    push-notification:
-#      image: gcr.io/anyvision-training/push-notification-service:master
+#      image: gcr.io/anyvision-training/push-notification-service:1.22.0.4
 #      restart: always
 #      #command: --disable-services --no-exitkills --debug sleep infinity
 #      networks:
