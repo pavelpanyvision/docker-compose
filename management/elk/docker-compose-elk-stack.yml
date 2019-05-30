@@ -7,7 +7,7 @@ services:
 
 
   elasticsearch:
-    image: gcr.io/anyvision-training/elasticsearch:6.3.2
+    image: gcr.io/anyvision-production/elasticsearch:6.3.2
     deploy:
       resources:
         limits:
@@ -35,7 +35,7 @@ services:
         max-size: 1g
 
   logstash:
-    image: gcr.io/anyvision-training/logstash:6.3.2
+    image: gcr.io/anyvision-production/logstash:6.3.2
     deploy:
       resources:
         limits:
@@ -59,7 +59,7 @@ services:
     # mem_limit: 1gb
 
   kibana:
-    image: gcr.io/anyvision-training/kibana:6.3.2
+    image: gcr.io/anyvision-production/kibana:6.3.2
     deploy:
       resources:
         limits: 
@@ -81,7 +81,7 @@ services:
 
 
   filebeat:
-    image: gcr.io/anyvision-training/filebeat:6.3.2
+    image: gcr.io/anyvision-production/filebeat:6.3.2
     deploy:
       resources:
         limits: 
