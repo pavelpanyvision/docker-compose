@@ -138,7 +138,7 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-production/webrtc-streamer:19.03
+    image: gcr.io/anyvision-production/webrtc-streamer:1.23.0.2
     restart: always
     networks:
       prod:
