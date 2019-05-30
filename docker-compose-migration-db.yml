@@ -37,7 +37,7 @@ services:
 
 
   migration_manager:
-    image: gcr.io/anyvision-production/migration_manager:development
+    image: gcr.io/anyvision-production/migration_manager:1.23.0.2
     restart: "no"
     networks:
       prod:
