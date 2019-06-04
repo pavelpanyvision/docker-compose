@@ -356,7 +356,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:development
+    image: gcr.io/anyvision-production/api-gateway:1.23.0.3
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
