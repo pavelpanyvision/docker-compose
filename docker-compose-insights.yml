@@ -569,7 +569,7 @@ services:
       - memsql
 
   insights-service:
-    image: gcr.io/anyvision-production/insights-service:0.0.2.0
+    image: gcr.io/anyvision-production/insights-service:0.0.2.0-ifsec.1
     restart: always
     networks:
       prod:
