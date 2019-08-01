@@ -15,8 +15,8 @@ services:
 
   mongodb:
     # why it is mongo:orig??
-    #image: gcr.io/anyvision-training/mongo:orig
-    image: gcr.io/anyvision-training/mongo:19.04
+    #image: gcr.io/anyvision-production/mongo:orig
+    image: gcr.io/anyvision-production/mongo:19.06
     restart: always
     networks:
       prod:
@@ -37,7 +37,7 @@ services:
 
 
   migration_manager:
-    image: gcr.io/anyvision-training/migration_manager:development
+    image: gcr.io/anyvision-production/migration_manager:1.23.1
     restart: "no"
     networks:
       prod:

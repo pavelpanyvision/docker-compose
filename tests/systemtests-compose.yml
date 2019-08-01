@@ -13,7 +13,7 @@ services:
         aliases:
           - backend-jmeter.tls.ai
     #command: sleep 1d
-    image: gcr.io/anyvision-training/backend-jmeter:latest
+    image: gcr.io/anyvision-production/backend-jmeter:latest
     restart: "no"
     volumes:
       - /storage:/var/www/html

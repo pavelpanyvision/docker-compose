@@ -21,7 +21,7 @@ add image to the local docker registry
 
 example:
 ```
-docker tag gcr.io/anyvision-training/backend-cpu:development 192.168.59.128:5000/backend-cpu:development
+docker tag gcr.io/anyvision-production/backend-cpu:development 192.168.59.128:5000/backend-cpu:development
 docker push 192.168.59.128:5000/backend-cpu:development
 ```
 

@@ -16,7 +16,7 @@ networks:
 services:
 
   seaweedfs-master:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:1.10
 #    ports:
 #      - 9333:9333
     environment:
@@ -32,7 +32,7 @@ services:
 
 
   seaweedfs-volume:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:1.10
     environment:
       - SEAWEEDFS_VOLUME=1
       - SEAWEEDFS_VOLUME_PORT=8080
@@ -46,7 +46,7 @@ services:
 
 
   seaweedfs-filer:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:1.10
     ports:
        - 8888:8888
     depends_on:
@@ -62,7 +62,7 @@ services:
 
 
   seaweedfs-s3:
-    image: gcr.io/anyvision-training/seaweedfs:1.10
+    image: gcr.io/anyvision-production/seaweedfs:1.10
     ports:
        - 8333:8333
     depends_on:
@@ -79,7 +79,7 @@ services:
 
 
   consul:
-    image: gcr.io/anyvision-training/consul:1.4.0
+    image: gcr.io/anyvision-production/consul:1.4.0
     command: agent -server -client=0.0.0.0 -bootstrap -ui -datacenter=${SITE:-dc1}
     networks:
       anyvision:
@@ -95,7 +95,7 @@ services:
 
 
   consul-agent:
-    image: gcr.io/anyvision-training/consul-agent:1.4.0
+    image: gcr.io/anyvision-production/consul-agent:1.4.0
     networks:
       anyvision:
         aliases:
@@ -111,7 +111,7 @@ services:
 
 
   guacamole:
-    image: gcr.io/anyvision-training/guacamole:0.9.14
+    image: gcr.io/anyvision-production/guacamole:0.9.14
     restart: always
     networks:
       - anyvision
@@ -132,7 +132,7 @@ services:
 
 
   sftp:
-    image: gcr.io/anyvision-training/sftp:alpine
+    image: gcr.io/anyvision-production/sftp:alpine
     restart: always
     networks:
       - anyvision
@@ -150,7 +150,7 @@ services:
 
 
   nginx:
-    image: gcr.io/anyvision-training/nginx:18.12
+    image: gcr.io/anyvision-production/nginx:18.12
     restart: always
     networks:
       anyvision:
@@ -177,7 +177,7 @@ services:
 
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:18.12
+    image: gcr.io/anyvision-production/supercronic:18.12
     restart: always
     networks:
       anyvision:
@@ -199,7 +199,7 @@ services:
 
 
   # rabbitmq:
-  #   image: gcr.io/anyvision-training/rabbitmq:18.12
+  #   image: gcr.io/anyvision-production/rabbitmq:18.12
   #   restart: always
   #   networks:
   #     anyvision:
@@ -224,7 +224,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:18.12
+    image: gcr.io/anyvision-production/mongo:18.12
     restart: always
     networks:
       anyvision:
@@ -245,7 +245,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:18.12
+    image: gcr.io/anyvision-production/redis:18.12
     restart: always
     networks:
       anyvision:
@@ -264,7 +264,7 @@ services:
 
 
   # broadcaster:
-  #   image: gcr.io/anyvision-training/broadcaster:development
+  #   image: gcr.io/anyvision-production/broadcaster:development
   #   restart: always
   #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
   #   hostname: broadcaster
@@ -295,7 +295,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
+    image: gcr.io/anyvision-production/api-gateway:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -333,7 +333,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-production/api:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -376,7 +376,7 @@ services:
 
 
   certificator:
-    image: gcr.io/anyvision-training/certificator:latest
+    image: gcr.io/anyvision-production/certificator:latest
     restart: on-failure
     #command: --disable-services --no-exitkills --debug sleep infinity
     volumes:
@@ -392,7 +392,7 @@ services:
 
 
   backend-pyconcrete:
-    image: gcr.io/anyvision-training/backend:development
+    image: gcr.io/anyvision-production/backend:development
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true   ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -451,7 +451,7 @@ services:
 
 
   dante-proxy:
-    image: gcr.io/anyvision-training/dante-proxy
+    image: gcr.io/anyvision-production/dante-proxy
     restart: always
     networks:
       - anyvision
@@ -472,7 +472,7 @@ services:
 
 
   # dashboard-updater:
-  #   image: gcr.io/anyvision-training/dashboard-updater:latest
+  #   image: gcr.io/anyvision-production/dashboard-updater:latest
   #   restart: always
   #   networks:
   #     - anyvision
