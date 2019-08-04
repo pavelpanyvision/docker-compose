@@ -301,7 +301,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     environment:
       - limit_rate_speed=0
-      - aws_host="seaweedfs-s3-localnode.tls.ai:8333"
+      - aws_host=seaweedfs-s3-localnode.tls.ai:8333
       - error_log_level=info
       - access_log=on
       - rewrite_log=on
@@ -509,7 +509,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-production/backend-pyconcrete:1.23.1.5
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.23.1.8
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
