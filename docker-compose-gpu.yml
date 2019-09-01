@@ -566,6 +566,7 @@ services:
       - DB_USER=root
       - DB_PASSWORD=password
       - DB_NAME=reid_db
+      - prometheus_gateway_ip=monitor_pushgateway_1
     env_file:
       - env/global.env
       - env/backend.env

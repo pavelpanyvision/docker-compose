@@ -38,6 +38,7 @@ services:
       - 9090:9090
     networks:
       - monitor-net
+      - prod
     logging:
       options:
         max-size: 1g
@@ -124,6 +125,25 @@ services:
     command:
       - '--config.file=/config/blackbox.yml'
       - '--log.level=debug'
+    logging:
+      options:
+        max-size: 1g
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '1gb'
+
+  pushgateway:
+    image: prom/pushgateway
+    restart: always
+    networks:
+      monitor-net:
+      prod:
+         aliases:
+            - pushgateway.tls.ai
+    ports:
+      - 9091:9091
     logging:
       options:
         max-size: 1g
