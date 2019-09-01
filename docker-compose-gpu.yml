@@ -498,7 +498,9 @@ services:
       - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false        
+      - ENABLE_CHOWN=false
+      - REID_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
+      - TRACK_ARCHIVE_IP=reid-localnode.tls.ai 
     env_file:
       - env/global.env
       - env/api.env
