@@ -1,3 +1,7 @@
 [leveldb]
-enabled = true
+enabled = false
 dir = "/data"
+
+[leveldb2]
+enabled = true
+dir = "/data/filerldb2"
