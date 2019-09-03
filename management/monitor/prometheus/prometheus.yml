@@ -119,7 +119,7 @@ scrape_configs:
     relabel_configs:
       - source_labels: ['__address__']
         target_label:  instance
-        replacement:   reid-localnode.tls.ai:5002
+        replacement:   reid-localnode.tls.ai:5003
       - source_labels: ['__address__']
         target_label:  '__address__'
         replacement:   'reid-localnode.tls.ai:5003'
