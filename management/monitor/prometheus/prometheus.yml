@@ -97,7 +97,7 @@ scrape_configs:
       replacement: blackbox:9115  # The blackbox exporter's real hostname:port.
 
   - job_name: 'collate'
-    metrics_path: /
+    metrics_path: /metrics
     scrape_interval: 5s
     static_configs:
     - targets:
@@ -111,7 +111,7 @@ scrape_configs:
         replacement:   'coll-localnode.tls.ai:5002'
 
   - job_name: 'reid'
-    metrics_path: /
+    metrics_path: /metrics
     scrape_interval: 5s
     static_configs:
     - targets:
@@ -125,7 +125,7 @@ scrape_configs:
         replacement:   'reid-localnode.tls.ai:5003'
 
   - job_name: 'track_archive'
-    metrics_path: /
+    metrics_path: /metrics
     scrape_interval: 5s
     static_configs:
     - targets:
