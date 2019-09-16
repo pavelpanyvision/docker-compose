@@ -102,7 +102,7 @@ services:
         max-size: 1g
 
   memsql-schema:
-    image: gcr.io/anyvision-training/db-migrator:development
+    image: gcr.io/anyvision-training/db-migrator:1.24.0-0BT
     restart: "no"
     networks:
       prod:
@@ -138,7 +138,7 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-training/webrtc-streamer:development
+    image: gcr.io/anyvision-training/webrtc-streamer:1.24.0.0
     restart: always
     networks:
       prod:
@@ -171,20 +171,12 @@ services:
   coturn:
     image: gcr.io/anyvision-training/coturn:19.05
     restart: always
-    network_mode: host
-    #ports:
-    #  - "3478:3478"
-    #  - "50000-50100:50000-50100/udp"
-    # networks: 
-    #   prod:
-    #     aliases:
-    #       - coturn.tls.ai    
+    network_mode: host 
     volumes:
       - /ssd/coturn:/var/lib/coturn
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
       - COTURN_CMD=-v -n --log-file stdout --min-port 50000 --max-port 50100 --no-stun --no-multicast-peers --no-loopback-peers --fingerprint --user webrtc:webrtc --lt-cred-mech --realm tls.ai --cert /usr/local/share/ca-certificates/tls.ai/tls.ai.full.pem --pkey /usr/local/share/ca-certificates/tls.ai/tls.ai.key
-      #- EXTERNAL_IP=
     logging:
       options:
         max-size: 1g
@@ -235,7 +227,7 @@ services:
       - env/global.env
     volumes:
       - ./seaweedfs/filer.toml:/etc/seaweedfs/filer.toml
-      - /ssd/seaweed-filer:/data
+      - /ssd/seaweed-filer:/data/filerldb2
     logging:
       options:
         max-size: 1g
@@ -263,9 +255,8 @@ services:
       - seaweedfs-volume
       - seaweedfs-filer
 
-
   nginx:
-    image: gcr.io/anyvision-training/nginx:19.06
+    image: gcr.io/anyvision-training/nginx:19.07
     restart: always
     networks:
       prod:
@@ -320,7 +311,9 @@ services:
       - ./crontab/site_crontab:/etc/crontabs/crontab
       - /etc/localtime:/etc/localtime:ro
     environment:
-      - TO_DATE_TRACK_DELETE=30   
+      - TO_DATE_TRACK_DELETE=30
+      - API_IP=api.tls.ai 
+      - CONSUL_AGENT=consul-agent.tls.ai  
     env_file:
       - env/global.env
     logging:
@@ -355,7 +348,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:19.05
+    image: gcr.io/anyvision-training/mongo:19.06
     restart: always
     networks:
       prod:
@@ -376,7 +369,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:19.06
+    image: gcr.io/anyvision-training/redis:19.08
     restart: always
     networks:
       prod:
@@ -413,7 +406,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:development
+    image: gcr.io/anyvision-training/api-gateway:1.24.0.4
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -453,7 +446,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:development
+    image: gcr.io/anyvision-training/api:1.24.0.12
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -477,7 +470,7 @@ services:
       - CA_HOST=apigateway.tls.ai
       - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672
-      - RUN_AS_USER=user
+      - RUN_AS_USER=node
       - ENABLE_CHOWN=false
       - REID_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - TRACK_ARCHIVE_IP=reid-localnode.tls.ai 
@@ -491,7 +484,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:development
+    image: gcr.io/anyvision-training/backend:1.24.0.8
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -502,7 +495,6 @@ services:
         aliases:
           - proc-localnode.tls.ai
           - reid-localnode.tls.ai
-          - coll-localnode.tls.ai
           - arch-localnode.tls.ai
     extra_hosts:
     #The IP here should point to nginx of the master API
@@ -562,10 +554,129 @@ services:
     entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
 
 
+  collate:
+    image: gcr.io/anyvision-training/backend:1.24.0.8
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    depends_on:
+      - memsql
+    networks:
+      prod:
+        aliases:
+          - coll-localnode.tls.ai
+    extra_hosts:
+    #The IP here should point to nginx of the master API
+      - "nginx-master-localnode.tls.ai:1.1.1.1"
+    ports:
+      - "9067:9067"                                           
+    volumes:
+      - /ssd/license:/home/user/license:ro
+      - /ssd/pipe_data:/root/pipe_data
+      - /ssd/reid_service_data:/root/reid_service_data
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - ENABLE_OPENSSH_SERVICE=true
+      - BACKEND_OPENSSH_PORT=9022
+      - DISPLAY=${DISPLAY:-:1}                                               
+      - external_ip=proc-localnode.tls.ai
+      - storage_ip=nginx-localnode.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
+      - redis_host=127.0.0.1
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      - reid_service_ip=reid-localnode.tls.ai
+      - collate_service_ip=coll-localnode.tls.ai
+      - track_archive_service_ip=arch-localnode.tls.ai
+      - frame_store_rtmp_url=rtstreamer.tls.ai
+      - frame_store_rtmp_port=80
+      - misc_gpu_encoding=true
+      - memsql_host=memsql.tls.ai
+      - memsql_port=3306
+      - DB_HOST=memsql.tls.ai
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=reid_db
+      - prometheus_gateway_ip=monitor_pushgateway_1
+      - ENABLE_MONITORING=false
+    env_file:
+      - env/global.env
+      - env/collate.env
+    logging:
+      options:
+        max-size: 1g
+    ipc: host   
+    working_dir: /root/backend_trunk
+    #entrypoint: sleep 1d
+    entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]   
 
+  edge:
+    image: gcr.io/anyvision-training/backend:1.24.0.8
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    depends_on:
+      - memsql
+    networks:
+      prod:
+        aliases:
+          - edge-localnode.tls.ai
+    extra_hosts:
+    #The IP here should point to nginx of the master API
+      - "nginx-master-localnode.tls.ai:1.1.1.1"
+    ports:
+      - "4005:4005"                                           
+    volumes:
+      - /ssd/license:/home/user/license:ro
+      - /ssd/pipe_data:/root/pipe_data
+      - /ssd/reid_service_data:/root/reid_service_data
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - ENABLE_OPENSSH_SERVICE=true
+      - BACKEND_OPENSSH_PORT=9022
+      - DISPLAY=${DISPLAY:-:1}                                               
+      - external_ip=proc-localnode.tls.ai
+      - storage_ip=nginx-localnode.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
+      - redis_host=127.0.0.1
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      - reid_service_ip=reid-localnode.tls.ai
+      - collate_service_ip=coll-localnode.tls.ai
+      - track_archive_service_ip=arch-localnode.tls.ai
+      - frame_store_rtmp_url=rtstreamer.tls.ai
+      - frame_store_rtmp_port=80
+      - misc_gpu_encoding=true
+      - memsql_host=memsql.tls.ai
+      - memsql_port=3306
+      - DB_HOST=memsql.tls.ai
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=reid_db
+      - prometheus_gateway_ip=monitor_pushgateway_1
+      - ENABLE_MONITORING=false
+    env_file:
+      - env/global.env
+      - env/edge.env
+    logging:
+      options:
+        max-size: 1g
+    ipc: host   
+    working_dir: /root/backend_trunk
+    #entrypoint: sleep 1d
+    entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]   
 
+  
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:development
+    image: gcr.io/anyvision-training/broadcaster:1.24.0.0
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -595,91 +706,91 @@ services:
       options:
         max-size: 1g
 
-  # dslr-dashboard-bt:
-  #   image: gcr.io/anyvision-training/dslr-dashboard-bt:development
-  #   restart: always
-  #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
-  #   hostname: dslr-dashboard-bt
-  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-  #   networks:
-  #     prod:
-  #       aliases:
-  #         - dslr-dashboard-bt.tls.ai
-  #   ports:
-  #     - "38392:38392"
-  #   volumes:
-  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-  #     - /etc/localtime:/etc/localtime:ro
-  #   environment:
-  #     - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38392
-  #     #- ENABLE_DOCKERIZE=false
-  #     - ENABLE_CHOWN=false     
-  #   env_file:
-  #     - env/global.env
-  #     - env/broadcaster.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
+  dslr-dashboard-bt:
+    image: gcr.io/anyvision-training/dslr-dashboard-bt:1.24.0.0
+    restart: always
+    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
+    hostname: dslr-dashboard-bt
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+    networks:
+      prod:
+        aliases:
+          - dslr-dashboard-bt.tls.ai
+    ports:
+      - "38392:38392"
+    volumes:
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38392
+      #- ENABLE_DOCKERIZE=false
+      - ENABLE_CHOWN=false     
+    env_file:
+      - env/global.env
+      - env/broadcaster.env
+    logging:
+      options:
+        max-size: 1g
 
 
-  # master-sync-service:
-  #   image: gcr.io/anyvision-training/master-sync-service:development
-  #   restart: always
-  #   #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
-  #   hostname: master-sync-service
-  #   #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-  #   #those port should be opened only development mode
-  #   #ports:
-  #   #  - "16180:16180"
-  #   networks:
-  #     prod:
-  #       aliases:
-  #         - master-sync-service.tls.ai
-  #   volumes:
-  #     - /storage:/var/www/html
-  #     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-  #     - /etc/localtime:/etc/localtime:ro
-  #   depends_on:
-  #     - api
-  #   environment:
-  #     #- ENABLE_DOCKERIZE=false
-  #     - ENABLE_CHOWN=false
-  #     - RUN_AS_USER=user
-  #   env_file:
-  #     - env/global.env
-  #     - env/master-sync-service.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
+  master-sync-service:
+    image: gcr.io/anyvision-training/master-sync-service:1.1.4.0
+    restart: always
+    #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
+    hostname: master-sync-service
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+    #those port should be opened only development mode
+    #ports:
+    #  - "16180:16180"
+    networks:
+      prod:
+        aliases:
+          - master-sync-service.tls.ai
+    volumes:
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - api
+    environment:
+      #- ENABLE_DOCKERIZE=false
+      - ENABLE_CHOWN=false
+      - RUN_AS_USER=user
+    env_file:
+      - env/global.env
+      - env/master-sync-service.env
+    logging:
+      options:
+        max-size: 1g
 
-#    push-notification:
-#      image: gcr.io/anyvision-training/push-notification-service:master
-#      restart: always
-#      #command: --disable-services --no-exitkills --debug sleep infinity
-#      networks:
-#        prod:
-#          aliases:
-#          - push-notification.tls.ai
-#      ports:
-#      - "7443:7443"
-#      volumes:
-#      - /storage:/var/www/html
-#      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-#      - /etc/localtime:/etc/localtime:ro
-#      environment:
-#      - FIREBASE_ADMIN_TOKEN=AAAA
-#      - RUN_AS_USER=user
-#      - ENABLE_CHOWN=false
-#      - RMQ_API_USER=user
-#      - RMQ_API_PASS=password
-#      - MONGO_DB_NAME=push-notifications
-#      - MONGO_DB_IP=mongodb.tls.ai
-#      - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672
-#      env_file:
-#      - env/global.env
-#      logging:
-#        options:
-#          max-size: 1g
+   push-notification:
+     image: gcr.io/anyvision-training/push-notification-service:1.24.0.0
+     restart: always
+     #command: --disable-services --no-exitkills --debug sleep infinity
+     networks:
+       prod:
+         aliases:
+         - push-notification.tls.ai
+     ports:
+     - "7443:7443"
+     volumes:
+     - /storage:/var/www/html
+     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+     - /etc/localtime:/etc/localtime:ro
+     environment:
+     - FIREBASE_ADMIN_TOKEN=AAAA
+     - RUN_AS_USER=user
+     - ENABLE_CHOWN=false
+     - RMQ_API_USER=user
+     - RMQ_API_PASS=password
+     - MONGO_DB_NAME=push-notifications
+     - MONGO_DB_IP=mongodb.tls.ai
+     - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672
+     env_file:
+     - env/global.env
+     logging:
+       options:
+         max-size: 1g
 
 
 
