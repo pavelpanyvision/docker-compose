@@ -500,8 +500,6 @@ services:
     #The IP here should point to nginx of the master API
       - "nginx-master-localnode.tls.ai:1.1.1.1"
     ports:
-      - "4005:4005"
-      - "9067:9067"
       - "9068:9068"
       - "9069:9069"
       - "9022:9022" #ssh
