@@ -495,7 +495,9 @@ services:
         aliases:
           #- edge.tls.ai
           - reid.tls.ai
+          - reid-localnode.tls.ai
           - arch.tls.ai
+          - arch-localnode.tls.ai
     extra_hosts:
     #The IP here should point to nginx of the master API
       - "nginx-master.tls.ai:1.1.1.1"
@@ -519,8 +521,8 @@ services:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
-      - storage_ip=nginx.tls.ai
-      - frame_store_storage_ip=nginx.tls.ai
+      - storage_ip=nginx-localnode.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
@@ -563,6 +565,7 @@ services:
       prod:
         aliases:
           - coll.tls.ai
+          - coll-localnode.tls.ai
     extra_hosts:
     #The IP here should point to nginx of the master API
       - "nginx-master.tls.ai:1.1.1.1"
@@ -581,7 +584,7 @@ services:
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               
       - storage_ip=nginx.tls.ai
-      - frame_store_storage_ip=nginx.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
@@ -622,6 +625,8 @@ services:
       prod:
         aliases:
           - edge.tls.ai
+          - proc-localnode.tls.ai
+
     extra_hosts:
     #The IP here should point to nginx of the master API
       - "nginx-master.tls.ai:1.1.1.1"
@@ -640,7 +645,7 @@ services:
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               
       - storage_ip=nginx.tls.ai
-      - frame_store_storage_ip=nginx.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
