@@ -453,7 +453,7 @@ services:
       prod:
         aliases:
           - api.tls.ai
-          - api.tls.ai
+          #- api.tls.ai
     ports:
       - "5443:5443"
       - "38389:38389"
