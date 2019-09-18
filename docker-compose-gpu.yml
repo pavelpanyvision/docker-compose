@@ -484,7 +484,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:1.24.0.8
+    image: gcr.io/anyvision-training/backend-pyconcrete:1.24.0.8
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -493,7 +493,7 @@ services:
     networks:
       prod:
         aliases:
-          - proc-localnode.tls.ai
+          - edge-localnode.tls.ai
           - reid-localnode.tls.ai
           - arch-localnode.tls.ai
     extra_hosts:
@@ -519,7 +519,7 @@ services:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               ### local display mode - do not forget to run "xhost +" as your local host user (not as root)
-      - external_ip=proc-localnode.tls.ai
+      - external_ip=edge-localnode.tls.ai
       - storage_ip=nginx-localnode.tls.ai
       - frame_store_storage_ip=nginx-localnode.tls.ai
       - redis_host=127.0.0.1
@@ -580,7 +580,7 @@ services:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               
-      - external_ip=proc-localnode.tls.ai
+      - external_ip=edge-localnode.tls.ai
       - storage_ip=nginx-localnode.tls.ai
       - frame_store_storage_ip=nginx-localnode.tls.ai
       - redis_host=127.0.0.1
@@ -613,7 +613,7 @@ services:
     entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]   
 
   edge:
-    image: gcr.io/anyvision-training/backend:1.24.0.8
+    image: gcr.io/anyvision-training/backend-pyconcrete:1.24.0.8
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -640,7 +640,7 @@ services:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               
-      - external_ip=proc-localnode.tls.ai
+      - external_ip=edge-localnode.tls.ai
       - storage_ip=nginx-localnode.tls.ai
       - frame_store_storage_ip=nginx-localnode.tls.ai
       - redis_host=127.0.0.1
