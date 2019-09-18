@@ -144,7 +144,7 @@ services:
       prod:
         aliases:
           - webrtc.tls.ai
-          - webrtc.tls.ai
+          #- webrtc.tls.ai
     ports:
       - "8000:8000"
     volumes:
