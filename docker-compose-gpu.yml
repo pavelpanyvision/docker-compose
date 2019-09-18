@@ -413,7 +413,7 @@ services:
       prod:
         aliases:
           - apigateway.tls.ai
-          - apigateway.tls.ai
+          #- apigateway.tls.ai
     ports:
       - "9443:9443"
       - "38391:38391"
