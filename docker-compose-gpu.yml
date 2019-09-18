@@ -176,7 +176,7 @@ services:
       - /ssd/coturn:/var/lib/coturn
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
-      - COTURN_CMD=-v -n --log-file stdout --min-port 50000 --max-port 50100 --no-stun --no-multicast-peers --no-loopback-peers --fingerprint --user webrtc:webrtc --lt-cred-mech --realm tls.ai --cert /usr/local/share/ca-certificates/tls.ai/tls.ai.full.pem --pkey /usr/local/share/ca-certificates/tls.ai/tls.ai.key
+      - COTURN_CMD=-v -n --log-file stdout --min-port 50000 --max-port 50100 --no-stun --no-multicast-peers --fingerprint --user webrtc:webrtc --lt-cred-mech --realm tls.ai
     logging:
       options:
         max-size: 1g
