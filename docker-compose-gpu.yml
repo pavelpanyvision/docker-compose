@@ -261,7 +261,7 @@ services:
     networks:
       prod:
         aliases:
-          - nginx.tls.ai
+          - nginx-localnode.tls.ai
     ports:
       - "1935:1935"
       - "443:443"
@@ -583,7 +583,7 @@ services:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               
-      - storage_ip=nginx.tls.ai
+      - storage_ip=nginx-localnode.tls.ai
       - frame_store_storage_ip=nginx-localnode.tls.ai
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
@@ -644,7 +644,7 @@ services:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
       - DISPLAY=${DISPLAY:-:1}                                               
-      - storage_ip=nginx.tls.ai
+      - storage_ip=nginx-localnode.tls.ai
       - frame_store_storage_ip=nginx-localnode.tls.ai
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
