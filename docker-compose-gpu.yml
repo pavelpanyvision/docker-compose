@@ -238,7 +238,7 @@ services:
   seaweedfs-s3:
     image: chrislusf/seaweedfs@sha256:81cfa3cb02fe909ac94da858fcc8f9b4158281d082637e41fcd2665cf93c3963
     restart: always
-    command: '-v=2 s3 -filer=seaweedfs-filer.tls.ai:8888 -port=8333 -filer.dir.buckets="/buckets"'
+    command: '-v=2 s3 -filer=seaweedfs-filer-localnode.tls.ai:8888 -port=8333 -filer.dir.buckets="/buckets"'
     networks:
       prod:
         aliases:
