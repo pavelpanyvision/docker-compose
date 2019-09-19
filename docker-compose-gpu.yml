@@ -475,7 +475,7 @@ services:
       - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672
       - RUN_AS_USER=node
       - ENABLE_CHOWN=false
-      - REID_IP=reid.tls.ai          ### use this configuration to configure localhost reid service
+      - REID_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - TRACK_ARCHIVE_IP=reid-localnode.tls.ai 
     env_file:
       - env/global.env
@@ -529,7 +529,7 @@ services:
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
-      - reid_service_ip=reid.tls.ai
+      - reid_service_ip=reid-localnode.tls.ai
       - collate_service_ip=coll.tls.ai
       - track_archive_service_ip=arch.tls.ai
       - frame_store_rtmp_url=rtstreamer.tls.ai
@@ -591,7 +591,7 @@ services:
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
-      - reid_service_ip=reid.tls.ai
+      - reid_service_ip=reid-localnode.tls.ai
       - collate_service_ip=coll.tls.ai
       - track_archive_service_ip=arch.tls.ai
       - frame_store_rtmp_url=rtstreamer.tls.ai
@@ -652,7 +652,7 @@ services:
       - redis_host=127.0.0.1
       - api_service_ip=api.tls.ai
       - mongodb_host=mongodb.tls.ai
-      - reid_service_ip=reid.tls.ai
+      - reid_service_ip=reid-localnode.tls.ai
       - collate_service_ip=coll.tls.ai
       - track_archive_service_ip=arch.tls.ai
       - frame_store_rtmp_url=rtstreamer.tls.ai
