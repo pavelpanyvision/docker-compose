@@ -455,6 +455,7 @@ services:
       prod:
         aliases:
           - api.tls.ai
+          - api-localnode.tls.ai
           #- api.tls.ai
     ports:
       - "5443:5443"
@@ -470,12 +471,12 @@ services:
       - API_IP=api.tls.ai
       - MONGO_DB_IP=mongodb.tls.ai
       - CA_HOST=apigateway.tls.ai
-      - MASS_IMPORT_IP=reid.tls.ai          ### use this configuration to configure localhost reid service
+      - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
       - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672
       - RUN_AS_USER=node
       - ENABLE_CHOWN=false
       - REID_IP=reid.tls.ai          ### use this configuration to configure localhost reid service
-      - TRACK_ARCHIVE_IP=reid.tls.ai 
+      - TRACK_ARCHIVE_IP=reid-localnode.tls.ai 
     env_file:
       - env/global.env
       - env/api.env
