@@ -702,6 +702,7 @@ services:
       - api_service_ip=api.tls.ai
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
       - RUN_AS_USER=user
+      - BCAST_RMQ_IS_ENABLED=true
       #- ENABLE_DOCKERIZE=false
       - ENABLE_CHOWN=false     
     env_file:
