@@ -4,4 +4,5 @@
 0 2 * * * find /var/www/html/pipe_store/video -mtime +${TO_DATE_TRACK_DELETE} -type f -name "*.mp4" -delete
 0 3 * * * find /var/www/html/frame_store -mtime +${TO_DATE_TRACK_DELETE} -type f -delete
 30 3 * * * track_delete_with_subject=$(date --iso-8601=seconds -d "$TO_DATE_TRACK_DELETE day ago") && curl -v -G -X "DELETE" --max-time 82800 --data-urlencode "toDate=$track_delete_with_subject" http://${API_IP}:3000/detections/with-subject
-
+0 * * * * curl -G -X "POST" api-master.tls.ai:2000/master/subjects/delete-expired
+0 * * * * curl -G -X "POST" api-master.tls.ai:2000/master/subjects/expire-notification
