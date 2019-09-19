@@ -184,7 +184,7 @@ services:
   seaweedfs-master:
     image: chrislusf/seaweedfs@sha256:81cfa3cb02fe909ac94da858fcc8f9b4158281d082637e41fcd2665cf93c3963
     restart: always
-    command: "-v=2 master -ip=seaweedfs-master.tls.ai -mdir=/data"
+    command: "-v=2 master -ip=seaweedfs-master-localnode.tls.ai -mdir=/data"
     networks:
       prod:
         aliases:
@@ -200,7 +200,7 @@ services:
   seaweedfs-volume:
     image: chrislusf/seaweedfs@sha256:81cfa3cb02fe909ac94da858fcc8f9b4158281d082637e41fcd2665cf93c3963
     restart: always
-    command: '-v=2 volume -max=1000 -ip=seaweedfs-volume.tls.ai -mserver=seaweedfs-master-localnode.tls.ai:9333 -port=8080 -dir=/data'
+    command: '-v=2 volume -max=1000 -ip=seaweedfs-volume-localnode.tls.ai -mserver=seaweedfs-master-localnode.tls.ai:9333 -port=8080 -dir=/data'
     networks:
       prod:
         aliases:
@@ -274,7 +274,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     environment:
       - limit_rate_speed=0
-      - aws_host="seaweedfs-s3-localnode.tls.ai:8333"
+      - aws_host=seaweedfs-s3-localnode.tls.ai:8333
       - error_log_level=info
       - access_log=on
       - rewrite_log=on
