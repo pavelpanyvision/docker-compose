@@ -746,8 +746,8 @@ services:
     hostname: master-sync-service
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     #those port should be opened only development mode
-    #ports:
-    #  - "16180:16180"
+    ports:
+      - "16180:16180"
     networks:
       prod:
         aliases:
