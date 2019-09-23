@@ -302,7 +302,7 @@ services:
         max-size: 1g
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:19.05
+    image: gcr.io/anyvision-training/supercronic:19.06
     restart: always
     networks:
       prod:
