@@ -15,7 +15,7 @@ services:
 
 
   face-key-fe:
-    image: gcr.io/anyvision-training/face-key-fe:development
+    image: gcr.io/anyvision-training/face-key-fe:anyvision-development
     restart: always
     networks:
       prod:
@@ -41,7 +41,7 @@ services:
 
 
   face-key-be:
-    image: gcr.io/anyvision-training/face-key-be:development
+    image: gcr.io/anyvision-training/face-key-be:anyvision-development
     restart: always
     networks:
       prod:
@@ -52,6 +52,9 @@ services:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /etc/timezone:/etc/timezone:ro
+    depends_on:
+      - redis
+      - mongodb
     environment:
       - REDIS_HOST=redis.tls.ai
       - DATABASE_IP=mongodb.tls.ai
