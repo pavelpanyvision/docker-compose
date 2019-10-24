@@ -553,7 +553,7 @@ services:
     logging:
       options:
         max-size: 1g
-    ipc: host   
+    ipc: host
     working_dir: /root/backend_trunk
     #entrypoint: sleep 1d
     entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
@@ -575,7 +575,7 @@ services:
     #The IP here should point to nginx of the master API
       - "nginx-master.tls.ai:1.1.1.1"
     ports:
-      - "9067:9067"                                           
+      - "9067:9067"
     volumes:
       - /ssd/license:/home/user/license:ro
       - /ssd/pipe_data:/root/pipe_data
@@ -587,7 +587,7 @@ services:
     environment:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
-      - DISPLAY=${DISPLAY:-:1}                                               
+      - DISPLAY=${DISPLAY:-:1}
       - storage_ip=nginx-localnode.tls.ai
       - frame_store_storage_ip=nginx-localnode.tls.ai
       - redis_host=127.0.0.1
@@ -614,10 +614,10 @@ services:
     logging:
       options:
         max-size: 1g
-    ipc: host   
+    ipc: host
     working_dir: /root/backend_trunk
     #entrypoint: sleep 1d
-    entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]   
+    entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
 
   edge:
     image: gcr.io/anyvision-training/backend-pyconcrete:1.24.0.8
@@ -651,7 +651,7 @@ services:
     environment:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
-      - DISPLAY=${DISPLAY:-:1}                                               
+      - DISPLAY=${DISPLAY:-:1}
       - storage_ip=nginx-localnode.tls.ai
       - frame_store_storage_ip=nginx-localnode.tls.ai
       - redis_host=127.0.0.1
@@ -679,10 +679,10 @@ services:
     logging:
       options:
         max-size: 1g
-    ipc: host   
+    ipc: host
     working_dir: /root/backend_trunk
     #entrypoint: sleep 1d
-    entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]   
+    entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
 
   
   broadcaster:
@@ -792,8 +792,8 @@ services:
      - FIREBASE_ADMIN_TOKEN=AAAA
      - RUN_AS_USER=user
      - ENABLE_CHOWN=false
-     - RMQ_API_USER=user
-     - RMQ_API_PASS=password
+     - RMQ_API_USER=root
+     - RMQ_API_PASS=rabbitpass
      - MONGO_DB_NAME=push-notifications
      - MONGO_DB_IP=mongodb.tls.ai
      - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672

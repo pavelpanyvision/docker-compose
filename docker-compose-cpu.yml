@@ -645,8 +645,8 @@ services:
 #      - FIREBASE_ADMIN_TOKEN=AAAA
 #      - RUN_AS_USER=user
 #      - ENABLE_CHOWN=false
-#      - RMQ_API_USER=user
-#      - RMQ_API_PASS=password
+#      - RMQ_API_USER=root
+#      - RMQ_API_PASS=rabbitpass
 #      - MONGO_DB_NAME=push-notifications
 #      - MONGO_DB_IP=mongodb.tls.ai
 #      - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672
