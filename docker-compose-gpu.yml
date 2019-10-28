@@ -182,7 +182,7 @@ services:
         max-size: 1g
 
   seaweedfs-master:
-    image: chrislusf/seaweedfs:1.44
+    image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
     command: "-v=2 master -ip=seaweedfs-master-localnode.tls.ai -mdir=/data"
     networks:
@@ -198,7 +198,7 @@ services:
         max-size: 1g
 
   seaweedfs-volume:
-    image: chrislusf/seaweedfs:1.44
+    image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
     command: '-v=2 volume -max=1000 -ip=seaweedfs-volume-localnode.tls.ai -mserver=seaweedfs-master-localnode.tls.ai:9333 -port=8080 -dir=/data'
     networks:
@@ -214,7 +214,7 @@ services:
       - seaweedfs-master
 
   seaweedfs-filer:
-    image: chrislusf/seaweedfs:1.44
+    image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
     command: '-v=2 filer -master=seaweedfs-master-localnode.tls.ai:9333 -ip=seaweedfs-filer-localnode.tls.ai'
     networks:
@@ -236,7 +236,7 @@ services:
       - seaweedfs-volume
 
   seaweedfs-s3:
-    image: chrislusf/seaweedfs:1.44
+    image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
     command: '-v=2 s3 -filer=seaweedfs-filer-localnode.tls.ai:8888 -port=8333 -filer.dir.buckets="/buckets"'
     networks:
