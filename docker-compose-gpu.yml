@@ -2,13 +2,6 @@
 version: '3.3'
 
 
-#volumes:
-  #redis_db_data:
-  #api_gateway_keys:
-  #consul_data:
-  #consul_agent_data:
-
-
 networks:
   prod:
     ipam:
