@@ -487,7 +487,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-pyconcrete:1.24.0.8
+    image: gcr.io/anyvision-training/backend:1.24.0.8
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -618,7 +618,7 @@ services:
     entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
 
   edge:
-    image: gcr.io/anyvision-training/backend-pyconcrete:1.24.0.8
+    image: gcr.io/anyvision-training/backend:1.24.0.8
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
