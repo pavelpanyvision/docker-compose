@@ -4,11 +4,6 @@ version: '3.3'
 
 networks:
   prod:
-    ipam:
-      driver: default
-      config:
-      -
-        subnet: 172.30.30.0/24
 
 
 services:
@@ -234,7 +229,6 @@ services:
     command: '-v=2 s3 -filer=seaweedfs-filer-localnode.tls.ai:8888 -port=8333 -filer.dir.buckets="/buckets"'
     networks:
       prod:
-        ipv4_address: 172.30.30.150
         aliases:
          - seaweedfs-s3.tls.ai
          - seaweedfs-s3-localnode.tls.ai
@@ -251,7 +245,7 @@ services:
       - seaweedfs-filer
 
   nginx:
-    image: gcr.io/anyvision-training/nginx:19.07
+    image: gcr.io/anyvision-training/nginx:19.10
     restart: always
     networks:
       prod:
@@ -279,6 +273,8 @@ services:
     logging:
       options:
         max-size: 1g
+    depends_on:
+      - seaweedfs-s3
 
 
 
