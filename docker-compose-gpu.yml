@@ -10,7 +10,7 @@ services:
 
 
   consul:
-    image: gcr.io/anyvision-training/consul:18.12
+    image: gcr.io/anyvision-production/consul:18.12
     restart: always
     networks:
       prod:
@@ -39,7 +39,7 @@ services:
 
 
   consul-agent:
-    image: gcr.io/anyvision-training/consul:18.12
+    image: gcr.io/anyvision-production/consul:18.12
     restart: always
     networks:
       #host_network:
@@ -66,7 +66,7 @@ services:
 
 
   memsql:
-    image: gcr.io/anyvision-training/memsql:19.09
+    image: gcr.io/anyvision-production/memsql:19.09
     restart: always
     networks:
       prod:
@@ -90,7 +90,7 @@ services:
         max-size: 1g
 
   memsql-schema:
-    image: gcr.io/anyvision-training/db-migrator:1.24.0-1BT
+    image: gcr.io/anyvision-production/db-migrator:1.24.0-1BT
     restart: "no"
     networks:
       prod:
@@ -109,7 +109,7 @@ services:
 
 
   rtstreamer:
-    image: gcr.io/anyvision-training/node-rtsp-rtmp-server:19.05
+    image: gcr.io/anyvision-production/node-rtsp-rtmp-server:19.05
     restart: always
     networks:
       prod:
@@ -126,7 +126,7 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-training/webrtc-streamer:1.24.0.0
+    image: gcr.io/anyvision-production/webrtc-streamer:1.24.0.0
     restart: always
     networks:
       prod:
@@ -157,7 +157,7 @@ services:
 
 
   coturn:
-    image: gcr.io/anyvision-training/coturn:19.05
+    image: gcr.io/anyvision-production/coturn:19.05
     restart: always
     network_mode: host 
     volumes:
@@ -170,7 +170,7 @@ services:
         max-size: 1g
 
   seaweedfs-master:
-    image: gcr.io/anyvision-training/seaweedfs:1.44
+    image: gcr.io/anyvision-production/seaweedfs:1.44
     restart: always
     command: "-v=2 master -ip=seaweedfs-master-localnode.tls.ai -mdir=/data"
     networks:
@@ -186,7 +186,7 @@ services:
         max-size: 1g
 
   seaweedfs-volume:
-    image: gcr.io/anyvision-training/seaweedfs:1.44
+    image: gcr.io/anyvision-production/seaweedfs:1.44
     restart: always
     command: '-v=2 volume -max=1000 -ip=seaweedfs-volume-localnode.tls.ai -mserver=seaweedfs-master-localnode.tls.ai:9333 -port=8080 -dir=/data'
     networks:
@@ -202,7 +202,7 @@ services:
       - seaweedfs-master
 
   seaweedfs-filer:
-    image: gcr.io/anyvision-training/seaweedfs:1.44
+    image: gcr.io/anyvision-production/seaweedfs:1.44
     restart: always
     command: '-v=2 filer -master=seaweedfs-master-localnode.tls.ai:9333 -ip=seaweedfs-filer-localnode.tls.ai'
     networks:
@@ -224,7 +224,7 @@ services:
       - seaweedfs-volume
 
   seaweedfs-s3:
-    image: gcr.io/anyvision-training/seaweedfs:1.44
+    image: gcr.io/anyvision-production/seaweedfs:1.44
     restart: always
     command: '-v=2 s3 -filer=seaweedfs-filer-localnode.tls.ai:8888 -port=8333 -filer.dir.buckets="/buckets"'
     networks:
@@ -245,7 +245,7 @@ services:
       - seaweedfs-filer
 
   nginx:
-    image: gcr.io/anyvision-training/nginx:19.10
+    image: gcr.io/anyvision-production/nginx:19.10
     restart: always
     networks:
       prod:
@@ -279,7 +279,7 @@ services:
 
 
   certificator:
-    image: gcr.io/anyvision-training/certificator:latest
+    image: gcr.io/anyvision-production/certificator:latest
     restart: on-failure
     #command: --disable-services --no-exitkills --debug sleep infinity
     volumes:
@@ -292,7 +292,7 @@ services:
         max-size: 1g
 
   cron:
-    image: gcr.io/anyvision-training/supercronic:19.06
+    image: gcr.io/anyvision-production/supercronic:19.06
     restart: always
     networks:
       prod:
@@ -315,7 +315,7 @@ services:
 
 
   rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:19.05
+    image: gcr.io/anyvision-production/rabbitmq:19.05
     restart: always
     hostname: rabbitmq
     networks:
@@ -340,7 +340,7 @@ services:
 
 
   mongodb:
-    image: gcr.io/anyvision-training/mongo:19.09
+    image: gcr.io/anyvision-production/mongo:19.09
     restart: always
     networks:
       prod:
@@ -361,7 +361,7 @@ services:
 
 
   redis:
-    image: gcr.io/anyvision-training/redis:19.08
+    image: gcr.io/anyvision-production/redis:19.08
     restart: always
     networks:
       prod:
@@ -381,7 +381,7 @@ services:
 
 
   dante-proxy:
-    image: gcr.io/anyvision-training/dante-proxy:19.02
+    image: gcr.io/anyvision-production/dante-proxy:19.02
     restart: always
     networks:
       - prod
@@ -398,7 +398,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:1.24.0.6
+    image: gcr.io/anyvision-production/api-gateway:1.24.0.6
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -438,7 +438,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:1.24.0.19
+    image: gcr.io/anyvision-production/api:1.24.0.19
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -477,7 +477,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:1.24.0.18
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.24.0.18
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -548,7 +548,7 @@ services:
 
 
   collate:
-    image: gcr.io/anyvision-training/backend:1.24.0.18
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.24.0.18
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -608,7 +608,7 @@ services:
     entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
 
   edge:
-    image: gcr.io/anyvision-training/backend:1.24.0.18
+    image: gcr.io/anyvision-production/backend-pyconcrete:1.24.0.18
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -671,7 +671,7 @@ services:
 
   
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:1.24.0.1
+    image: gcr.io/anyvision-production/broadcaster:1.24.0.1
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -703,7 +703,7 @@ services:
         max-size: 1g
 
   dslr-dashboard-bt:
-    image: gcr.io/anyvision-training/dslr-dashboard-bt:1.24.0.0
+    image: gcr.io/anyvision-production/dslr-dashboard-bt:1.24.0.0
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: dslr-dashboard-bt
@@ -730,7 +730,7 @@ services:
 
 
   master-sync-service:
-    image: gcr.io/anyvision-training/master-sync-service:1.1.4.0
+    image: gcr.io/anyvision-production/master-sync-service:1.1.4.0
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: master-sync-service
@@ -760,7 +760,7 @@ services:
         max-size: 1g
 
   push-notification:
-     image: gcr.io/anyvision-training/push-notification-service:1.24.0.0
+     image: gcr.io/anyvision-production/push-notification-service:1.24.0.0
      restart: always
      #command: --disable-services --no-exitkills --debug sleep infinity
      networks:
@@ -791,7 +791,7 @@ services:
 
 
   # dashboard-updater:
-  #   image: gcr.io/anyvision-training/dashboard-updater:latest
+  #   image: gcr.io/anyvision-production/dashboard-updater:latest
   #   restart: always
   #   networks:
   #     - prod
@@ -814,7 +814,7 @@ services:
 
 
   docker-hoster:
-    image: gcr.io/anyvision-training/docker-hoster
+    image: gcr.io/anyvision-production/docker-hoster
     restart: always
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock
