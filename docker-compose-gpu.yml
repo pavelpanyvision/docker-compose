@@ -2,20 +2,8 @@
 version: '3.3'
 
 
-#volumes:
-  #redis_db_data:
-  #api_gateway_keys:
-  #consul_data:
-  #consul_agent_data:
-
-
 networks:
   prod:
-    ipam:
-      driver: default
-      config:
-      -
-        subnet: 172.30.30.0/24
 
 
 services:
@@ -102,7 +90,7 @@ services:
         max-size: 1g
 
   memsql-schema:
-    image: gcr.io/anyvision-training/db-migrator:1.24.0-0BT
+    image: gcr.io/anyvision-training/db-migrator:1.24.0-1BT
     restart: "no"
     networks:
       prod:
@@ -182,7 +170,7 @@ services:
         max-size: 1g
 
   seaweedfs-master:
-    image: chrislusf/seaweedfs:1.44
+    image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
     command: "-v=2 master -ip=seaweedfs-master-localnode.tls.ai -mdir=/data"
     networks:
@@ -198,7 +186,7 @@ services:
         max-size: 1g
 
   seaweedfs-volume:
-    image: chrislusf/seaweedfs:1.44
+    image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
     command: '-v=2 volume -max=1000 -ip=seaweedfs-volume-localnode.tls.ai -mserver=seaweedfs-master-localnode.tls.ai:9333 -port=8080 -dir=/data -compactionMBps=40'
     networks:
@@ -214,7 +202,7 @@ services:
       - seaweedfs-master
 
   seaweedfs-filer:
-    image: chrislusf/seaweedfs:1.44
+    image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
     command: '-v=2 filer -master=seaweedfs-master-localnode.tls.ai:9333 -ip=seaweedfs-filer-localnode.tls.ai'
     networks:
@@ -236,7 +224,7 @@ services:
       - seaweedfs-volume
 
   seaweedfs-s3:
-    image: chrislusf/seaweedfs:1.44
+    image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
     command: '-v=2 s3 -filer=seaweedfs-filer-localnode.tls.ai:8888 -port=8333 -filer.dir.buckets="/buckets"'
     networks:
@@ -257,7 +245,7 @@ services:
       - seaweedfs-filer
 
   nginx:
-    image: gcr.io/anyvision-training/nginx:19.07
+    image: gcr.io/anyvision-training/nginx:19.10
     restart: always
     networks:
       prod:
@@ -285,6 +273,8 @@ services:
     logging:
       options:
         max-size: 1g
+    depends_on:
+      - seaweedfs-s3
 
 
 
@@ -408,7 +398,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:1.24.0.4
+    image: gcr.io/anyvision-training/api-gateway:1.24.0.6
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -448,7 +438,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:1.24.0.12
+    image: gcr.io/anyvision-training/api:1.24.0.19
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -466,8 +456,6 @@ services:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
       #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
-    extra_hosts:
-      - edge.tls.ai:192.168.99.1
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.tls.ai
@@ -489,7 +477,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-pyconcrete:1.24.0.8
+    image: gcr.io/anyvision-training/backend:1.24.0.18
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -513,7 +501,7 @@ services:
       - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
     volumes:
       - /ssd/license:/home/user/license:ro
-      - /ssd/pipe_data:/root/pipe_data
+      - /tmp/pipe_data:/root/pipe_data
       #- /ssd/track_archive_service_data:/root/track_archive_service_data
       - /ssd/reid_service_data:/root/reid_service_data
       - /storage:/var/www/html
@@ -560,7 +548,7 @@ services:
 
 
   collate:
-    image: gcr.io/anyvision-training/backend:1.24.0.8
+    image: gcr.io/anyvision-training/backend:1.24.0.18
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -578,7 +566,7 @@ services:
       - "9067:9067"
     volumes:
       - /ssd/license:/home/user/license:ro
-      - /ssd/pipe_data:/root/pipe_data
+      - /tmp/pipe_data:/root/pipe_data
       - /ssd/reid_service_data:/root/reid_service_data
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -620,24 +608,21 @@ services:
     entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
 
   edge:
-    image: gcr.io/anyvision-training/backend-pyconcrete:1.24.0.8
+    image: gcr.io/anyvision-training/backend:1.24.0.18
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
     depends_on:
       - memsql
-    network_mode: host
-    dns: 127.0.0.53
-   # networks:
-   #   prod:
-   #    aliases:
-   #       - edge.tls.ai
-   #       - proc-localnode.tls.ai
+    networks:
+      prod:
+       aliases:
+          - edge.tls.ai
+          - proc-localnode.tls.ai
 
     extra_hosts:
     #The IP here should point to nginx of the master API
       - "nginx-master.tls.ai:1.1.1.1"
-      - "edge.tls.ai:127.0.0.1"
     ports:
       - "4005:4005"                                           
     volumes:
@@ -686,7 +671,7 @@ services:
 
   
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:1.24.0.0
+    image: gcr.io/anyvision-training/broadcaster:1.24.0.1
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
