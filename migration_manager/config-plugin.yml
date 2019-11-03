@@ -21,4 +21,4 @@ plugins: # Please add the plugin configuration for this array and the node proce
     databaseName: mapi
     dumpFolderPath: /data/db_backups/
     limitVersion: ''
-    enable: False
+    enable: True

@@ -37,7 +37,7 @@ services:
       - master_api_port=2000
       - master_api_username=admin
       - master_api_password=admin
-      - master_api_address=http://api-master.tls.ai:2000      
+      - master_api_address=http://api-master.tls.ai:2000
     env_file:
       - env/global.env
     logging:
@@ -59,20 +59,22 @@ services:
       - "38383:38383"
     volumes:
       - /storage:/var/www/html
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /usr/local/share/ca-certificates/tls.ai/:/usr/local/share/ca-certificates/tls.ai/:ro
       - /etc/localtime:/etc/localtime:ro
       - /ssd/apimaster/keys:/usr/local/share/keys
+      # - /home/anyvision/Projects/api-master:/home/user/api-master
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38383
       - API_MASTER_PORT=2000
-      - SELF_API_HOST=api.tls.ai
-      - SELF_API_PORT=3000
+      - SELF_API_HOST=192.168.20.45
+      - SELF_API_PORT=9443
       - MONGO_DB_IP=mongodb.tls.ai
       - RMQ_EXCHANGE_HOST=rabbitmq.tls.ai
-      - RMQ_EXCHANGE_PORT=5672      
+      - RMQ_EXCHANGE_PORT=5672
       - MONGO_DB_PORT=27017
       - RUN_AS_USER=user
       - API_MASTER_IP=api-master.tls.ai
+      - IS_SECURED_SOCKETS=false
       #- ENABLE_CHOWN=false
     env_file:
       - env/global.env
