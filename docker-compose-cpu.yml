@@ -12,7 +12,7 @@ networks:
 
 services:
   consul:
-    image: gcr.io/anyvision-training/consul:18.12
+    image: gcr.io/anyvision-production/consul:18.12
     restart: always
     networks:
       prod:
@@ -39,9 +39,8 @@ services:
         max-size: 1g
 
 
-
   consul-agent:
-    image: gcr.io/anyvision-training/consul:18.12
+    image: gcr.io/anyvision-production/consul:18.12
     restart: always
     networks:
       #host_network:
@@ -66,9 +65,8 @@ services:
       options:
         max-size: 1g
 
-
   memsql:
-    image: gcr.io/anyvision-training/memsql:19.09
+    image: gcr.io/anyvision-production/memsql:19.09
     restart: always
     networks:
       prod:
@@ -91,6 +89,7 @@ services:
       options:
         max-size: 1g
 
+
   memsql-schema:
     image: gcr.io/anyvision-production/db-migrator:1.24.0-1BT
     restart: "no"
@@ -109,6 +108,7 @@ services:
     depends_on:
       - memsql
 
+
   seaweedfs-master:
     image: gcr.io/anyvision-production/seaweedfs:1.44
     restart: always
@@ -125,6 +125,7 @@ services:
       options:
         max-size: 1g
 
+
   seaweedfs-volume:
     image: gcr.io/anyvision-production/seaweedfs:1.44
     restart: always
@@ -140,6 +141,7 @@ services:
         max-size: 1g
     depends_on:
       - seaweedfs-master
+
 
   seaweedfs-filer:
     image: gcr.io/anyvision-production/seaweedfs:1.44
@@ -163,6 +165,7 @@ services:
       - seaweedfs-master
       - seaweedfs-volume
 
+
   seaweedfs-s3:
     image: gcr.io/anyvision-production/seaweedfs:1.44
     restart: always
@@ -184,8 +187,9 @@ services:
       - seaweedfs-volume
       - seaweedfs-filer
 
+
   nginx:
-    image: gcr.io/anyvision-training/nginx:19.10
+    image: gcr.io/anyvision-production/nginx:19.10
     restart: always
     networks:
       prod:
@@ -212,9 +216,8 @@ services:
         max-size: 1g
 
 
-
   certificator:
-    image: gcr.io/anyvision-training/certificator:latest
+    image: gcr.io/anyvision-production/certificator:latest
     restart: on-failure
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -226,33 +229,8 @@ services:
         max-size: 1g
 
 
-  rabbitmq:
-    image: gcr.io/anyvision-training/rabbitmq:18.12
-    restart: always
-    hostname: rabbitmq
-    networks:
-      prod:
-        aliases:
-          - rabbitmq.tls.ai
-    # these ports should be opened only in development mode
-    ports:
-      - "5671:5671"
-      - "5672:5672"
-      - "15672:15672"
-      - "15671:15671"
-    volumes:
-      - /storage/rabbitmq:/var/lib/rabbitmq
-      - /etc/localtime:/etc/localtime:ro      
-    env_file:
-      - env/global.env
-    logging:
-      options:
-        max-size: 1g
-
-
-
   mongodb:
-    image: gcr.io/anyvision-training/mongo:19.04
+    image: gcr.io/anyvision-production/mongo:19.04
     restart: always
     networks:
       prod:
@@ -267,41 +245,6 @@ services:
     logging:
       options:
         max-size: 1g
-
-
-
-  redis:
-    image: gcr.io/anyvision-training/redis:18.12
-    restart: always
-    networks:
-      prod:
-        aliases:
-          - redis.tls.ai
-    sysctls:
-      - net.core.somaxconn=511
-    volumes:
-      - /ssd/redis_db_data:/data:rw
-      - /etc/localtime:/etc/localtime:ro         
-    logging:
-      options:
-        max-size: 1g
-
-
-
-  dante-proxy:
-    image: gcr.io/anyvision-training/dante-proxy:18.12
-    restart: always
-    networks:
-      - prod
-    ports:
-      - "1080:1080"
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ./socks/sockd.conf:/etc/sockd.conf         
-    logging:
-      options:
-        max-size: 1g
-
 
   api:
     image: gcr.io/anyvision-training/sesame-api:codefresh
@@ -338,7 +281,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:on-demand-cpu-mode
+    image: gcr.io/anyvision-production/backend-pyconcrete:on-demand-cpu-mode
     entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
     restart: always
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -404,12 +347,3 @@ services:
     ipc: host
 
 
-  docker-hoster:
-    image: gcr.io/anyvision-training/docker-hoster
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock
-      - /etc/hosts:/tmp/hosts
-    logging:
-      options:
-        max-size: 1g
