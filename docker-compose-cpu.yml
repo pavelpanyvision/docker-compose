@@ -204,13 +204,27 @@ services:
       - /etc/localtime:/etc/localtime:ro
     environment:
       - limit_rate_speed=0
-      - aws_host="seaweedfs-s3-localnode.tls.ai:8333"
+      - aws_host=seaweedfs-s3-localnode.tls.ai:8333
       - error_log_level=info
       - access_log=on
       - rewrite_log=on
-      - dns_resolver=127.0.0.1 
+      - default_dns_resolver=127.0.0.11
+      - dns_resolver=127.0.0.11
     env_file:
       - env/global.env
+    logging:
+      options:
+        max-size: 1g
+    depends_on:
+      - seaweedfs-s3
+
+
+  docker-hoster:
+    image: gcr.io/anyvision-production/docker-hoster
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+      - /etc/hosts:/tmp/hosts
     logging:
       options:
         max-size: 1g
