@@ -128,24 +128,27 @@ services:
       prod:
         aliases:
           - webrtc.tls.ai
-          #- webrtc.tls.ai
     ports:
-      - "8000:8000"
+      - 8000:8000
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
-      - WEBRTC_STREAMER_OPTIONS=-H0.0.0.0:8000s -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
-      #- HOST_IP=<ip of the host>
+      - WEBRTC_STREAMER_OPTIONS=-H0.0.0.0:8000 -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
       - WAN_MODE=false
       - WAN_STUN_URL=stun.l.google.com:19302
-      - APIGATEWAY_IP=apigateway.tls.ai
-      - APIGATEWAY_PROTOCOL=https
-      - APIGATEWAY_PORT=9443
+      - APIGATEWAY_IP=api.tls.ai
+      - APIGATEWAY_PROTOCOL=http
+      - APIGATEWAY_PORT=3000
       - NODE_RTSP_IP=rtstreamer.tls.ai
       - NODE_RTSP_PROTOCOL=rtsp
       - NODE_RTSP_PORT=80
       - CAMERA_INT_REQ_TIME=1000
       - CRT_CA_BUNDLE=/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
+      - WEBRTC_HOST=localhost
+      - 'WEBRTC_PROTOCOL=http:'
+      - WEBRTC_PORT=8000
+      - WEBRTC_PREFIX=
+      - DISABLE_GATEWAY_AUTH=true
     logging:
       options:
         max-size: 1g
