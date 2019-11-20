@@ -37,7 +37,7 @@ services:
       - master_api_port=2000
       - master_api_username=admin
       - master_api_password=admin
-      - master_api_address=http://api-master.tls.ai:2000      
+      - master_api_address=http://api-master.tls.ai:2000
     env_file:
       - env/global.env
     logging:
@@ -48,7 +48,7 @@ services:
 
 
   api-master:
-    image: gcr.io/anyvision-training/api-master:development
+    image: gcr.io/anyvision-training/api-master:1.1.4.4
     restart: always
     networks:
       prod:
@@ -69,7 +69,7 @@ services:
       - SELF_API_PORT=3000
       - MONGO_DB_IP=mongodb.tls.ai
       - RMQ_EXCHANGE_HOST=rabbitmq.tls.ai
-      - RMQ_EXCHANGE_PORT=5672      
+      - RMQ_EXCHANGE_PORT=5672
       - MONGO_DB_PORT=27017
       - RUN_AS_USER=user
       - API_MASTER_IP=api-master.tls.ai
