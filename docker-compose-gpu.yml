@@ -7,19 +7,17 @@ networks:
 
 
 services:
-
-
   consul:
     image: gcr.io/anyvision-training/consul:18.12
     restart: always
     networks:
       prod:
         aliases:
-        - consul.tls.ai
+          - consul.tls.ai
     ports:
-      - "8500:8500"
+      - 8500:8500
     volumes:
-      -  /ssd/consul_data:/consul/data
+      - /ssd/consul_data:/consul/data
       - /etc/hostname:/etc/host_hostname:ro
     environment:
       - CMD=agent -server -bootstrap -ui
@@ -37,12 +35,10 @@ services:
         max-size: 1g
 
 
-
   consul-agent:
     image: gcr.io/anyvision-training/consul:18.12
     restart: always
     networks:
-      #host_network:
       prod:
         aliases:
           - consul-agent.tls.ai
@@ -73,7 +69,7 @@ services:
         aliases:
           - memsql.tls.ai
     ports:
-      - "3306:3306"
+      - 3306:3306
     volumes:
       - /ssd/memsql:/var/lib/memsql
       - /storage/backup_memsql:/backup
@@ -89,9 +85,10 @@ services:
       options:
         max-size: 1g
 
+
   memsql-schema:
     image: gcr.io/anyvision-training/db-migrator:1.24.0-1BT
-    restart: "no"
+    restart: 'no'
     networks:
       prod:
         aliases:
@@ -114,15 +111,14 @@ services:
     networks:
       prod:
         aliases:
-         - node-rtsp-rtmp-server.tls.ai
-         - rtstreamer.tls.ai
-    # ports:
-    #   - "80:80"
-    #   - "1935:1935"
+          - node-rtsp-rtmp-server.tls.ai
+          - rtstreamer.tls.ai
+#     ports:
+#       - 80:80
+#       - 1935:1935
     logging:
       options:
         max-size: 1g
-
 
 
   webrtc-streamer:
@@ -132,34 +128,36 @@ services:
       prod:
         aliases:
           - webrtc.tls.ai
-          #- webrtc.tls.ai
     ports:
-      - "8000:8000"
+      - 8000:8000
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
-      - WEBRTC_STREAMER_OPTIONS=-H0.0.0.0:8000s -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
-      #- HOST_IP=<ip of the host>
+      - WEBRTC_STREAMER_OPTIONS=-H0.0.0.0:8000 -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
       - WAN_MODE=false
       - WAN_STUN_URL=stun.l.google.com:19302
-      - APIGATEWAY_IP=apigateway.tls.ai
-      - APIGATEWAY_PROTOCOL=https
-      - APIGATEWAY_PORT=9443
+      - APIGATEWAY_IP=api.tls.ai
+      - APIGATEWAY_PROTOCOL=http
+      - APIGATEWAY_PORT=3000
       - NODE_RTSP_IP=rtstreamer.tls.ai
       - NODE_RTSP_PROTOCOL=rtsp
       - NODE_RTSP_PORT=80
       - CAMERA_INT_REQ_TIME=1000
       - CRT_CA_BUNDLE=/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
+      - WEBRTC_HOST=localhost
+      - 'WEBRTC_PROTOCOL=http:'
+      - WEBRTC_PORT=8000
+      - WEBRTC_PREFIX=
+      - DISABLE_GATEWAY_AUTH=true
     logging:
       options:
         max-size: 1g
 
 
-
   coturn:
     image: gcr.io/anyvision-training/coturn:19.05
     restart: always
-    network_mode: host 
+    network_mode: host
     volumes:
       - /ssd/coturn:/var/lib/coturn
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -169,14 +167,15 @@ services:
       options:
         max-size: 1g
 
+
   seaweedfs-master:
     image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
-    command: "-v=2 master -ip=seaweedfs-master-localnode.tls.ai -mdir=/data"
+    command: -v=2 master -ip=seaweedfs-master-localnode.tls.ai -mdir=/data
     networks:
       prod:
         aliases:
-         - seaweedfs-master-localnode.tls.ai
+          - seaweedfs-master-localnode.tls.ai
     volumes:
       - /ssd/seaweed-master:/data
     env_file:
@@ -185,14 +184,15 @@ services:
       options:
         max-size: 1g
 
+
   seaweedfs-volume:
     image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
-    command: '-v=2 volume -max=1000 -ip=seaweedfs-volume-localnode.tls.ai -mserver=seaweedfs-master-localnode.tls.ai:9333 -port=8080 -dir=/data -compactionMBps=40'
+    command: -v=2 volume -max=1000 -ip=seaweedfs-volume-localnode.tls.ai -mserver=seaweedfs-master-localnode.tls.ai:9333 -port=8080 -dir=/data -compactionMBps=40
     networks:
       prod:
         aliases:
-         - seaweedfs-volume-localnode.tls.ai
+          - seaweedfs-volume-localnode.tls.ai
     volumes:
       - /storage/seaweed:/data
     logging:
@@ -201,16 +201,17 @@ services:
     depends_on:
       - seaweedfs-master
 
+
   seaweedfs-filer:
     image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
-    command: '-v=2 filer -master=seaweedfs-master-localnode.tls.ai:9333 -ip=seaweedfs-filer-localnode.tls.ai'
+    command: -v=2 filer -master=seaweedfs-master-localnode.tls.ai:9333 -ip=seaweedfs-filer-localnode.tls.ai
     networks:
       prod:
         aliases:
-         - seaweedfs-filer-localnode.tls.ai
+          - seaweedfs-filer-localnode.tls.ai
     ports:
-       - "8888:8888"
+      - 8888:8888
     env_file:
       - env/global.env
     volumes:
@@ -223,17 +224,18 @@ services:
       - seaweedfs-master
       - seaweedfs-volume
 
+
   seaweedfs-s3:
     image: gcr.io/anyvision-training/seaweedfs:1.44
     restart: always
-    command: '-v=2 s3 -filer=seaweedfs-filer-localnode.tls.ai:8888 -port=8333 -filer.dir.buckets="/buckets"'
+    command: -v=2 s3 -filer=seaweedfs-filer-localnode.tls.ai:8888 -port=8333 -filer.dir.buckets="/buckets"
     networks:
       prod:
         aliases:
-         - seaweedfs-s3.tls.ai
-         - seaweedfs-s3-localnode.tls.ai
+          - seaweedfs-s3.tls.ai
+          - seaweedfs-s3-localnode.tls.ai
     ports:
-       - "8333:8333"
+      - 8333:8333
     env_file:
       - env/global.env
     logging:
@@ -244,6 +246,7 @@ services:
       - seaweedfs-volume
       - seaweedfs-filer
 
+
   nginx:
     image: gcr.io/anyvision-training/nginx:19.10
     restart: always
@@ -253,9 +256,9 @@ services:
           - nginx-localnode.tls.ai
           - nginx.tls.ai
     ports:
-      - "1935:1935"
-      - "443:443"
-      #- "80:80"
+      - 1935:1935
+      - 443:443
+      #- 80:80
     volumes:
       - /storage:/opt/nginx/html:ro
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -277,7 +280,6 @@ services:
       - seaweedfs-s3
 
 
-
   certificator:
     image: gcr.io/anyvision-training/certificator:latest
     restart: on-failure
@@ -290,6 +292,7 @@ services:
     logging:
       options:
         max-size: 1g
+
 
   cron:
     image: gcr.io/anyvision-training/supercronic:19.06
@@ -304,14 +307,13 @@ services:
       - /etc/localtime:/etc/localtime:ro
     environment:
       - TO_DATE_TRACK_DELETE=30
-      - API_IP=api.tls.ai 
-      - CONSUL_AGENT=consul-agent.tls.ai  
+      - API_IP=api.tls.ai
+      - CONSUL_AGENT=consul-agent.tls.ai
     env_file:
       - env/global.env
     logging:
       options:
         max-size: 1g
-
 
 
   rabbitmq:
@@ -324,19 +326,18 @@ services:
           - rabbitmq.tls.ai
     # these ports should be opened only in development mode
     ports:
-      - "5671:5671"
-      - "5672:5672"
-      - "15672:15672"
-      - "15671:15671"
+      - 5671:5671
+      - 5672:5672
+      - 15672:15672
+      - 15671:15671
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
-      - /etc/localtime:/etc/localtime:ro      
+      - /etc/localtime:/etc/localtime:ro
     env_file:
       - env/global.env
     logging:
       options:
         max-size: 1g
-
 
 
   mongodb:
@@ -351,13 +352,12 @@ services:
     volumes:
       - /ssd/mongo_db_data:/data/db
       - /storage/backup_mongodb:/backup
-      - /etc/localtime:/etc/localtime:ro          
+      - /etc/localtime:/etc/localtime:ro
     env_file:
       - env/global.env
     logging:
       options:
         max-size: 1g
-
 
 
   redis:
@@ -373,11 +373,10 @@ services:
       - /ssd/redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
     env_file:
-      - env/global.env               
+      - env/global.env
     logging:
       options:
         max-size: 1g
-
 
 
   dante-proxy:
@@ -386,15 +385,13 @@ services:
     networks:
       - prod
     ports:
-      - "1080:1080"
+      - 1080:1080
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./socks/sockd.conf:/etc/sockd.conf         
+      - ./socks/sockd.conf:/etc/sockd.conf
     logging:
       options:
         max-size: 1g
-
-
 
 
   apigateway:
@@ -405,10 +402,9 @@ services:
       prod:
         aliases:
           - apigateway.tls.ai
-          #- apigateway.tls.ai
     ports:
-      - "9443:9443"
-      - "38391:38391"
+      - 9443:9443
+      - 38391:38391
     volumes:
       - /storage:/var/www/html
       #- api_gateway_keys:/home/user/api-gateway/config/keys
@@ -427,14 +423,13 @@ services:
       - GATEWAY_URL=http://apigateway.tls.ai:8080
       - REDIS_HOST=redis.tls.ai
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false         
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/api-gateway.env
     logging:
       options:
         max-size: 1g
-
 
 
   api:
@@ -446,11 +441,10 @@ services:
         aliases:
           - api.tls.ai
           - api-localnode.tls.ai
-          #- api.tls.ai
     ports:
-      - "5443:5443"
-      - "38389:38389"
-      - "3000:3000"
+      - 5443:5443
+      - 38389:38389
+      - 3000:3000
     volumes:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -466,14 +460,13 @@ services:
       - RUN_AS_USER=node
       - ENABLE_CHOWN=false
       - REID_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
-      - TRACK_ARCHIVE_IP=reid-localnode.tls.ai 
+      - TRACK_ARCHIVE_IP=reid-localnode.tls.ai
     env_file:
       - env/global.env
       - env/api.env
     logging:
       options:
         max-size: 1g
-
 
 
   backend:
@@ -486,23 +479,20 @@ services:
     networks:
       prod:
         aliases:
-          #- edge.tls.ai
           - reid.tls.ai
           - reid-localnode.tls.ai
           - arch.tls.ai
           - arch-localnode.tls.ai
     extra_hosts:
     #The IP here should point to nginx of the master API
-      - "nginx-master.tls.ai:1.1.1.1"
+      - nginx-master.tls.ai:1.1.1.1
     ports:
-      - "9068:9068"
-      - "9069:9069"
-      - "9022:9022" #ssh
-      - "5000-5250:5000-5250/udp"                                            ### for remote VMS rtsp connections
+      - 9068:9068
+      - 9069:9069
+      - 9022:9022   #ssh
+      - 5000-5250:5000-5250/udp                                              ### for remote VMS rtsp connections
     volumes:
       - /ssd/license:/home/user/license:ro
-      - /tmp/pipe_data:/root/pipe_data
-      #- /ssd/track_archive_service_data:/root/track_archive_service_data
       - /ssd/reid_service_data:/root/reid_service_data
       - /storage:/var/www/html
       #- /dev:/dev:rw       ## FOR ACCESSING DEVICES - HOT-PLUGGABLE
@@ -510,6 +500,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       #- /root/backend_trunk:/root/backend_trunk                             ### mount your local project directory to the container
+      - /tmp/pipe_data:/root/pipe_data
     environment:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
@@ -544,7 +535,7 @@ services:
     ipc: host
     working_dir: /root/backend_trunk
     #entrypoint: sleep 1d
-    entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
+    entrypoint: [/bin/containerpilot, -config, /etc/containerpilot.json5]
 
 
   collate:
@@ -561,78 +552,17 @@ services:
           - coll-localnode.tls.ai
     extra_hosts:
     #The IP here should point to nginx of the master API
-      - "nginx-master.tls.ai:1.1.1.1"
+      - nginx-master.tls.ai:1.1.1.1
     ports:
-      - "9067:9067"
+      - 9067:9067
     volumes:
       - /ssd/license:/home/user/license:ro
+      - /ssd/reid_service_data:/root/reid_service_data
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
       - /tmp/pipe_data:/root/pipe_data
-      - /ssd/reid_service_data:/root/reid_service_data
-      - /storage:/var/www/html
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      - ENABLE_OPENSSH_SERVICE=true
-      - BACKEND_OPENSSH_PORT=9022
-      - DISPLAY=${DISPLAY:-:1}
-      - storage_ip=nginx-localnode.tls.ai
-      - frame_store_storage_ip=nginx-localnode.tls.ai
-      - redis_host=127.0.0.1
-      - api_service_ip=api.tls.ai
-      - mongodb_host=mongodb.tls.ai
-      - reid_service_ip=reid-localnode.tls.ai
-      - collate_service_ip=coll.tls.ai
-      - track_archive_service_ip=arch.tls.ai
-      - frame_store_rtmp_url=rtstreamer.tls.ai
-      - frame_store_rtmp_port=80
-      - misc_gpu_encoding=true
-      - memsql_host=memsql.tls.ai
-      - memsql_port=3306
-      - DB_HOST=memsql.tls.ai
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=password
-      - DB_NAME=reid_db
-      - prometheus_gateway_ip=monitor_pushgateway_1
-      - ENABLE_MONITORING=false
-    env_file:
-      - env/global.env
-      - env/collate.env
-    logging:
-      options:
-        max-size: 1g
-    ipc: host
-    working_dir: /root/backend_trunk
-    #entrypoint: sleep 1d
-    entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
-
-  edge:
-    image: gcr.io/anyvision-training/backend:1.24.0.18
-    restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
-    depends_on:
-      - memsql
-    networks:
-      prod:
-       aliases:
-          - edge.tls.ai
-          - proc-localnode.tls.ai
-
-    extra_hosts:
-    #The IP here should point to nginx of the master API
-      - "nginx-master.tls.ai:1.1.1.1"
-    ports:
-      - "4005:4005"                                           
-    volumes:
-      - /ssd/license:/home/user/license:ro
-      - /ssd/pipe_data:/root/pipe_data
-      - /ssd/reid_service_data:/root/reid_service_data
-      - /storage:/var/www/html
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /etc/localtime:/etc/localtime:ro
     environment:
       - ENABLE_OPENSSH_SERVICE=true
       - BACKEND_OPENSSH_PORT=9022
@@ -660,6 +590,68 @@ services:
       - external_ip=edge.tls.ai
     env_file:
       - env/global.env
+      - env/collate.env
+    logging:
+      options:
+        max-size: 1g
+    ipc: host
+    working_dir: /root/backend_trunk
+    #entrypoint: sleep 1d
+    entrypoint: [/bin/containerpilot, -config, /etc/containerpilot.json5]
+
+
+  edge:
+    image: gcr.io/anyvision-training/backend:1.24.0.18
+    restart: always
+    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
+    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
+    depends_on:
+      - memsql
+    extra_hosts:
+    #The IP here should point to nginx of the master API
+      - nginx-master.tls.ai:1.1.1.1
+    networks:
+      prod:
+        aliases:
+          - edge.tls.ai
+          - proc-localnode.tls.ai
+    ports:
+      - 4005:4005
+    volumes:
+      - /ssd/license:/home/user/license:ro
+      - /ssd/pipe_data:/root/pipe_data
+      - /ssd/reid_service_data:/root/reid_service_data
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - BACKEND_OPENSSH_PORT=9022
+      - DISPLAY=${DISPLAY:-:1}
+      - storage_ip=nginx-localnode.tls.ai
+      - frame_store_storage_ip=nginx-localnode.tls.ai
+      - redis_host=127.0.0.1
+      - api_service_ip=api.tls.ai
+      - mongodb_host=mongodb.tls.ai
+      - reid_service_ip=reid-localnode.tls.ai
+      - collate_service_ip=coll.tls.ai
+      - track_archive_service_ip=arch.tls.ai
+      - frame_store_rtmp_url=rtstreamer.tls.ai
+      - frame_store_rtmp_port=80
+      - misc_gpu_encoding=true
+      - memsql_host=memsql.tls.ai
+      - memsql_port=3306
+      - DB_HOST=memsql.tls.ai
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=reid_db
+      - prometheus_gateway_ip=monitor_pushgateway_1
+      - ENABLE_MONITORING=false
+      - external_ip=edge.tls.ai
+      - ENABLE_OPENSSH_SERVICE=true
+    env_file:
+      - env/global.env
       - env/edge.env
     logging:
       options:
@@ -667,9 +659,9 @@ services:
     ipc: host
     working_dir: /root/backend_trunk
     #entrypoint: sleep 1d
-    entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
+    entrypoint: [/bin/containerpilot, -config, /etc/containerpilot.json5]
 
-  
+
   broadcaster:
     image: gcr.io/anyvision-training/broadcaster:1.24.0.1
     restart: always
@@ -693,14 +685,14 @@ services:
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
       - RUN_AS_USER=user
       - BCAST_RMQ_IS_ENABLED=true
-      #- ENABLE_DOCKERIZE=false
-      - ENABLE_CHOWN=false     
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/broadcaster.env
     logging:
       options:
         max-size: 1g
+
 
   dslr-dashboard-bt:
     image: gcr.io/anyvision-training/dslr-dashboard-bt:1.24.0.0
@@ -713,14 +705,13 @@ services:
         aliases:
           - dslr-dashboard-bt.tls.ai
     ports:
-      - "38392:38392"
+      - 38392:38392
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38392
-      #- ENABLE_DOCKERIZE=false
-      - ENABLE_CHOWN=false     
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/broadcaster.env
@@ -737,7 +728,7 @@ services:
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     #those port should be opened only development mode
     ports:
-      - "16180:16180"
+      - 16180:16180
     networks:
       prod:
         aliases:
@@ -749,7 +740,6 @@ services:
     depends_on:
       - api
     environment:
-      #- ENABLE_DOCKERIZE=false
       - ENABLE_CHOWN=false
       - RUN_AS_USER=user
     env_file:
@@ -759,58 +749,35 @@ services:
       options:
         max-size: 1g
 
+
   push-notification:
-     image: gcr.io/anyvision-training/push-notification-service:1.24.0.0
-     restart: always
+    image: gcr.io/anyvision-training/push-notification-service:1.24.0.0
+    restart: always
      #command: --disable-services --no-exitkills --debug sleep infinity
-     networks:
-       prod:
-         aliases:
-         - push-notification.tls.ai
-     ports:
-     - "7443:7443"
-     volumes:
-     - /storage:/var/www/html
-     - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-     - /etc/localtime:/etc/localtime:ro
-     environment:
-     - FIREBASE_ADMIN_TOKEN=AAAA
-     - RUN_AS_USER=user
-     - ENABLE_CHOWN=false
-     - RMQ_API_USER=root
-     - RMQ_API_PASS=rabbitpass
-     - MONGO_DB_NAME=push-notifications
-     - MONGO_DB_IP=mongodb.tls.ai
-     - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672
-     env_file:
-     - env/global.env
-     logging:
-       options:
-         max-size: 1g
-
-
-
-  # dashboard-updater:
-  #   image: gcr.io/anyvision-training/dashboard-updater:latest
-  #   restart: always
-  #   networks:
-  #     - prod
-  #   ports:
-  #     - "8888:8888"
-  #   volumes:
-  #     - /ssd/dashboards:/opt/nginx/html:rw
-  #     - /etc/localtime:/etc/localtime:ro
-  #   environment:
-  #     - limit_rate_speed=0
-  #     - DASHBOARD_VERSION=1.20.0
-  #     - ENABLE_FETCHER=false
-  #     - ENABLE_NGINX=true
-  #   env_file:
-  #     - env/global.env
-  #   logging:
-  #     options:
-  #       max-size: 1g
-
+    networks:
+      prod:
+        aliases:
+          - push-notification.tls.ai
+    ports:
+      - 7443:7443
+    volumes:
+      - /storage:/var/www/html
+      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - FIREBASE_ADMIN_TOKEN=AAAA
+      - RUN_AS_USER=user
+      - ENABLE_CHOWN=false
+      - RMQ_API_USER=root
+      - RMQ_API_PASS=rabbitpass
+      - MONGO_DB_NAME=push-notifications
+      - MONGO_DB_IP=mongodb.tls.ai
+      - RMQ_API_HOST=amqp://rabbitmq.tls.ai:5672
+    env_file:
+      - env/global.env
+    logging:
+      options:
+        max-size: 1g
 
 
   docker-hoster:
