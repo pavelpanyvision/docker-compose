@@ -126,7 +126,7 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-production/webrtc-streamer:1.24.0.0
+    image: gcr.io/anyvision-production/webrtc-streamer:1.24.0.4
     restart: always
     networks:
       prod:
@@ -159,7 +159,7 @@ services:
   coturn:
     image: gcr.io/anyvision-production/coturn:19.05
     restart: always
-    network_mode: host 
+    network_mode: host
     volumes:
       - /ssd/coturn:/var/lib/coturn
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
@@ -304,8 +304,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
     environment:
       - TO_DATE_TRACK_DELETE=30
-      - API_IP=api.tls.ai 
-      - CONSUL_AGENT=consul-agent.tls.ai  
+      - API_IP=api.tls.ai
+      - CONSUL_AGENT=consul-agent.tls.ai
     env_file:
       - env/global.env
     logging:
@@ -330,7 +330,7 @@ services:
       - "15671:15671"
     volumes:
       - /storage/rabbitmq:/var/lib/rabbitmq
-      - /etc/localtime:/etc/localtime:ro      
+      - /etc/localtime:/etc/localtime:ro
     env_file:
       - env/global.env
     logging:
@@ -351,7 +351,7 @@ services:
     volumes:
       - /ssd/mongo_db_data:/data/db
       - /storage/backup_mongodb:/backup
-      - /etc/localtime:/etc/localtime:ro          
+      - /etc/localtime:/etc/localtime:ro
     env_file:
       - env/global.env
     logging:
@@ -373,7 +373,7 @@ services:
       - /ssd/redis_db_data:/data:rw
       - /etc/localtime:/etc/localtime:ro
     env_file:
-      - env/global.env               
+      - env/global.env
     logging:
       options:
         max-size: 1g
@@ -389,7 +389,7 @@ services:
       - "1080:1080"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./socks/sockd.conf:/etc/sockd.conf         
+      - ./socks/sockd.conf:/etc/sockd.conf
     logging:
       options:
         max-size: 1g
@@ -398,7 +398,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-production/api-gateway:1.24.0.6
+    image: gcr.io/anyvision-production/api-gateway:1.24.0.8
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -427,7 +427,7 @@ services:
       - GATEWAY_URL=http://apigateway.tls.ai:8080
       - REDIS_HOST=redis.tls.ai
       - RUN_AS_USER=user
-      - ENABLE_CHOWN=false         
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/api-gateway.env
@@ -438,7 +438,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.24.0.19
+    image: gcr.io/anyvision-production/api:1.24.0.25
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -466,7 +466,7 @@ services:
       - RUN_AS_USER=node
       - ENABLE_CHOWN=false
       - REID_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
-      - TRACK_ARCHIVE_IP=reid-localnode.tls.ai 
+      - TRACK_ARCHIVE_IP=reid-localnode.tls.ai
     env_file:
       - env/global.env
       - env/api.env
@@ -624,7 +624,7 @@ services:
     #The IP here should point to nginx of the master API
       - "nginx-master.tls.ai:1.1.1.1"
     ports:
-      - "4005:4005"                                           
+      - "4005:4005"
     volumes:
       - /ssd/license:/home/user/license:ro
       - /ssd/pipe_data:/root/pipe_data
@@ -669,9 +669,9 @@ services:
     #entrypoint: sleep 1d
     entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
 
-  
+
   broadcaster:
-    image: gcr.io/anyvision-production/broadcaster:1.24.0.1
+    image: gcr.io/anyvision-production/broadcaster:1.24.0.3
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -694,7 +694,7 @@ services:
       - RUN_AS_USER=user
       - BCAST_RMQ_IS_ENABLED=true
       #- ENABLE_DOCKERIZE=false
-      - ENABLE_CHOWN=false     
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/broadcaster.env
@@ -703,7 +703,7 @@ services:
         max-size: 1g
 
   dslr-dashboard-bt:
-    image: gcr.io/anyvision-production/dslr-dashboard-bt:1.24.0.0
+    image: gcr.io/anyvision-production/dslr-dashboard-bt:1.24.0.1
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: dslr-dashboard-bt
@@ -720,7 +720,7 @@ services:
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38392
       #- ENABLE_DOCKERIZE=false
-      - ENABLE_CHOWN=false     
+      - ENABLE_CHOWN=false
     env_file:
       - env/global.env
       - env/broadcaster.env
@@ -730,7 +730,7 @@ services:
 
 
   master-sync-service:
-    image: gcr.io/anyvision-production/master-sync-service:1.1.4.0
+    image: gcr.io/anyvision-production/master-sync-service:1.1.4.2
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: master-sync-service
