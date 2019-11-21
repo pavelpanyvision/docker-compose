@@ -122,7 +122,7 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-training/webrtc-streamer:1.24.0.0
+    image: gcr.io/anyvision-training/webrtc-streamer:1.24.0.4
     restart: always
     networks:
       prod:
@@ -395,7 +395,7 @@ services:
 
 
   apigateway:
-    image: gcr.io/anyvision-training/api-gateway:1.24.0.6
+    image: gcr.io/anyvision-training/api-gateway:1.24.0.8
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     networks:
@@ -433,7 +433,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-training/api:1.24.0.19
+    image: gcr.io/anyvision-training/api:1.24.0.25
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -470,7 +470,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend:1.24.0.18
+    image: gcr.io/anyvision-training/backend:1.24.0.20
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -539,7 +539,7 @@ services:
 
 
   collate:
-    image: gcr.io/anyvision-training/backend:1.24.0.18
+    image: gcr.io/anyvision-training/backend:1.24.0.20
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -601,7 +601,7 @@ services:
 
 
   edge:
-    image: gcr.io/anyvision-training/backend:1.24.0.18
+    image: gcr.io/anyvision-training/backend:1.24.0.20
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -663,7 +663,7 @@ services:
 
 
   broadcaster:
-    image: gcr.io/anyvision-training/broadcaster:1.24.0.1
+    image: gcr.io/anyvision-training/broadcaster:1.24.0.3
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: broadcaster
@@ -695,7 +695,7 @@ services:
 
 
   dslr-dashboard-bt:
-    image: gcr.io/anyvision-training/dslr-dashboard-bt:1.24.0.0
+    image: gcr.io/anyvision-training/dslr-dashboard-bt:1.24.0.1
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: dslr-dashboard-bt
@@ -721,7 +721,7 @@ services:
 
 
   master-sync-service:
-    image: gcr.io/anyvision-training/master-sync-service:1.1.4.0
+    image: gcr.io/anyvision-training/master-sync-service:1.1.4.2
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: master-sync-service
