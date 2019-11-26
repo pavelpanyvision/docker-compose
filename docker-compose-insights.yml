@@ -62,7 +62,6 @@ services:
 
 
   webrtc-streamer:
-    image: gcr.io/anyvision-training/webrtc-streamer:18.12
     restart: always
     networks:
       prod:
@@ -542,8 +541,8 @@ services:
         max-size: 5m
     depends_on:
       - memsql
-  
-        
+
+
   insights-backend:
     image: gcr.io/anyvision-training/insights-backend:development
     #entrypoint: sleep infinity
