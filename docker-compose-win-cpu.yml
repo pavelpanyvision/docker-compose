@@ -319,7 +319,7 @@ services:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38392
       - api_service_ip=api.tls.ai
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
-      - RUN_AS_USER=user
+      - RUN_AS_USER=node
       #- ENABLE_DOCKERIZE=false
       #- ENABLE_CHOWN=false
     env_file:
@@ -370,7 +370,7 @@ services:
       - "38391:38391"
     volumes:
       - c:/anv/storage:/var/www/html
-      - api_gateway_keys:/home/user/api-gateway/config/keys
+      - api_gateway_keys:/home/node/api-gateway/config/keys
       - c:/anv/usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     depends_on:
       - redis
@@ -382,7 +382,7 @@ services:
       - GATEWAY_SECURE_URL=https://apigateway.tls.ai:9443
       - GATEWAY_URL=http://apigateway.tls.ai:8080
       - REDIS_HOST=redis.tls.ai
-      - RUN_AS_USER=user
+      - RUN_AS_USER=node
       #- ENABLE_CHOWN=false
     env_file:
       - env/api-gateway.env
@@ -414,7 +414,7 @@ services:
       - MONGO_DB_IP=mongodb.tls.ai
       - CA_HOST=apigateway.tls.ai
       - MASS_IMPORT_IP=reid-localnode.tls.ai          ### use this configuration to configure localhost reid service
-      - RUN_AS_USER=user
+      - RUN_AS_USER=node
       #- ENABLE_CHOWN=false
     env_file:
       - env/global.env

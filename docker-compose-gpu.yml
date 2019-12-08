@@ -407,11 +407,11 @@ services:
       - 38391:38391
     volumes:
       - /storage:/var/www/html
-      #- api_gateway_keys:/home/user/api-gateway/config/keys
-      - /ssd/apigateway/keys:/home/user/api-gateway/config/keys
+      #- api_gateway_keys:/home/node/api-gateway/config/keys
+      - /ssd/apigateway/keys:/home/node/api-gateway/config/keys
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
-      #- /home/anyvision/Projects/API-gateway:/home/user/api-gateway         ### mount your local project directory to the container
+      #- /home/anyvision/Projects/API-gateway:/home/node/api-gateway         ### mount your local project directory to the container
     depends_on:
       - redis
     environment:
@@ -422,7 +422,7 @@ services:
       - GATEWAY_SECURE_URL=https://apigateway.tls.ai:9443
       - GATEWAY_URL=http://apigateway.tls.ai:8080
       - REDIS_HOST=redis.tls.ai
-      - RUN_AS_USER=user
+      - RUN_AS_USER=node
       - ENABLE_CHOWN=false
     env_file:
       - env/global.env
@@ -449,7 +449,7 @@ services:
       - /storage:/var/www/html
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
       - /etc/localtime:/etc/localtime:ro
-      #- /home/anyvision/Projects/Dash-API:/home/user/Dash-API               ### mount your local project directory to the container
+      #- /home/anyvision/Projects/Dash-API:/home/node/Dash-API               ### mount your local project directory to the container
     environment:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38389
       - API_IP=api.tls.ai
@@ -618,7 +618,7 @@ services:
     ports:
       - 4005:4005
     volumes:
-      - /ssd/license:/home/user/license:ro
+      - /ssd/license:/home/node/license:ro
       - /ssd/pipe_data:/root/pipe_data
       - /ssd/reid_service_data:/root/reid_service_data
       - /storage:/var/www/html
@@ -683,7 +683,7 @@ services:
       - NODE_DEBUG_OPTION=--inspect=0.0.0.0:38392
       - api_service_ip=api.tls.ai
       - BCAST_SOCKETIO_API_URL=https://api.tls.ai:5443
-      - RUN_AS_USER=user
+      - RUN_AS_USER=node
       - BCAST_RMQ_IS_ENABLED=true
       - ENABLE_CHOWN=false
     env_file:
@@ -741,7 +741,7 @@ services:
       - api
     environment:
       - ENABLE_CHOWN=false
-      - RUN_AS_USER=user
+      - RUN_AS_USER=node
     env_file:
       - env/global.env
       - env/master-sync-service.env
@@ -766,7 +766,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     environment:
       - FIREBASE_ADMIN_TOKEN=AAAA
-      - RUN_AS_USER=user
+      - RUN_AS_USER=node
       - ENABLE_CHOWN=false
       - RMQ_API_USER=root
       - RMQ_API_PASS=rabbitpass
