@@ -145,7 +145,7 @@ services:
       - CAMERA_INT_REQ_TIME=1000
       - CRT_CA_BUNDLE=/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
       - WEBRTC_HOST=localhost
-      - 'WEBRTC_PROTOCOL=http:'
+      - WEBRTC_PROTOCOL=http
       - WEBRTC_PORT=8000
       - WEBRTC_PREFIX=
       - DISABLE_GATEWAY_AUTH=true
