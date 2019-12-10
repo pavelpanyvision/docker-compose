@@ -438,7 +438,7 @@ services:
 
 
   api:
-    image: gcr.io/anyvision-production/api:1.24.0.36
+    image: gcr.io/anyvision-production/api:1.24.0.37
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
@@ -730,7 +730,7 @@ services:
 
 
   master-sync-service:
-    image: gcr.io/anyvision-production/master-sync-service:1.1.4.3
+    image: gcr.io/anyvision-production/master-sync-service:1.1.4.9
     restart: always
     #network_mode: "host"       ## REQUIRED FOR MULTICAST BROADCASTING
     hostname: master-sync-service
