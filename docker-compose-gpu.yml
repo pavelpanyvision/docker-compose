@@ -144,7 +144,7 @@ services:
       - WAN_STUN_URL=stun.l.google.com:19302
       - APIGATEWAY_IP=api.tls.ai
       - APIGATEWAY_PROTOCOL=http
-      - WEBRTC_PROTOCOL='http:'
+      - WEBRTC_PROTOCOL=http
       - WEBRTC_HOST=webrtc.tls.ai
       - APIGATEWAY_PORT=3000
       - WEBRTC_PREFIX=
