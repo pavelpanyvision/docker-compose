@@ -133,8 +133,7 @@ services:
     volumes:
       - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
     environment:
-	      - WEBRTC_STREAMER_OPTIONS=-H0.0.0.0:8000 -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
-      #- HOST_IP=<ip of the host>
+      - WEBRTC_STREAMER_OPTIONS=-H0.0.0.0:8000 -w/webrtc-streamer/html -c/usr/local/share/ca-certificates/tls.ai/tls.ai.full.with.key.pem
       - WAN_MODE=false
       - WAN_STUN_URL=stun.l.google.com:19302
       - APIGATEWAY_IP=api.tls.ai
