@@ -22,7 +22,7 @@ services:
 
 
   prometheus:
-    image: gcr.io/anyvision-training/prometheus:v2.3.2
+    image: gcr.io/anyvision-training/prometheus:v2.10.0
     volumes:
       - ./prometheus/:/etc/prometheus:rw
       - prometheus_data:/prometheus:rw
