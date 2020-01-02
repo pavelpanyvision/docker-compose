@@ -1,0 +1,45 @@
+version: '3.3'
+
+networks:
+  prod:
+
+services:
+
+  prometheus:
+    image: gcr.io/anyvision-training/prometheus:v2.10.0
+    volumes:
+      - ../prometheus/:/etc/prometheus:rw
+      - /ssd/prometheus_data:/prometheus:rw
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=10d'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    restart: always
+    ports:
+      - 9090:9090
+    logging:
+      options:
+        max-size: 1g
+
+  grafana:
+    image: gcr.io/anyvision-training/grafana:5.2.2
+    volumes:
+      - /ssd/grafana_data:/var/lib/grafana:rw
+      - ../grafana/grafana.ini:/etc/grafana/grafana.ini:rw
+      - ../grafana/provisioning:/etc/grafana/provisioning:rw
+      - ./dashboards/1.24.0:/var/lib/grafana/dashboards:rw
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: always
+    ports:
+      - 3001:3001
+    depends_on:
+      - prometheus
+    logging:
+      options:
+        max-size: 1g

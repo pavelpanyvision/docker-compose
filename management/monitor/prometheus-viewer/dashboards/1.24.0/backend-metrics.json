@@ -1,0 +1,1224 @@
+{
+    "annotations": {
+        "list": [{
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+        }]
+    },
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 0,
+    "id": 8,
+    "iteration": 1572514053125,
+    "links": [],
+    "panels": [{
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "prometheus",
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 9,
+                "w": 9,
+                "x": 0,
+                "y": 0
+            },
+            "id": 41,
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [{
+                    "expr": "increase(TrackProcessingStages{counter=\"finished_processing\", name=~\"$COLLATE_NAME\", matches=~\"$MATCHES\"}[1m])",
+                    "format": "time_series",
+                    "interval": "",
+                    "intervalFactor": 1,
+                    "legendFormat": "tracks rate - {{`{{name}}`}}, matches: {{`{{matches}}`}}",
+                    "refId": "A"
+                },
+                {
+                    "expr": "sum(increase(TrackProcessingStages{counter=\"finished_processing\", name=~\"$COLLATE_NAME\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "total tracks",
+                    "refId": "B"
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "handled tracks per minute",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [{
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "prometheus",
+            "description": "Time elapsed from the first frame creation of a track until it sent to the API",
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 9,
+                "w": 8,
+                "x": 9,
+                "y": 0
+            },
+            "id": 31,
+            "legend": {
+                "alignAsTable": true,
+                "avg": false,
+                "current": true,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [{
+                    "expr": "histogram_quantile(0.5, rate(BackendTotalHandlingElapsed_bucket{name=~\"$COLLATE_NAME\"}[1m]))",
+                    "format": "time_series",
+                    "intervalFactor": 1,
+                    "legendFormat": "BackendTotalHandlingElapsed - {{`{{name}}`}} - percentile 50",
+                    "refId": "A"
+                },
+                {
+                    "expr": "histogram_quantile(0.9, rate(BackendTotalHandlingElapsed_bucket{name=~\"$COLLATE_NAME\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "BackendTotalHandlingElapsed - {{`{{name}}`}} - percentile 90",
+                    "refId": "B"
+                },
+                {
+                    "expr": "histogram_quantile(0.99, rate(BackendTotalHandlingElapsed_bucket{name=~\"$COLLATE_NAME\"}[1m]))",
+                    "format": "time_series",
+                    "intervalFactor": 1,
+                    "legendFormat": "BackendTotalHandlingElapsed - {{`{{name}}`}} - percentile 99",
+                    "refId": "C"
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Backend Total Handling Elapsed Time",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [{
+                    "format": "s",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "prometheus",
+            "description": "Number of failed memsql insert queries when trying to insert track to TA",
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 9,
+                "w": 7,
+                "x": 17,
+                "y": 0
+            },
+            "id": 46,
+            "legend": {
+                "alignAsTable": true,
+                "avg": false,
+                "current": true,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [{
+                "expr": "Failures{job=\"collate\", name=~\"$COLLATE_NAME\"}",
+                "format": "time_series",
+                "intervalFactor": 1,
+                "legendFormat": "{{`{{type}}`}}  - {{`{{name}}`}}",
+                "refId": "A"
+            }],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Failures",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [{
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "prometheus",
+            "fill": 0,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 11,
+                "w": 10,
+                "x": 0,
+                "y": 9
+            },
+            "id": 47,
+            "legend": {
+                "alignAsTable": true,
+                "avg": false,
+                "current": true,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 2,
+            "links": [],
+            "nullPointMode": "null as zero",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [{
+                    "expr": "histogram_quantile(0.5, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\", operation=~\"send_to_api\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "API report - {{`{{name}}`}} - percentile 50",
+                    "refId": "A"
+                },
+                {
+                    "expr": "histogram_quantile(0.90, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\", operation=~\"send_to_api\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "API report -{{`{{name}}`}}- percentile 90",
+                    "refId": "G"
+                },
+                {
+                    "expr": "histogram_quantile(0.99, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\", operation=~\"send_to_api\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "API report - {{`{{name}}`}} - percentile 99",
+                    "refId": "H"
+                },
+                {
+                    "expr": "histogram_quantile(0.5, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\", operation=~\"association\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "AssociationTime - {{`{{name}}`}} - percentile 50",
+                    "refId": "B"
+                },
+                {
+                    "expr": "histogram_quantile(0.9, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\", operation=~\"association\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "AssociationTime - {{`{{name}}`}} - percentile 90",
+                    "refId": "I"
+                },
+                {
+                    "expr": "histogram_quantile(0.99, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\", operation=~\"association\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "AssociationTime - {{`{{name}}`}} - percentile 99",
+                    "refId": "K"
+                },
+                {
+                    "expr": "histogram_quantile(0.5, rate(ArchiveTime_bucket{name=~\"$COLLATE_NAME\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "ArchiveTime - {{`{{name}}`}} - percentile 50",
+                    "refId": "C"
+                },
+                {
+                    "expr": "histogram_quantile(0.90, rate(ArchiveTime_bucket{name=~\"$COLLATE_NAME\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "ArchiveTime - {{`{{name}}`}} - percentile 90",
+                    "refId": "L"
+                },
+                {
+                    "expr": "histogram_quantile(0.99, rate(ArchiveTime_bucket{name=~\"$COLLATE_NAME\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "ArchiveTime - {{`{{name}}`}} - percentile 99",
+                    "refId": "M"
+                },
+                {
+                    "expr": "histogram_quantile(0.5, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\", operation=~\"reid\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "ReidTime - {{`{{name}}`}} - percentile 50",
+                    "refId": "D"
+                },
+                {
+                    "expr": "histogram_quantile(0.9, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\", operation=~\"reid\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "ReidTime - {{`{{name}}`}} - percentile 90",
+                    "refId": "Q"
+                },
+                {
+                    "expr": "histogram_quantile(0.99, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\", operation=~\"reid\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "ReidTime - {{`{{name}}`}} - percentile 99",
+                    "refId": "R"
+                },
+                {
+                    "expr": "histogram_quantile(0.5, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\", operation=\"queue\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "queue - {{`{{name}}`}} - percentile 50",
+                    "refId": "E"
+                },
+                {
+                    "expr": "histogram_quantile(0.9, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\", operation=\"queue\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "queue - {{`{{name}}`}} - percentile 90",
+                    "refId": "J"
+                },
+                {
+                    "expr": "histogram_quantile(0.99, rate(TrackProcessingTime_bucket{name=\"$COLLATE_NAME\", operation=\"queue\"}[1m]))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "queue - {{`{{name}}`}} - percentile 99",
+                    "refId": "N"
+                },
+                {
+                    "expr": "sum(histogram_quantile(0.5, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\"}[1m])))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "total - {{`{{name}}`}} - percentile 50",
+                    "refId": "F"
+                },
+                {
+                    "expr": "sum(histogram_quantile(0.9, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\"}[1m])))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "total - {{`{{name}}`}} - percentile 90",
+                    "refId": "O"
+                },
+                {
+                    "expr": "sum(histogram_quantile(0.99, rate(TrackProcessingTime_bucket{name=~\"$COLLATE_NAME\"}[1m])))",
+                    "format": "time_series",
+                    "hide": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "total - {{`{{name}}`}} - percentile 99",
+                    "refId": "P"
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Collate Timings",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [{
+                    "format": "s",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "s",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "prometheus",
+            "description": "Queue size of pending tracks at the Collate service",
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 8,
+                "w": 14,
+                "x": 10,
+                "y": 9
+            },
+            "id": 27,
+            "legend": {
+                "alignAsTable": true,
+                "avg": false,
+                "current": true,
+                "max": true,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [{
+                    "expr": "CollateQsize{name=~\"$COLLATE_NAME\"}",
+                    "format": "time_series",
+                    "intervalFactor": 1,
+                    "legendFormat": "CollateQsize - {{`{{name}}`}}",
+                    "refId": "A"
+                },
+                {
+                    "expr": "histogram_quantile(0.5, rate(CollatePending_bucket{name=~\"$COLLATE_NAME\"}[1m]))",
+                    "format": "time_series",
+                    "intervalFactor": 1,
+                    "legendFormat": "collate -  {{`{{name}}`}}- pending 50",
+                    "refId": "B"
+                },
+                {
+                    "expr": "histogram_quantile(0.90, rate(CollatePending_bucket{name=~\"$COLLATE_NAME\"}[1m]))",
+                    "format": "time_series",
+                    "intervalFactor": 1,
+                    "legendFormat": "collate - {{`{{name}}`}} - pending 90",
+                    "refId": "C"
+                },
+                {
+                    "expr": "histogram_quantile(0.99, rate(CollatePending_bucket{name=~\"$COLLATE_NAME\"}[1m]))",
+                    "format": "time_series",
+                    "intervalFactor": 1,
+                    "legendFormat": "collate - {{`{{name}}`}} - pending 99",
+                    "refId": "D"
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Collate Queue Size",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [{
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "prometheus",
+            "description": "Queue size of pending tracks at the Track-Archive service",
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 10,
+                "y": 17
+            },
+            "id": 21,
+            "legend": {
+                "alignAsTable": true,
+                "avg": false,
+                "current": true,
+                "max": true,
+                "min": false,
+                "rightSide": false,
+                "show": true,
+                "total": true,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [{
+                "expr": "TrackArchiveQSize{name=~\"$COLLATE_NAME\"}",
+                "format": "time_series",
+                "intervalFactor": 1,
+                "legendFormat": "TrackArchiveQSize - {{`{{name}}`}}",
+                "refId": "A"
+            }],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Track Archive Queue Size",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [{
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "prometheus",
+            "description": "Size of batch of tracks sent to Track-Archive service",
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 17,
+                "y": 17
+            },
+            "id": 17,
+            "legend": {
+                "alignAsTable": true,
+                "avg": false,
+                "current": true,
+                "max": true,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [{
+                "expr": "TrackArchiveBatchSize{name=~\"$COLLATE_NAME\"}",
+                "format": "time_series",
+                "intervalFactor": 1,
+                "legendFormat": "TrackArchiveBatchSize - {{`{{name}}`}}",
+                "refId": "A"
+            }],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Track Archive Batch Size",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [{
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "prometheus",
+            "description": "Number of tracks:\n* received from zmq\n* pulled from collate_queue\n* finished processed\nat the Collate service",
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 17,
+                "w": 10,
+                "x": 0,
+                "y": 20
+            },
+            "id": 7,
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 2,
+            "links": [],
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [{
+                    "expr": "idelta(TrackProcessingStages{counter=\"received_from_zmq\",name=~\"$COLLATE_NAME\"}[1m])",
+                    "format": "time_series",
+                    "interval": "5s",
+                    "intervalFactor": 1,
+                    "legendFormat": "TrackProcessingStages (received_from_zmq) - {{`{{name}}`}}",
+                    "refId": "A"
+                },
+                {
+                    "expr": "idelta(TrackProcessingStages{counter=\"pulled_from_collate_queue\",name=~\"$COLLATE_NAME\"}[1m])",
+                    "format": "time_series",
+                    "instant": false,
+                    "intervalFactor": 1,
+                    "legendFormat": "TrackProcessingStages (pulled_from_collate_queue) - {{`{{name}}`}}",
+                    "refId": "C"
+                },
+                {
+                    "expr": "idelta(TrackProcessingStages{counter=\"finished_processing\",name=~\"$COLLATE_NAME\"}[1m])",
+                    "format": "time_series",
+                    "intervalFactor": 1,
+                    "legendFormat": "TrackProcessingStages (finished_processing) - {{`{{name}}`}}",
+                    "refId": "B"
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Track Processing Stages",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [{
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "prometheus",
+            "description": "AssociationManagers size of camera group at the Collate service",
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 5,
+                "w": 14,
+                "x": 10,
+                "y": 25
+            },
+            "id": 29,
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "repeat": "camera",
+            "repeatDirection": "h",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [{
+                "expr": "sum(AssociationManagersSize{name=~\"$COLLATE_NAME\"})",
+                "format": "time_series",
+                "hide": false,
+                "instant": false,
+                "intervalFactor": 1,
+                "legendFormat": "AssociationManagersSize - {{`{{name}}`}}",
+                "refId": "A"
+            }],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Association Managers Size",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [{
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "prometheus",
+            "decimals": 2,
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 7,
+                "w": 14,
+                "x": 10,
+                "y": 30
+            },
+            "id": 43,
+            "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "null",
+            "options": {
+                "dataLinks": []
+            },
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [{
+                "expr": "increase(TrackProcessingStages{counter=\"finished_processing\"}[1m])/60",
+                "format": "time_series",
+                "intervalFactor": 1,
+                "refId": "A"
+            }],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "handled tracks/sec",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [{
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "label": null,
+                    "logBase": 1,
+                    "max": null,
+                    "min": null,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+        }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 19,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+        "list": [{
+                "allValue": null,
+                "current": {
+                    "text": "collate-0",
+                    "value": [
+                        "collate-0"
+                    ]
+                },
+                "datasource": "prometheus",
+                "definition": "label_values(name)",
+                "hide": 0,
+                "includeAll": true,
+                "label": null,
+                "multi": true,
+                "name": "COLLATE_NAME",
+                "options": [],
+                "query": "label_values(name)",
+                "refresh": 1,
+                "regex": "/^collate.*/",
+                "skipUrlSync": false,
+                "sort": 0,
+                "tagValuesQuery": "",
+                "tags": [],
+                "tagsQuery": "",
+                "type": "query",
+                "useTags": false
+            },
+            {
+                "allValue": null,
+                "current": {
+                    "text": "All",
+                    "value": "$__all"
+                },
+                "datasource": "prometheus",
+                "definition": "label_values(camera_group)",
+                "hide": 0,
+                "includeAll": true,
+                "label": null,
+                "multi": true,
+                "name": "CAMERA_GROUP",
+                "options": [],
+                "query": "label_values(camera_group)",
+                "refresh": 1,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 0,
+                "tagValuesQuery": "",
+                "tags": [],
+                "tagsQuery": "",
+                "type": "query",
+                "useTags": false
+            },
+            {
+                "allValue": null,
+                "current": {
+                    "text": "All",
+                    "value": [
+                        "$__all"
+                    ]
+                },
+                "datasource": "prometheus",
+                "definition": "label_values(matches)",
+                "hide": 0,
+                "includeAll": true,
+                "label": null,
+                "multi": true,
+                "name": "MATCHES",
+                "options": [],
+                "query": "label_values(matches)",
+                "refresh": 2,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 0,
+                "tagValuesQuery": "",
+                "tags": [],
+                "tagsQuery": "",
+                "type": "query",
+                "useTags": false
+            }
+        ]
+    },
+    "time": {
+        "from": "now-5m",
+        "to": "now"
+    },
+    "timepicker": {
+        "refresh_intervals": [
+            "5s",
+            "10s",
+            "30s",
+            "1m",
+            "5m",
+            "15m",
+            "30m",
+            "1h",
+            "2h",
+            "1d"
+        ],
+        "time_options": [
+            "5m",
+            "15m",
+            "1h",
+            "6h",
+            "12h",
+            "24h",
+            "2d",
+            "7d",
+            "30d"
+        ]
+    },
+    "timezone": "",
+    "title": "Backend Metrics",
+    "uid": "CCE3UfcWz123",
+    "version": 1
+}
