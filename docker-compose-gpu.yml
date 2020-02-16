@@ -477,7 +477,7 @@ services:
 
 
   backend:
-    image: gcr.io/anyvision-training/backend-pyconcrete:development
+    image:  gcr.io/anyvision-production/backend-pyconcrete:on-demand-bank-hapoalim-spoof-fix
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -547,68 +547,8 @@ services:
     entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
 
 
-  collate:
-    image: gcr.io/anyvision-training/backend-pyconcrete:development
-    restart: always
-    #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
-    privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
-    depends_on:
-      - memsql
-    networks:
-      prod:
-        aliases:
-          - coll.tls.ai
-          - coll-localnode.tls.ai
-    extra_hosts:
-    #The IP here should point to nginx of the master API
-      - "nginx-master.tls.ai:1.1.1.1"
-    ports:
-      - "9067:9067"
-    volumes:
-      - /ssd/license:/home/user/license:ro
-      - /tmp/pipe_data:/root/pipe_data
-      - /ssd/reid_service_data:/root/reid_service_data
-      - /storage:/var/www/html
-      - /usr/local/share/ca-certificates:/usr/local/share/ca-certificates
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      - ENABLE_OPENSSH_SERVICE=true
-      - BACKEND_OPENSSH_PORT=9022
-      - DISPLAY=${DISPLAY:-:1}
-      - storage_ip=nginx-localnode.tls.ai
-      - frame_store_storage_ip=nginx-localnode.tls.ai
-      - redis_host=127.0.0.1
-      - api_service_ip=api.tls.ai
-      - mongodb_host=mongodb.tls.ai
-      - reid_service_ip=reid-localnode.tls.ai
-      - collate_service_ip=coll.tls.ai
-      - track_archive_service_ip=arch.tls.ai
-      - frame_store_rtmp_url=rtstreamer.tls.ai
-      - frame_store_rtmp_port=80
-      - misc_gpu_encoding=true
-      - memsql_host=memsql.tls.ai
-      - memsql_port=3306
-      - DB_HOST=memsql.tls.ai
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=password
-      - DB_NAME=reid_db
-      - prometheus_gateway_ip=monitor_pushgateway_1
-      - ENABLE_MONITORING=false
-    env_file:
-      - env/global.env
-      - env/collate.env
-    logging:
-      options:
-        max-size: 1g
-    ipc: host
-    working_dir: /root/backend_trunk
-    #entrypoint: sleep 1d
-    entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
-
   edge:
-    image: gcr.io/anyvision-training/backend-pyconcrete:development
+    image: gcr.io/anyvision-production/backend-pyconcrete:on-demand-bank-hapoalim-spoof-fix
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
