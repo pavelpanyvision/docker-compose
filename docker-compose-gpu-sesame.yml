@@ -123,8 +123,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
     environment:
       - TO_DATE_TRACK_DELETE=30
-      - API_IP=api.tls.ai 
-      - CONSUL_AGENT=consul-agent.tls.ai  
+      - API_IP=api.tls.ai
+      - CONSUL_AGENT=consul-agent.tls.ai
     env_file:
       - env/global.env
     logging:
@@ -141,38 +141,39 @@ services:
       - "1080:1080"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./socks/sockd.conf:/etc/sockd.conf         
+      - ./socks/sockd.conf:/etc/sockd.conf
     logging:
       options:
         max-size: 1g
 
-  liveness-api:
+  sesame-service:
     image: gcr.io/anyvision-training/sesame-service:codefresh
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity
     networks:
       prod:
         aliases:
-          - liveness-api.tls.ai
+          - sesame-service.tls.ai
     ports:
       - "3003:3003"
     volumes:
+      - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
       - /storage/logs/liveness-api-service:/var/logs/liveness-api-service
     environment:
       - LOG_DIR_PATH=/var/logs/liveness-api-service
       - RUN_AS_USER=node
       - ENABLE_CHOWN=false
-      - SERVICE_NAME=liveness-api-service
+      - SERVICE_NAME=sesame-api-service
     env_file:
       - env/global.env
-      - env/api.env
+      - env/sesame-api.env
     logging:
       options:
         max-size: 1g
 
   edge:
-    image: gcr.io/anyvision-training/backend-pyconcrete:development
+    image: gcr.io/anyvision-training/backend:on-demand-SSM-663
     restart: always
     #command: --disable-services --no-exitkills --debug sleep infinity       ### development mode  - disable chaperone init
     privileged: true    ## FOR ACCESSING DEVICES - NOT HOT-PLUGGABLE
@@ -186,7 +187,7 @@ services:
     #The IP here should point to nginx of the master API
       - "nginx-master.tls.ai:1.1.1.1"
     ports:
-      - "4005:4005"                                           
+      - "4005:4005"
     volumes:
       - /ssd/license:/home/user/license:ro
       - /ssd/pipe_data:/root/pipe_data
@@ -231,7 +232,7 @@ services:
     #entrypoint: sleep 1d
     entrypoint: ["/bin/containerpilot","-config","/etc/containerpilot.json5"]
 
-  
+
   docker-hoster:
     image: gcr.io/anyvision-production/docker-hoster
     restart: always
