@@ -159,12 +159,12 @@ services:
     volumes:
       - /storage:/var/www/html
       - /etc/localtime:/etc/localtime:ro
-      - /storage/logs/liveness-api-service:/var/logs/liveness-api-service
+      - /storage/logs/liveness-api-service:/var/logs/sesame-service
     environment:
-      - LOG_DIR_PATH=/var/logs/liveness-api-service
+      - LOG_DIR_PATH=/var/logs/sesame-service
       - RUN_AS_USER=node
       - ENABLE_CHOWN=false
-      - SERVICE_NAME=sesame-api-service
+      - SERVICE_NAME=sesame-service
     env_file:
       - env/global.env
       - env/sesame-api.env
